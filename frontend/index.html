@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CitySync — Resource Sharing & Notifications</title>
+  <meta name="description" content="CitySync Member 5 — Inter-departmental resource sharing, request management, and real-time notifications." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="src/styles.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- ── LOGIN SCREEN ── -->
+    <div id="login-screen" class="auth-screen">
+      <div class="auth-card">
+        <div class="brand">
+          <div class="brand-icon">🏙️</div>
+          <h1 class="brand-name">CitySync</h1>
+          <p class="brand-sub">Resource Sharing & Notifications</p>
+        </div>
+        <form id="login-form" class="auth-form">
+          <div class="form-group">
+            <label for="login-email">Email</label>
+            <input id="login-email" type="email" placeholder="you@citymail.gov" required />
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input id="login-password" type="password" placeholder="••••••••" required />
+          </div>
+          <div id="login-error" class="form-error hidden"></div>
+          <button id="login-btn" type="submit" class="btn btn-primary btn-full">
+            <span class="btn-text">Sign In</span>
+            <span class="btn-loader hidden">⏳</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ── MAIN DASHBOARD ── -->
+    <div id="dashboard" class="dashboard hidden">
+
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-icon-sm">🏙️</div>
+          <span class="brand-label">CitySync</span>
+        </div>
+        <nav class="sidebar-nav">
+          <button class="nav-item active" data-page="overview" id="nav-overview">
+            <span class="nav-icon">📊</span><span class="nav-label">Overview</span>
+          </button>
+          <button class="nav-item" data-page="resources" id="nav-resources">
+            <span class="nav-icon">📦</span><span class="nav-label">Resources</span>
+          </button>
+          <button class="nav-item" data-page="requests" id="nav-requests">
+            <span class="nav-icon">📋</span><span class="nav-label">Requests</span>
+          </button>
+          <button class="nav-item" data-page="notifications" id="nav-notifications">
+            <span class="nav-icon">🔔</span><span class="nav-label">Notifications</span>
+            <span class="badge" id="notif-badge" style="display:none">0</span>
+          </button>
+          <button class="nav-item" data-page="audit" id="nav-audit">
+            <span class="nav-icon">📜</span><span class="nav-label">Audit Logs</span>
+          </button>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="user-chip" id="user-chip">
+            <div class="avatar" id="user-avatar">U</div>
+            <div class="user-info">
+              <span class="user-name" id="user-name-display">User</span>
+              <span class="user-role" id="user-role-display">officer</span>
+            </div>
+          </div>
+          <button id="logout-btn" class="btn btn-ghost btn-sm">Logout</button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content" id="main-content">
+
+        <!-- HEADER -->
+        <header class="top-bar">
+          <div class="page-title-wrap">
+            <h2 class="page-title" id="page-title">Overview</h2>
+          </div>
+          <div class="top-bar-actions">
+            <button class="icon-btn" id="refresh-btn" title="Refresh">↻</button>
+            <div class="notif-bell" id="notif-bell">
+              🔔
+              <span class="bell-dot hidden" id="bell-dot"></span>
+            </div>
+          </div>
+        </header>
+
+        <!-- ── PAGE: OVERVIEW ── -->
+        <section id="page-overview" class="page active">
+          <div class="stats-grid" id="stats-grid">
+            <div class="stat-card" id="stat-resources">
+              <div class="stat-icon">📦</div>
+              <div class="stat-info">
+                <span class="stat-num" id="stat-res-count">—</span>
+                <span class="stat-label">Total Resources</span>
+              </div>
+            </div>
+            <div class="stat-card" id="stat-available">
+              <div class="stat-icon">✅</div>
+              <div class="stat-info">
+                <span class="stat-num" id="stat-avail-count">—</span>
+                <span class="stat-label">Available</span>
+              </div>
+            </div>
+            <div class="stat-card" id="stat-pending-req">
+              <div class="stat-icon">⏳</div>
+              <div class="stat-info">
+                <span class="stat-num" id="stat-pending-count">—</span>
+                <span class="stat-label">Pending Requests</span>
+              </div>
+            </div>
+            <div class="stat-card" id="stat-notifs">
+              <div class="stat-icon">🔔</div>
+              <div class="stat-info">
+                <span class="stat-num" id="stat-notif-count">—</span>
+                <span class="stat-label">Unread Alerts</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-header">
+            <h3>Recent Requests</h3>
+          </div>
+          <div id="recent-requests-list" class="card-list">
+            <div class="empty-state">Loading...</div>
+          </div>
+        </section>
+
+        <!-- ── PAGE: RESOURCES ── -->
+        <section id="page-resources" class="page hidden">
+          <div class="page-actions">
+            <div class="search-wrap">
+              <input id="resource-search" type="text" placeholder="Search resources…" class="search-input" />
+            </div>
+            <div class="filter-wrap">
+              <select id="resource-cat-filter" class="select-input">
+                <option value="">All Categories</option>
+                <option value="equipment">Equipment</option>
+                <option value="vehicle">Vehicle</option>
+                <option value="facility">Facility</option>
+                <option value="personnel">Personnel</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <button id="add-resource-btn" class="btn btn-primary admin-only hidden">+ Add Resource</button>
+          </div>
+          <div id="resources-list" class="resources-grid">
+            <div class="empty-state">Loading resources…</div>
+          </div>
+        </section>
+
+        <!-- ── PAGE: REQUESTS ── -->
+        <section id="page-requests" class="page hidden">
+          <div class="page-actions">
+            <select id="req-status-filter" class="select-input">
+              <option value="">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="returned">Returned</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <button id="new-request-btn" class="btn btn-primary">+ New Request</button>
+          </div>
+          <div id="requests-list" class="card-list">
+            <div class="empty-state">Loading requests…</div>
+          </div>
+        </section>
+
+        <!-- ── PAGE: NOTIFICATIONS ── -->
+        <section id="page-notifications" class="page hidden">
+          <div class="page-actions">
+            <label class="toggle-label">
+              <input type="checkbox" id="unread-toggle" /> Show unread only
+            </label>
+            <button id="mark-all-read-btn" class="btn btn-ghost btn-sm">Mark all as read</button>
+          </div>
+          <div id="notifications-list" class="card-list">
+            <div class="empty-state">Loading notifications…</div>
+          </div>
+        </section>
+
+        <!-- ── PAGE: AUDIT ── -->
+        <section id="page-audit" class="page hidden admin-only hidden">
+          <div class="page-actions">
+            <select id="audit-action-filter" class="select-input">
+              <option value="">All Actions</option>
+              <option value="RESOURCE_CREATED">RESOURCE_CREATED</option>
+              <option value="RESOURCE_UPDATED">RESOURCE_UPDATED</option>
+              <option value="REQUEST_SUBMITTED">REQUEST_SUBMITTED</option>
+              <option value="REQUEST_APPROVED">REQUEST_APPROVED</option>
+              <option value="REQUEST_REJECTED">REQUEST_REJECTED</option>
+              <option value="RESOURCE_RETURNED">RESOURCE_RETURNED</option>
+              <option value="REQUEST_CANCELLED">REQUEST_CANCELLED</option>
+            </select>
+            <button id="audit-load-btn" class="btn btn-ghost btn-sm">Load Logs</button>
+          </div>
+          <div id="audit-list" class="card-list">
+            <div class="empty-state">Click "Load Logs" to fetch audit records.</div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- ── MODALS ── -->
+
+    <!-- Add Resource Modal -->
+    <div id="modal-add-resource" class="modal-overlay hidden">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Add New Resource</h3>
+          <button class="modal-close" data-modal="modal-add-resource">✕</button>
+        </div>
+        <form id="form-add-resource" class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Resource Name *</label>
+              <input id="res-name" type="text" placeholder="e.g. Excavator" required />
+            </div>
+            <div class="form-group">
+              <label>Category *</label>
+              <select id="res-category" required>
+                <option value="">Select…</option>
+                <option value="equipment">Equipment</option>
+                <option value="vehicle">Vehicle</option>
+                <option value="facility">Facility</option>
+                <option value="personnel">Personnel</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Total Quantity *</label>
+              <input id="res-qty" type="number" min="1" placeholder="e.g. 5" required />
+            </div>
+            <div class="form-group">
+              <label>Unit</label>
+              <input id="res-unit" type="text" placeholder="e.g. machines, units" value="units" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Department ID *</label>
+              <input id="res-dept" type="text" placeholder="MongoDB ObjectId" required />
+            </div>
+            <div class="form-group">
+              <label>Location</label>
+              <input id="res-location" type="text" placeholder="e.g. Depot A" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="res-desc" rows="2" placeholder="Brief description…"></textarea>
+          </div>
+          <div id="add-res-error" class="form-error hidden"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" data-modal="modal-add-resource">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Resource</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- New Request Modal -->
+    <div id="modal-new-request" class="modal-overlay hidden">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Submit Resource Request</h3>
+          <button class="modal-close" data-modal="modal-new-request">✕</button>
+        </div>
+        <form id="form-new-request" class="modal-body">
+          <div class="form-group">
+            <label>Resource ID *</label>
+            <input id="req-resource-id" type="text" placeholder="MongoDB ObjectId of resource" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Quantity Needed *</label>
+              <input id="req-qty" type="number" min="1" placeholder="e.g. 2" required />
+            </div>
+            <div class="form-group">
+              <label>Priority</label>
+              <select id="req-priority">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Start Date *</label>
+              <input id="req-start" type="date" required />
+            </div>
+            <div class="form-group">
+              <label>End Date *</label>
+              <input id="req-end" type="date" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Purpose *</label>
+            <textarea id="req-purpose" rows="2" placeholder="Why do you need this resource?" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea id="req-notes" rows="2" placeholder="Any additional notes…"></textarea>
+          </div>
+          <div id="new-req-error" class="form-error hidden"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" data-modal="modal-new-request">Cancel</button>
+            <button type="submit" class="btn btn-primary">Submit Request</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Reject Request Modal -->
+    <div id="modal-reject" class="modal-overlay hidden">
+      <div class="modal modal-sm">
+        <div class="modal-header">
+          <h3>Reject Request</h3>
+          <button class="modal-close" data-modal="modal-reject">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Reason for Rejection</label>
+            <textarea id="reject-reason" rows="3" placeholder="Provide a reason…"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" data-modal="modal-reject">Cancel</button>
+            <button id="confirm-reject-btn" class="btn btn-danger">Reject</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+  </div>
+
+  <script src="src/api/api.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
