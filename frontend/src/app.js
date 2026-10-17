@@ -74,12 +74,16 @@ function logout() {
   localStorage.removeItem("cs_token");
   localStorage.removeItem("cs_user");
   currentUser = null;
+
+  // Hide dashboard and reset admin-only controls
   hide($("dashboard"));
+  document.querySelectorAll(".admin-only").forEach(el => hide(el));
+  hide($("nav-audit"));
+
   show($("login-screen"));
   $("login-email").value = "";
   $("login-password").value = "";
 }
-
 // ── Boot ──────────────────────────────────────────────────────────────────────
 function bootDashboard() {
   hide($("login-screen"));

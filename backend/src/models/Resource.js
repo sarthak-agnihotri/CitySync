@@ -65,7 +65,7 @@ const resourceSchema = new mongoose.Schema(
 );
 
 // Auto-update status based on available quantity
-resourceSchema.pre("save", function (next) {
+resourceSchema.pre("save", function () {
   if (this.availableQuantity <= 0) {
     this.status = "unavailable";
   } else if (this.availableQuantity < this.quantity) {
@@ -73,7 +73,6 @@ resourceSchema.pre("save", function (next) {
   } else {
     this.status = "available";
   }
-  next();
 });
 
 module.exports = mongoose.model("Resource", resourceSchema);
