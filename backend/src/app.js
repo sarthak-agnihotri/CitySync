@@ -13,6 +13,7 @@ const resourceRoutes = require("./routes/resourceRoutes");
 const requestRoutes = require("./routes/requestRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const auditRoutes = require("./routes/auditRoutes");
+
 app.use(cors());
 app.use(express.json());
 
