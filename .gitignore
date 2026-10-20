@@ -5,6 +5,8 @@ backend/.env
 makeAdmin.js
 backend/makeAdmin.js
 frontend/node_modules/
+frontend/.vite/
+.vite/
 ml-service/.venv/
 __pycache__/
 discription.md
