@@ -6,7 +6,7 @@ const User = require("../models/User");
 // ─── CREATE RESOURCE ─────────────────────────────────────────────────────────
 const createResource = async (req, res) => {
   try {
-    const {
+    let {
       name,
       category,
       description,
@@ -16,6 +16,20 @@ const createResource = async (req, res) => {
       location,
       tags
     } = req.body;
+
+    if (req.user.role === "department_head") {
+      if (!ownerDepartment && req.user.department) {
+        ownerDepartment = req.user.department;
+      } else if (
+        ownerDepartment &&
+        req.user.department &&
+        ownerDepartment.toString() !== req.user.department.toString()
+      ) {
+        return res.status(403).json({
+          message: "Department heads can only create resources for their own department"
+        });
+      }
+    }
 
     if (!name || !category || quantity === undefined || !ownerDepartment) {
       return res.status(400).json({
@@ -59,12 +73,18 @@ const createResource = async (req, res) => {
 // ─── GET ALL RESOURCES ────────────────────────────────────────────────────────
 const getAllResources = async (req, res) => {
   try {
-    const { department, category, status } = req.query;
+    const { department, category, status, search } = req.query;
     const filter = { isActive: true };
 
     if (department) filter.ownerDepartment = department;
     if (category) filter.category = category;
     if (status) filter.status = status;
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } }
+      ];
+    }
 
     const resources = await Resource.find(filter)
       .populate("ownerDepartment", "name code")
@@ -102,6 +122,15 @@ const updateResource = async (req, res) => {
     const resource = await Resource.findById(req.params.id);
     if (!resource || !resource.isActive) {
       return res.status(404).json({ message: "Resource not found" });
+    }
+
+    if (
+      req.user.role === "department_head" &&
+      resource.ownerDepartment.toString() !== req.user.department?.toString()
+    ) {
+      return res.status(403).json({
+        message: "You can only update resources belonging to your department"
+      });
     }
 
     const allowedFields = [

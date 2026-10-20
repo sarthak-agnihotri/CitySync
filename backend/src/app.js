@@ -14,6 +14,10 @@ const requestRoutes = require("./routes/requestRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const auditRoutes = require("./routes/auditRoutes");
 
+// Member 3 — Project Management & Scheduling
+const projectRoutes = require("./routes/projectRoutes");
+const conflictRoutes = require("./routes/conflictRoutes");
+
 app.use(cors());
 app.use(express.json());
 
@@ -38,5 +42,9 @@ app.use("/api/resources", resourceRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/audit", auditRoutes);
+
+// Member 3 — Project Registry & Conflict Engine
+app.use("/api/projects", projectRoutes);
+app.use("/api/conflicts", conflictRoutes);
 
 module.exports = app;

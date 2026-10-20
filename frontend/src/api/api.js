@@ -61,6 +61,31 @@ const Notifications = {
   delete: (id) => apiFetch(`/notifications/${id}`, { method: "DELETE" })
 };
 
+// ─── DEPARTMENTS ──────────────────────────────────────────────────────────────
+const Departments = {
+  list: () => apiFetch("/departments"),
+  get: (id) => apiFetch(`/departments/${id}`)
+};
+
+// ─── PROJECTS ─────────────────────────────────────────────────────────────────
+const Projects = {
+  list: (params = {}) => apiFetch("/projects?" + new URLSearchParams(params)),
+  get: (id) => apiFetch(`/projects/${id}`),
+  create: (data) => apiFetch("/projects", { method: "POST", body: JSON.stringify(data) }),
+  update: (id, data) => apiFetch(`/projects/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  delete: (id) => apiFetch(`/projects/${id}`, { method: "DELETE" }),
+  timeline: (params = {}) => apiFetch("/projects/schedule/timeline?" + new URLSearchParams(params)),
+  calendar: (params = {}) => apiFetch("/projects/schedule/calendar?" + new URLSearchParams(params))
+};
+
+// ─── CONFLICTS ────────────────────────────────────────────────────────────────
+const Conflicts = {
+  list: (params = {}) => apiFetch("/conflicts?" + new URLSearchParams(params)),
+  get: (id) => apiFetch(`/conflicts/${id}`),
+  checkDraft: (data) => apiFetch("/conflicts/check", { method: "POST", body: JSON.stringify(data) }),
+  resolve: (id, data) => apiFetch(`/conflicts/${id}/resolve`, { method: "PUT", body: JSON.stringify(data) })
+};
+
 // ─── AUDIT ────────────────────────────────────────────────────────────────────
 const Audit = {
   list: (params = {}) => apiFetch("/audit?" + new URLSearchParams(params))
