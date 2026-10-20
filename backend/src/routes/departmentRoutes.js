@@ -5,6 +5,7 @@ const router = express.Router();
 const {
   createDepartment,
   getDepartments,
+  getDepartmentById,
   updateDepartment,
   deactivateDepartment
 } = require("../controllers/departmentController");
@@ -17,6 +18,7 @@ router.use(authMiddleware);
 
 // Any authenticated user can view active departments
 router.get("/", getDepartments);
+router.get("/:id", getDepartmentById);
 
 // Only city admins can make changes
 router.post(
