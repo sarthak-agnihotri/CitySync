@@ -141,8 +141,19 @@ const getAllRequests = async (req, res) => {
     if (req.user.role === "officer") {
       filter.requestedBy = req.user.userId;
     } else if (req.user.role === "department_head") {
-      // Department heads see requests for resources owned by their department
-      filter.requestingDepartment = req.user.department;
+      // Department heads see requests made by their department AND incoming requests for their department's resources
+      if (!req.user.department) {
+        filter.requestedBy = req.user.userId;
+      } else {
+        const ownedResourceIds = await Resource.find({
+          ownerDepartment: req.user.department
+        }).distinct("_id");
+
+        filter.$or = [
+          { requestingDepartment: req.user.department },
+          { resource: { $in: ownedResourceIds } }
+        ];
+      }
     }
 
     if (status) filter.status = status;
@@ -213,6 +224,15 @@ const approveRequest = async (req, res) => {
 
     const resource = request.resource;
 
+    if (
+      req.user.role === "department_head" &&
+      resource.ownerDepartment.toString() !== req.user.department?.toString()
+    ) {
+      return res.status(403).json({
+        message: "You can only approve requests for resources owned by your department"
+      });
+    }
+
     if (resource.availableQuantity < request.quantityRequested) {
       return res.status(400).json({
         message: `Insufficient quantity. Only ${resource.availableQuantity} available`
@@ -266,7 +286,7 @@ const rejectRequest = async (req, res) => {
     const { rejectionReason } = req.body;
     const request = await ResourceRequest.findById(req.params.id).populate(
       "resource",
-      "name unit"
+      "name unit ownerDepartment"
     );
 
     if (!request) {
@@ -276,6 +296,15 @@ const rejectRequest = async (req, res) => {
     if (request.status !== "pending") {
       return res.status(400).json({
         message: `Request is already ${request.status}`
+      });
+    }
+
+    if (
+      req.user.role === "department_head" &&
+      request.resource?.ownerDepartment?.toString() !== req.user.department?.toString()
+    ) {
+      return res.status(403).json({
+        message: "You can only reject requests for resources owned by your department"
       });
     }
 
@@ -333,6 +362,15 @@ const returnResource = async (req, res) => {
 
     const resource = request.resource;
 
+    if (
+      req.user.role === "department_head" &&
+      resource.ownerDepartment.toString() !== req.user.department?.toString()
+    ) {
+      return res.status(403).json({
+        message: "You can only mark resources returned for your department"
+      });
+    }
+
     // Restore quantity
     resource.availableQuantity += request.quantityRequested;
     if (resource.availableQuantity > resource.quantity) {
@@ -386,7 +424,7 @@ const cancelRequest = async (req, res) => {
 
     // Only the requester or an admin can cancel
     if (
-      req.user.role === "officer" &&
+      req.user.role !== "city_admin" &&
       request.requestedBy.toString() !== req.user.userId
     ) {
       return res.status(403).json({ message: "You can only cancel your own requests" });

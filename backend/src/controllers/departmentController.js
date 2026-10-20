@@ -65,6 +65,28 @@ const getDepartments = async (req, res) => {
   }
 };
 
+// Get single active department by ID
+const getDepartmentById = async (req, res) => {
+  try {
+    const department = await Department.findOne({
+      _id: req.params.id,
+      isActive: true
+    });
+
+    if (!department) {
+      return res.status(404).json({ message: "Active department not found" });
+    }
+
+    res.json({ department });
+  } catch (error) {
+    if (error.name === "CastError") {
+      return res.status(400).json({ message: "Invalid department ID" });
+    }
+    console.error("Get department by id error:", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 // Update a department
 const updateDepartment = async (req, res) => {
   try {
@@ -163,6 +185,7 @@ const deactivateDepartment = async (req, res) => {
 module.exports = {
   createDepartment,
   getDepartments,
+  getDepartmentById,
   updateDepartment,
   deactivateDepartment
 };

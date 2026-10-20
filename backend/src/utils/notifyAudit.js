@@ -12,7 +12,8 @@ const createNotification = async ({
   title,
   message,
   relatedRequest = null,
-  relatedResource = null
+  relatedResource = null,
+  relatedProject = null
 }) => {
   try {
     await Notification.create({
@@ -22,7 +23,8 @@ const createNotification = async ({
       title,
       message,
       relatedRequest,
-      relatedResource
+      relatedResource,
+      relatedProject
     });
   } catch (err) {
     console.error("Failed to create notification:", err.message);

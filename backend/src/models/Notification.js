@@ -27,7 +27,11 @@ const notificationSchema = new mongoose.Schema(
         "inventory_low",
         "request_cancelled",
         "audit_alert",
-        "general"
+        "general",
+        "project_created",
+        "project_conflict_detected",
+        "conflict_resolved",
+        "project_updated"
       ],
       required: true
     },
@@ -53,6 +57,12 @@ const notificationSchema = new mongoose.Schema(
     relatedResource: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Resource",
+      default: null
+    },
+
+    relatedProject: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
       default: null
     },
 
