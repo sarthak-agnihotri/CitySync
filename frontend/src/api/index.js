@@ -6,3 +6,5 @@ export { ResourcesAPI } from "./resources";
 export { RequestsAPI } from "./requests";
 export { NotificationsAPI } from "./notifications";
 export { AuditAPI } from "./audit";
+export { ProjectsAPI } from "./projects";
+export { ConflictsAPI } from "./conflicts";
