@@ -11,7 +11,15 @@ const resourceSchema = new mongoose.Schema(
 
     category: {
       type: String,
-      enum: ["equipment", "vehicle", "facility", "personnel", "other"],
+      enum: [
+  "equipment",
+  "vehicle",
+  "facility",
+  "personnel",
+  "materials",
+  "technology",
+  "other"
+],
       required: true
     },
 

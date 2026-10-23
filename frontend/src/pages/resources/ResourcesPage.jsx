@@ -213,7 +213,7 @@ export function ResourcesPage() {
         <div>
           <h3 className="section-title">Inter-Departmental Shared Resource Pool</h3>
           <p className="section-hint">
-            Searchable inventory of municipal heavy equipment, specialized vehicles, and machinery
+            Shared inventory of municipal equipment, vehicles, materials, facilities, and specialist teams
           </p>
         </div>
         {canManage && (
@@ -238,11 +238,13 @@ export function ResourcesPage() {
           onChange={(e) => setCategoryFilter(e.target.value)}
         >
           <option value="">All Categories</option>
-          <option value="equipment">Heavy Equipment</option>
-          <option value="vehicle">Specialized Vehicles</option>
-          <option value="facility">Facility & Yards</option>
-          <option value="personnel">Specialist Personnel</option>
-          <option value="other">Other Assets</option>
+          <option value="equipment">Heavy Machinery & Equipment</option>
+          <option value="vehicle">Vehicles & Transport</option>
+          <option value="facility">Facilities & Work Yards</option>
+          <option value="personnel">Personnel & Teams</option>
+          <option value="materials">Materials & Supplies</option>
+          <option value="technology">Technology & Surveying</option>
+          <option value="other">Other / Legacy Assets</option>
         </select>
 
         <select
@@ -302,7 +304,17 @@ export function ResourcesPage() {
                     <h4 className="resource-name">{res.name}</h4>
                     <span className="resource-dept-label">{deptName}</span>
                   </div>
-                  <span className="resource-cat">{res.category}</span>
+                  <span className="resource-cat">
+                    {{
+                      equipment: "Heavy Machinery & Equipment",
+                      vehicle: "Vehicles & Transport",
+                      facility: "Facilities & Work Yards",
+                      personnel: "Personnel & Teams",
+                      materials: "Materials & Supplies",
+                      technology: "Technology & Surveying",
+                      other: "Other / Legacy Assets"
+                    }[res.category] || res.category}
+                  </span>
                 </div>
 
                 <p className="resource-desc">
@@ -409,11 +421,12 @@ export function ResourcesPage() {
                 value={addForm.category}
                 onChange={(e) => setAddForm({ ...addForm, category: e.target.value })}
               >
-                <option value="equipment">Equipment (Heavy Machinery)</option>
-                <option value="vehicle">Specialized Vehicle</option>
-                <option value="facility">Facility / Work Yard</option>
-                <option value="personnel">Specialist Personnel</option>
-                <option value="other">Other Asset</option>
+                <option value="equipment">Heavy Machinery & Equipment</option>
+                <option value="vehicle">Vehicles & Transport</option>
+                <option value="facility">Facilities & Work Yards</option>
+                <option value="personnel">Personnel & Teams</option>
+                <option value="materials">Materials & Supplies</option>
+                <option value="technology">Technology & Surveying</option>
               </select>
             </div>
           </div>
@@ -526,11 +539,13 @@ export function ResourcesPage() {
                 value={editForm.category}
                 onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
               >
-                <option value="equipment">Equipment</option>
-                <option value="vehicle">Vehicle</option>
-                <option value="facility">Facility</option>
-                <option value="personnel">Personnel</option>
-                <option value="other">Other</option>
+                <option value="equipment">Heavy Machinery & Equipment</option>
+                <option value="vehicle">Vehicles & Transport</option>
+                <option value="facility">Facilities & Work Yards</option>
+                <option value="personnel">Personnel & Teams</option>
+                <option value="materials">Materials & Supplies</option>
+                <option value="technology">Technology & Surveying</option>
+                <option value="other">Other / Legacy Assets</option>
               </select>
             </div>
           </div>
