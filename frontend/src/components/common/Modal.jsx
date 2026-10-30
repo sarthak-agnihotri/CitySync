@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { X } from "lucide-react";
 
 export function Modal({ isOpen, onClose, title, children, size = "md" }) {
   useEffect(() => {
@@ -20,23 +21,35 @@ export function Modal({ isOpen, onClose, title, children, size = "md" }) {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
+    <div
+      className="modal-overlay"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
       <div
-        className={`modal ${size === "sm" ? "modal-sm" : size === "lg" ? "modal-lg" : ""}`}
+        className={`modal-dialog ${
+          size === "sm" ? "modal-dialog-sm" : size === "lg" ? "modal-dialog-lg" : ""
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="modal-header">
-          <h3>{title}</h3>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)]">
+          <h3 id="modal-title" className="text-sm font-bold text-[var(--text-primary)]">
+            {title}
+          </h3>
           <button
             type="button"
-            className="modal-close"
+            className="p-1 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-muted)] transition-colors cursor-pointer"
             onClick={onClose}
             aria-label="Close dialog"
           >
-            ✕
+            <X className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
-        <div className="modal-body-wrapper">{children}</div>
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)] text-[var(--text-primary)]">
+          {children}
+        </div>
       </div>
     </div>
   );
