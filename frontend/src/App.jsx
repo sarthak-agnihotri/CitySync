@@ -17,6 +17,8 @@ import { DepartmentsPage } from "./pages/departments/DepartmentsPage";
 import { UsersPage } from "./pages/users/UsersPage";
 import { AuditPage } from "./pages/audit/AuditPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { ProjectsPage } from "./pages/projects/ProjectsPage";
+import { ConflictsPage } from "./pages/conflicts/ConflictsPage";
 
 export default function App() {
   return (
@@ -70,6 +72,8 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route path="/projects" element={<ProjectsPage />} />
+                <Route path="/conflicts" element={<ConflictsPage />} />
               </Route>
 
               {/* 404 Fallback */}

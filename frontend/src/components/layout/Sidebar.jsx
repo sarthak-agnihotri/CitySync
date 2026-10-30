@@ -141,6 +141,26 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
             )}
           </NavLink>
 
+
+
+          <NavLink
+            to="/projects"
+            className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+            onClick={handleNavClick}
+          >
+            <span className="nav-icon">📁</span>
+            <span className="nav-label">Projects</span>
+          </NavLink>
+
+          <NavLink
+            to="/conflicts"
+            className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+            onClick={handleNavClick}
+          >
+            <span className="nav-icon">⚠️</span>
+            <span className="nav-label">Conflicts</span>
+          </NavLink>
+
           {/* City Admin Only Section */}
           {isRole("city_admin") && (
             <>

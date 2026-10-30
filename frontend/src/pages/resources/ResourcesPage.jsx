@@ -266,6 +266,8 @@ export function ResourcesPage() {
           <option value="vehicle">Specialized Vehicles</option>
           <option value="facility">Yard / Facility</option>
           <option value="personnel">Specialist Personnel</option>
+          <option value="materials">Materials & Supplies</option>
+          <option value="technology">Technology & Surveying</option>
           <option value="other">Other Assets</option>
         </select>
 
@@ -461,6 +463,8 @@ export function ResourcesPage() {
                 <option value="vehicle">Specialized Vehicle</option>
                 <option value="facility">Yard / Facility</option>
                 <option value="personnel">Specialist Personnel</option>
+                <option value="materials">Materials & Supplies</option>
+                <option value="technology">Technology & Surveying</option>
                 <option value="other">Other Asset</option>
               </select>
             </div>
@@ -602,6 +606,8 @@ export function ResourcesPage() {
                 <option value="vehicle">Specialized Vehicle</option>
                 <option value="facility">Yard / Facility</option>
                 <option value="personnel">Specialist Personnel</option>
+                <option value="materials">Materials & Supplies</option>
+                <option value="technology">Technology & Surveying</option>
                 <option value="other">Other Asset</option>
               </select>
             </div>
