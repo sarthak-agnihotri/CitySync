@@ -75,4 +75,5 @@ export const Conflicts = {
   }))(`/conflicts/${id}/resolve`, { method: "PUT", body: JSON.stringify(data) })
 };
 
-export * from "./index";
+export * from "./index"; 
+

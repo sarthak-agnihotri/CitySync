@@ -1,5 +1,19 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
+import {
+  Bell,
+  CheckCheck,
+  Check,
+  Trash2,
+  ClipboardList,
+  CheckCircle2,
+  XCircle,
+  Package,
+  AlertTriangle,
+  TrendingDown,
+  Clock,
+  Ban
+} from "lucide-react";
 import { NotificationsAPI } from "../../api";
 import { useToast } from "../../context/ToastContext";
 import { LoadingSpinner } from "../../components/common/LoadingSpinner";
@@ -66,26 +80,27 @@ export function NotificationsPage() {
     }
   };
 
-  const getNotifIcon = (type) => {
+  const renderNotifIcon = (type) => {
+    const size = 18;
     switch (type) {
       case "request_submitted":
-        return "📋";
+        return <ClipboardList size={size} />;
       case "request_approved":
-        return "✅";
+        return <CheckCircle2 size={size} className="text-success" />;
       case "request_rejected":
-        return "❌";
+        return <XCircle size={size} className="text-danger" />;
       case "resource_returned":
-        return "📦";
+        return <Package size={size} />;
       case "resource_conflict":
-        return "⚠️";
+        return <AlertTriangle size={size} className="text-warning" />;
       case "inventory_low":
-        return "📉";
+        return <TrendingDown size={size} className="text-warning" />;
       case "deadline_reminder":
-        return "⏰";
+        return <Clock size={size} />;
       case "request_cancelled":
-        return "🚫";
+        return <Ban size={size} className="text-danger" />;
       default:
-        return "🔔";
+        return <Bell size={size} />;
     }
   };
 
@@ -101,7 +116,8 @@ export function NotificationsPage() {
 
         {notifications.some((n) => !n.isRead) && (
           <button className="btn btn-ghost btn-sm" onClick={handleMarkAllRead}>
-            Mark All as Read
+            <CheckCheck size={16} />
+            <span>Mark All as Read</span>
           </button>
         )}
       </div>
@@ -126,7 +142,7 @@ export function NotificationsPage() {
         <LoadingSpinner text="Fetching official notifications..." />
       ) : notifications.length === 0 ? (
         <EmptyState
-          icon="🔔"
+          icon={Bell}
           title="No notifications"
           message={
             unreadOnly
@@ -141,7 +157,7 @@ export function NotificationsPage() {
               key={notif._id}
               className={`notif-card ${!notif.isRead ? "unread" : ""}`}
             >
-              <div className="notif-icon">{getNotifIcon(notif.type)}</div>
+              <div className="notif-icon">{renderNotifIcon(notif.type)}</div>
               <div className="notif-body">
                 <div className="notif-title-row">
                   <h4 className="notif-title">{notif.title}</h4>
@@ -159,17 +175,19 @@ export function NotificationsPage() {
                   <button
                     className="icon-btn-sm"
                     title="Mark as read"
+                    aria-label="Mark as read"
                     onClick={() => handleMarkRead(notif._id)}
                   >
-                    ✓
+                    <Check size={14} />
                   </button>
                 )}
                 <button
                   className="icon-btn-sm delete-btn"
                   title="Dismiss notification"
+                  aria-label="Dismiss notification"
                   onClick={() => handleDelete(notif._id)}
                 >
-                  ✕
+                  <Trash2 size={14} />
                 </button>
               </div>
             </div>

@@ -1,5 +1,20 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
+import {
+  FileText,
+  Plus,
+  Search,
+  CheckCircle2,
+  XCircle,
+  RotateCcw,
+  Ban,
+  Calendar,
+  Building2,
+  User,
+  Boxes,
+  Eye,
+  AlertCircle
+} from "lucide-react";
 import { RequestsAPI, ResourcesAPI } from "../../api";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
@@ -198,18 +213,33 @@ export function RequestsPage() {
           </p>
         </div>
         <button className="btn btn-primary" onClick={() => setNewOpen(true)}>
-          + New Resource Request
+          <Plus size={16} />
+          <span>New Resource Request</span>
         </button>
       </div>
 
       <div className="page-actions">
-        <input
-          type="text"
-          className="search-input"
-          placeholder="Search by equipment, purpose, officer..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div style={{ position: "relative", flex: 1, minWidth: 260 }}>
+          <Search
+            size={16}
+            style={{
+              position: "absolute",
+              left: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "var(--text-muted)",
+              pointerEvents: "none"
+            }}
+          />
+          <input
+            type="text"
+            className="search-input"
+            style={{ paddingLeft: 36, width: "100%" }}
+            placeholder="Search by equipment, purpose, officer..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
         <select
           className="select-input"
@@ -233,7 +263,7 @@ export function RequestsPage() {
         <LoadingSpinner text="Retrieving requisitions log..." />
       ) : filteredRequests.length === 0 ? (
         <EmptyState
-          icon="📋"
+          icon={FileText}
           title="No requests found"
           message={
             search || statusFilter
@@ -244,7 +274,8 @@ export function RequestsPage() {
             !search &&
             !statusFilter && (
               <button className="btn btn-primary" onClick={() => setNewOpen(true)}>
-                Submit First Request
+                <Plus size={15} />
+                <span>Submit First Request</span>
               </button>
             )
           }
@@ -262,7 +293,9 @@ export function RequestsPage() {
               <div key={req._id} className="req-card-expanded">
                 <div className="req-header-row">
                   <div className="req-title-meta">
-                    <span className="req-asset-icon">🚜</span>
+                    <span className="req-asset-icon">
+                      <Boxes size={20} />
+                    </span>
                     <div>
                       <h4 className="req-asset-name">{resName}</h4>
                       <span className="req-requester-info">
@@ -283,7 +316,11 @@ export function RequestsPage() {
                   </p>
                   {req.rejectionReason && (
                     <div className="rejection-box">
-                      <strong>Rejection Reason:</strong> {req.rejectionReason}
+                      <div className="flex items-center gap-1.5 font-semibold mb-1">
+                        <AlertCircle size={14} />
+                        <span>Rejection Reason:</span>
+                      </div>
+                      <p className="m-0">{req.rejectionReason}</p>
                     </div>
                   )}
                   {req.notes && (
@@ -295,8 +332,9 @@ export function RequestsPage() {
 
                 <div className="req-footer-row">
                   <div className="req-date-range">
-                    <span>
-                      📅 <strong>{new Date(req.startDate).toLocaleDateString()}</strong> to{" "}
+                    <span className="flex items-center gap-1.5">
+                      <Calendar size={14} />
+                      <strong>{new Date(req.startDate).toLocaleDateString()}</strong> to{" "}
                       <strong>{new Date(req.endDate).toLocaleDateString()}</strong>
                     </span>
                     <span className="dot-sep">•</span>
@@ -313,7 +351,8 @@ export function RequestsPage() {
                         setDetailOpen(true);
                       }}
                     >
-                      Details
+                      <Eye size={14} />
+                      <span>Details</span>
                     </button>
 
                     {/* Pending actions */}
@@ -323,7 +362,8 @@ export function RequestsPage() {
                           className="btn btn-success btn-sm"
                           onClick={() => handleApprove(req._id)}
                         >
-                          Approve
+                          <CheckCircle2 size={14} />
+                          <span>Approve</span>
                         </button>
                         <button
                           className="btn btn-danger btn-sm"
@@ -332,7 +372,8 @@ export function RequestsPage() {
                             setRejectOpen(true);
                           }}
                         >
-                          Reject
+                          <XCircle size={14} />
+                          <span>Reject</span>
                         </button>
                       </>
                     )}
@@ -343,7 +384,8 @@ export function RequestsPage() {
                         className="btn btn-ghost btn-sm text-danger"
                         onClick={() => handleCancel(req._id)}
                       >
-                        Cancel
+                        <Ban size={14} />
+                        <span>Cancel</span>
                       </button>
                     )}
 
@@ -353,7 +395,8 @@ export function RequestsPage() {
                         className="btn btn-primary btn-sm"
                         onClick={() => handleReturn(req._id)}
                       >
-                        Mark Returned
+                        <RotateCcw size={14} />
+                        <span>Mark Returned</span>
                       </button>
                     )}
                   </div>
@@ -603,7 +646,7 @@ export function RequestsPage() {
                     : "—"}
                 </p>
                 {selectedReqDetail.rejectionReason && (
-                  <p className="text-danger">
+                  <p className="text-danger m-0 mt-1">
                     <strong>Rejection reason:</strong> {selectedReqDetail.rejectionReason}
                   </p>
                 )}

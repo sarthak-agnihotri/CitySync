@@ -1,5 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Boxes,
+  CheckCircle2,
+  Clock,
+  Bell,
+  Building2,
+  Users,
+  HardHat,
+  ShieldCheck,
+  ArrowRight,
+  Plus,
+  AlertTriangle
+} from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { ResourcesAPI, RequestsAPI, NotificationsAPI, DepartmentsAPI, UsersAPI } from "../../api";
 import { StatCard } from "../../components/common/StatCard";
@@ -39,7 +52,6 @@ export function DashboardPage() {
       const availableCount = resources.filter((r) => r.status === "available" || r.availableQuantity > 0).length;
       const pendingCount = requests.filter((req) => req.status === "pending").length;
 
-      // Find resources with low stock (availableQuantity <= 1 or < 20% of quantity)
       const lowStock = resources.filter(
         (r) => r.quantity > 0 && r.availableQuantity / r.quantity <= 0.25
       );
@@ -80,14 +92,13 @@ export function DashboardPage() {
 
   useEffect(() => {
     loadDashboardData();
-
     const handleRefresh = () => loadDashboardData();
     window.addEventListener("citysync:refresh-data", handleRefresh);
     return () => window.removeEventListener("citysync:refresh-data", handleRefresh);
   }, [loadDashboardData]);
 
   if (loading) {
-    return <LoadingSpinner text="Aggregating city metrics..." />;
+    return <LoadingSpinner text="Aggregating municipal metrics and requisition logs..." />;
   }
 
   const deptName =
@@ -96,191 +107,223 @@ export function DashboardPage() {
       : user?.department || "General Municipal Services";
 
   return (
-    <div className="page dashboard-page">
-      {/* Welcome Banner */}
-      <div className="welcome-banner">
-        <div className="welcome-content">
-          <div className="welcome-badge">MUNICIPAL OPERATIONS HUB</div>
-          <h2 className="welcome-title">
-            Welcome back, {user?.name || "Officer"}
+    <div className="space-y-6">
+      {/* Institutional Officer Welcome Banner */}
+      <div className="surface-card p-6 bg-gradient-to-r from-[var(--bg-surface)] to-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 mb-2">
+            <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>MUNICIPAL OPERATIONS HUB</span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">
+            Welcome, {user?.name || "Officer"}
           </h2>
-          <p className="welcome-sub">
-            Logged in as <strong>{user?.role?.replace(/_/g, " ")}</strong> representing{" "}
-            <strong>{deptName}</strong>.
+          <p className="text-xs text-[var(--text-secondary)] mt-1">
+            Logged in with <strong className="text-[var(--text-primary)]">{user?.role?.replace(/_/g, " ")}</strong> credentials representing{" "}
+            <strong className="text-[var(--text-primary)]">{deptName}</strong>.
           </p>
         </div>
-        <div className="welcome-actions">
-          <button className="btn btn-primary" onClick={() => navigate("/requests")}>
-            <span>+ Submit Request</span>
+
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => navigate("/requests")}
+            className="btn btn-primary text-xs py-2 px-3.5 shadow-xs"
+          >
+            <Plus className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>Submit Requisition</span>
           </button>
-          <button className="btn btn-ghost" onClick={() => navigate("/resources")}>
-            <span>Browse Equipment</span>
+          <button
+            onClick={() => navigate("/resources")}
+            className="btn btn-secondary text-xs py-2 px-3.5"
+          >
+            <span>Equipment Directory</span>
           </button>
         </div>
       </div>
 
-      {/* Primary Stats Grid */}
-      <div className="stats-grid">
+      {/* Primary Metrics Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
-          icon="📦"
+          icon={<Boxes className="w-6 h-6" />}
           count={stats.totalResources}
-          label="Total Resources"
-          subtitle="Registered machinery & assets"
+          label="Total Machinery Pool"
+          subtitle="Registered city assets"
           onClick={() => navigate("/resources")}
         />
         <StatCard
-          icon="✅"
+          icon={<CheckCircle2 className="w-6 h-6" />}
           count={stats.availableResources}
           label="Available Units"
-          subtitle="Ready for inter-dept transfer"
+          subtitle="Ready for deployment"
           onClick={() => navigate("/resources")}
         />
         <StatCard
-          icon="⏳"
+          icon={<Clock className="w-6 h-6" />}
           count={stats.pendingRequests}
-          label="Pending Requests"
-          subtitle="Awaiting authorization"
+          label="Pending Approvals"
+          subtitle="Requisitions awaiting action"
           onClick={() => navigate("/requests")}
         />
         <StatCard
-          icon="🔔"
+          icon={<Bell className="w-6 h-6" />}
           count={stats.unreadNotifications}
           label="Unread Alerts"
-          subtitle="Actionable notices"
+          subtitle="Corridor notices & actions"
           onClick={() => navigate("/notifications")}
         />
 
         {isRole("city_admin") && (
           <>
             <StatCard
-              icon="🏛️"
+              icon={<Building2 className="w-6 h-6" />}
               count={stats.totalDepartments}
-              label="Active Departments"
-              subtitle="Coordinating municipal bodies"
+              label="Line Departments"
+              subtitle="Coordinating civic bodies"
               onClick={() => navigate("/departments")}
             />
             <StatCard
-              icon="👥"
+              icon={<Users className="w-6 h-6" />}
               count={stats.totalUsers}
-              label="Registered Officers"
-              subtitle="Users across all agencies"
+              label="Authorized Officers"
+              subtitle="Registered across agencies"
               onClick={() => navigate("/users")}
             />
           </>
         )}
       </div>
 
-      <div className="dashboard-columns">
-        {/* Recent Requests Section */}
-        <div className="dashboard-section main-col">
-          <div className="section-header">
-            <div className="section-title-wrap">
-              <h3>Recent Requisition Activity</h3>
-              <span className="section-hint">Latest equipment requests and bookings</span>
+      {/* Main Content Columns */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column (2 Cols): Recent Requisitions */}
+        <div className="lg:col-span-2 surface-card p-6 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)] mb-4">
+              <div>
+                <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                  Recent Equipment Requisitions
+                </h3>
+                <span className="text-[11px] text-[var(--text-muted)]">
+                  Latest inter-departmental machinery bookings
+                </span>
+              </div>
+              <button
+                className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer"
+                onClick={() => navigate("/requests")}
+              >
+                View All Requisitions
+              </button>
             </div>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate("/requests")}>
-              View All
-            </button>
-          </div>
 
-          {recentRequests.length === 0 ? (
-            <EmptyState
-              icon="📋"
-              title="No recent requests"
-              message="No equipment requisitions have been placed yet."
-              actionButton={
-                <button className="btn btn-primary btn-sm" onClick={() => navigate("/requests")}>
-                  Create First Request
-                </button>
-              }
-            />
-          ) : (
-            <div className="card-list">
-              {recentRequests.map((req) => {
-                const resName = req.resource?.name || "Equipment";
-                const requesterName = req.requestedBy?.name || "Officer";
-                const dept = req.requestingDepartment?.name || "Agency";
-                return (
-                  <div
-                    key={req._id}
-                    className="req-card"
+            {recentRequests.length === 0 ? (
+              <EmptyState
+                icon={<HardHat className="w-6 h-6" />}
+                title="No active requisitions"
+                message="No machinery requests have been submitted yet."
+                actionButton={
+                  <button
+                    className="btn btn-primary text-xs py-1.5 px-3"
                     onClick={() => navigate("/requests")}
-                    style={{ cursor: "pointer" }}
                   >
-                    <div className="req-card-icon">🚜</div>
-                    <div className="req-card-info">
-                      <div className="req-card-header">
-                        <span className="req-card-title">{resName}</span>
-                        <StatusPill status={req.status} />
-                        <StatusPill status={req.priority} type="priority" />
+                    Place First Request
+                  </button>
+                }
+              />
+            ) : (
+              <div className="space-y-3">
+                {recentRequests.map((req) => {
+                  const resName = req.resource?.name || "Machinery Item";
+                  const requesterName = req.requestedBy?.name || "Officer";
+                  const dept = req.requestingDepartment?.name || "Agency";
+
+                  return (
+                    <div
+                      key={req._id}
+                      onClick={() => navigate("/requests")}
+                      className="p-3.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer flex items-center justify-between gap-4"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-md bg-[var(--bg-surface)] border border-[var(--border-subtle)] flex items-center justify-center text-emerald-700 dark:text-emerald-400 shrink-0">
+                          <HardHat className="w-4 h-4" />
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-xs font-bold text-[var(--text-primary)] truncate">
+                            {resName}
+                          </span>
+                          <span className="text-[11px] text-[var(--text-muted)] truncate">
+                            {req.quantityRequested} unit(s) • Req by {requesterName} ({dept})
+                          </span>
+                        </div>
                       </div>
-                      <div className="req-card-meta">
-                        <span>
-                          <strong>{req.quantityRequested}</strong> unit(s) requested by{" "}
-                          <strong>{requesterName}</strong> ({dept})
-                        </span>
-                        <span className="dot-sep">•</span>
-                        <span>
-                          {new Date(req.startDate).toLocaleDateString()} to{" "}
-                          {new Date(req.endDate).toLocaleDateString()}
-                        </span>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <StatusPill status={req.priority} type="priority" />
+                        <StatusPill status={req.status} />
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Low Stock / Quick Insights Section */}
-        <div className="dashboard-section side-col">
-          <div className="section-header">
-            <div className="section-title-wrap">
-              <h3>Equipment Stock Alerts</h3>
-              <span className="section-hint">High-demand machinery</span>
+        {/* Right Column: Inventory Alerts & Policy Reminders */}
+        <div className="space-y-6">
+          {/* Inventory Watch Card */}
+          <div className="surface-card p-6">
+            <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)] mb-4">
+              <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                Equipment Availability Alerts
+              </h3>
+              <span className="text-[10px] uppercase font-bold text-amber-700 dark:text-amber-400">
+                Critical Level
+              </span>
             </div>
-          </div>
 
-          {lowStockResources.length === 0 ? (
-            <div className="info-box success">
-              <span>✅ All shared equipment inventory levels are optimal.</span>
-            </div>
-          ) : (
-            <div className="alert-stack">
-              {lowStockResources.map((res) => (
-                <div key={res._id} className="stock-alert-card">
-                  <div className="stock-alert-header">
-                    <span className="stock-alert-name">{res.name}</span>
-                    <StatusPill status={res.status} />
-                  </div>
-                  <div className="stock-alert-progress">
-                    <div className="progress-bar">
+            {lowStockResources.length === 0 ? (
+              <div className="p-3 rounded-md bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-800 dark:text-emerald-400 font-medium">
+                All registered machinery pool inventory levels are adequate.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {lowStockResources.map((res) => (
+                  <div
+                    key={res._id}
+                    className="p-3 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] space-y-2"
+                  >
+                    <div className="flex items-center justify-between text-xs font-semibold">
+                      <span className="text-[var(--text-primary)]">{res.name}</span>
+                      <StatusPill status={res.status} />
+                    </div>
+                    <div className="w-full bg-[var(--border-subtle)] rounded-full h-1.5 overflow-hidden">
                       <div
-                        className="progress-fill low"
+                        className="h-full bg-rose-600 rounded-full"
                         style={{
-                          width: `${Math.max(
-                            5,
-                            (res.availableQuantity / (res.quantity || 1)) * 100
-                          )}%`
+                          width: `${Math.max(5, (res.availableQuantity / (res.quantity || 1)) * 100)}%`
                         }}
                       />
                     </div>
-                    <span className="stock-alert-qty">
-                      {res.availableQuantity} of {res.quantity} {res.unit || "units"} available
-                    </span>
+                    <div className="flex justify-between text-[11px] text-[var(--text-muted)]">
+                      <span>Available</span>
+                      <span className="font-bold text-rose-600 dark:text-rose-400">
+                        {res.availableQuantity} of {res.quantity} {res.unit || "units"}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
 
-          {/* Institutional Governance Notice */}
-          <div className="governance-card">
-            <h4>🛡️ Dig-Later Inter-Agency Protocol</h4>
-            <p>
-              Under Municipal Coordination Guidelines, ensure all heavy excavation machinery
-              requests align with active utility moratoriums before authorizing deployment.
+          {/* Statutory Governance Card */}
+          <div className="p-5 rounded-lg border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50/50 dark:bg-neutral-900 text-xs space-y-2">
+            <div className="flex items-center gap-2 font-bold text-emerald-800 dark:text-emerald-400">
+              <ShieldCheck className="w-4 h-4 shrink-0" />
+              <span>Statutory Dig-Later Compliance</span>
+            </div>
+            <p className="text-[var(--text-secondary)] leading-relaxed">
+              Under municipal coordination guidelines, all heavy excavation machinery deployed on
+              arterial corridors must be verified against active utility duct plans and road moratoriums.
             </p>
           </div>
         </div>

@@ -1,5 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Search,
+  Filter,
+  Plus,
+  Wrench,
+  MapPin,
+  Building2,
+  Tag,
+  Edit2,
+  Trash2,
+  CheckCircle2,
+  ArrowRight
+} from "lucide-react";
 import { ResourcesAPI, DepartmentsAPI } from "../../api";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
@@ -67,7 +80,6 @@ export function ResourcesPage() {
       const activeDepts = deptData.departments || [];
       setDepartments(activeDepts);
 
-      // Preselect user's department for add modal if available
       if (user?.department && typeof user.department === "object" && user.department._id) {
         setAddForm((prev) => ({ ...prev, ownerDepartment: user.department._id }));
       } else if (activeDepts.length > 0) {
@@ -106,7 +118,7 @@ export function ResourcesPage() {
         tags: tagsArray
       });
 
-      showToast("Resource registered to pool", "success");
+      showToast("Resource registered to pool successfully", "success");
       setAddOpen(false);
       setAddForm({
         name: "",
@@ -208,89 +220,104 @@ export function ResourcesPage() {
   });
 
   return (
-    <div className="page resources-page">
-      <div className="page-header-row">
+    <div className="space-y-6">
+      {/* Page Title Row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border-subtle)]">
         <div>
-          <h3 className="section-title">Inter-Departmental Shared Resource Pool</h3>
-          <p className="section-hint">
-            Shared inventory of municipal equipment, vehicles, materials, facilities, and specialist teams
+          <h2 className="text-xl font-bold text-[var(--text-primary)]">
+            Inter-Departmental Shared Equipment Pool
+          </h2>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+            Searchable registry of heavy machinery, specialized vehicles, and excavation assets
           </p>
         </div>
+
         {canManage && (
-          <button className="btn btn-primary" onClick={() => setAddOpen(true)}>
-            + Add New Resource
+          <button
+            onClick={() => setAddOpen(true)}
+            className="btn btn-primary text-xs py-2 px-3.5 shadow-xs"
+          >
+            <Plus className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>Add Equipment</span>
           </button>
         )}
       </div>
 
-      <div className="page-actions">
-        <input
-          type="text"
-          className="search-input"
-          placeholder="Search by equipment name, location, department..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      {/* Filter Toolbar */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[240px]">
+          <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-2.5" />
+          <input
+            type="text"
+            className="form-input pl-9 text-xs"
+            placeholder="Search by machinery name, department, or depot location..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
         <select
-          className="select-input"
+          className="form-select text-xs w-auto"
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
         >
           <option value="">All Categories</option>
-          <option value="equipment">Heavy Machinery & Equipment</option>
-          <option value="vehicle">Vehicles & Transport</option>
-          <option value="facility">Facilities & Work Yards</option>
-          <option value="personnel">Personnel & Teams</option>
+          <option value="equipment">Heavy Equipment</option>
+          <option value="vehicle">Specialized Vehicles</option>
+          <option value="facility">Yard / Facility</option>
+          <option value="personnel">Specialist Personnel</option>
           <option value="materials">Materials & Supplies</option>
           <option value="technology">Technology & Surveying</option>
-          <option value="other">Other / Legacy Assets</option>
+          <option value="other">Other Assets</option>
         </select>
 
         <select
-          className="select-input"
+          className="form-select text-xs w-auto"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >
           <option value="">All Availability Statuses</option>
-          <option value="available">Available (100% Free)</option>
+          <option value="available">Available</option>
           <option value="partially_available">Partially Available</option>
-          <option value="unavailable">Unavailable (Fully Deployed)</option>
+          <option value="unavailable">Unavailable (Deployed)</option>
           <option value="maintenance">Under Maintenance</option>
         </select>
 
-        <span className="results-count">
-          Showing <strong>{filteredResources.length}</strong> of {resources.length} resources
+        <span className="text-xs text-[var(--text-muted)] ml-auto">
+          Showing <strong>{filteredResources.length}</strong> of {resources.length} items
         </span>
       </div>
 
+      {/* Content Grid */}
       {loading ? (
-        <LoadingSpinner text="Querying equipment registry..." />
+        <LoadingSpinner text="Retrieving equipment pool records..." />
       ) : filteredResources.length === 0 ? (
         <EmptyState
-          icon="🚜"
+          icon={<Wrench className="w-6 h-6" />}
           title="No resources found"
           message={
             search || categoryFilter || statusFilter
-              ? "No equipment matches the selected filters."
-              : "No shared resources have been registered yet."
+              ? "No equipment matches the active filters."
+              : "No shared machinery assets have been registered yet."
           }
           actionButton={
             canManage &&
             !search && (
-              <button className="btn btn-primary" onClick={() => setAddOpen(true)}>
+              <button
+                className="btn btn-primary text-xs py-1.5 px-3"
+                onClick={() => setAddOpen(true)}
+              >
                 Add First Resource
               </button>
             )
           }
         />
       ) : (
-        <div className="resources-grid">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {filteredResources.map((res) => {
             const avail = res.availableQuantity ?? res.quantity;
             const total = res.quantity || 1;
             const pct = Math.round((avail / total) * 100);
-            const progressType = pct > 50 ? "high" : pct > 20 ? "mid" : "low";
 
             const deptName =
               res.ownerDepartment && typeof res.ownerDepartment === "object"
@@ -298,95 +325,100 @@ export function ResourcesPage() {
                 : "Municipal Depot";
 
             return (
-              <div key={res._id} className="resource-card">
-                <div className="resource-card-top">
-                  <div>
-                    <h4 className="resource-name">{res.name}</h4>
-                    <span className="resource-dept-label">{deptName}</span>
+              <div key={res._id} className="surface-card p-5 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h4 className="text-sm font-bold text-[var(--text-primary)]">{res.name}</h4>
+                      <span className="text-[11px] text-[var(--text-muted)] flex items-center gap-1 mt-0.5">
+                        <Building2 className="w-3 h-3 text-emerald-700 dark:text-emerald-400" />
+                        {deptName}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] text-[var(--text-secondary)]">
+                      {res.category}
+                    </span>
                   </div>
-                  <span className="resource-cat">
-                    {{
-                      equipment: "Heavy Machinery & Equipment",
-                      vehicle: "Vehicles & Transport",
-                      facility: "Facilities & Work Yards",
-                      personnel: "Personnel & Teams",
-                      materials: "Materials & Supplies",
-                      technology: "Technology & Surveying",
-                      other: "Other / Legacy Assets"
-                    }[res.category] || res.category}
-                  </span>
-                </div>
 
-                <p className="resource-desc">
-                  {res.description || "Heavy-duty municipal equipment for civil works."}
-                </p>
+                  <p className="text-xs text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
+                    {res.description || "Heavy-duty civic machinery asset."}
+                  </p>
 
-                <div className="resource-meta-details">
-                  <div className="meta-line">
-                    <span className="meta-label">Location:</span>
-                    <span className="meta-val">{res.location || "Central Yard"}</span>
-                  </div>
-                  <div className="meta-line">
-                    <span className="meta-label">Status:</span>
+                  <div className="flex items-center justify-between text-xs pt-1 border-t border-[var(--border-subtle)]">
+                    <span className="text-[var(--text-muted)] flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      {res.location || "Central Yard"}
+                    </span>
                     <StatusPill status={res.status} />
                   </div>
+
+                  {/* Stock Bar */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-[var(--text-muted)]">Stock Availability</span>
+                      <strong className="text-[var(--text-primary)]">
+                        {avail} / {total} {res.unit || "units"} ({pct}%)
+                      </strong>
+                    </div>
+                    <div className="w-full bg-[var(--border-subtle)] rounded-full h-1.5 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          pct > 50
+                            ? "bg-emerald-600 dark:bg-emerald-500"
+                            : pct > 20
+                            ? "bg-amber-600 dark:bg-amber-500"
+                            : "bg-rose-600 dark:bg-rose-500"
+                        }`}
+                        style={{ width: `${Math.max(5, pct)}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Tags */}
+                  {res.tags && res.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {res.tags.map((t, idx) => (
+                        <span
+                          key={idx}
+                          className="text-[10px] px-1.5 py-0.5 rounded-sm bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] text-[var(--text-muted)]"
+                        >
+                          #{t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                {/* Availability Stock Bar */}
-                <div className="resource-progress">
-                  <div className="progress-label">
-                    <span>Pool Availability</span>
-                    <strong>
-                      {avail} / {total} {res.unit || "units"} ({pct}%)
-                    </strong>
-                  </div>
-                  <div className="progress-bar">
-                    <div
-                      className={`progress-fill ${progressType}`}
-                      style={{ width: `${Math.max(5, pct)}%` }}
-                    />
-                  </div>
-                </div>
-
-                {res.tags && res.tags.length > 0 && (
-                  <div className="tags-row">
-                    {res.tags.map((t, idx) => (
-                      <span key={idx} className="tag-chip">
-                        #{t}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <div className="resource-actions">
+                {/* Actions */}
+                <div className="pt-4 mt-3 border-t border-[var(--border-subtle)] flex items-center gap-2">
                   <button
-                    className="btn btn-primary btn-sm btn-flex"
+                    className="btn btn-primary text-xs py-1.5 flex-1 justify-center"
                     disabled={avail <= 0}
                     onClick={() => navigate(`/requests?resourceId=${res._id}`)}
                   >
-                    {avail > 0 ? "Request Resource" : "Out of Stock"}
+                    {avail > 0 ? "Request Resource" : "Deployed"}
                   </button>
 
                   {canManage && (
                     <button
-                      className="btn btn-ghost btn-sm"
+                      className="btn btn-secondary text-xs py-1.5 px-2.5"
                       onClick={() => openEditModal(res)}
                       title="Edit Resource"
                     >
-                      Edit
+                      <Edit2 className="w-3.5 h-3.5" />
                     </button>
                   )}
 
                   {isRole("city_admin") && (
                     <button
-                      className="btn btn-danger btn-sm"
+                      className="btn btn-secondary text-xs py-1.5 px-2.5 text-rose-600 hover:text-rose-700"
                       onClick={() => {
                         setDeactivatingResource(res);
                         setDeactivateOpen(true);
                       }}
                       title="Deactivate Resource"
                     >
-                      Deactivate
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
@@ -400,64 +432,80 @@ export function ResourcesPage() {
       <Modal
         isOpen={addOpen}
         onClose={() => setAddOpen(false)}
-        title="Add Shared Resource to Pool"
+        title="Register Shared Machinery to Pool"
       >
-        <form onSubmit={handleAddSubmit} className="modal-body">
-          <div className="form-row">
-            <div className="form-group">
-              <label>Resource / Equipment Name *</label>
+        <form onSubmit={handleAddSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Equipment Name *
+              </label>
               <input
                 type="text"
                 required
+                className="form-input text-xs"
                 placeholder="e.g. Caterpillar Hydraulic Excavator 320D"
                 value={addForm.name}
                 onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}
               />
             </div>
-            <div className="form-group">
-              <label>Category *</label>
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Category *
+              </label>
               <select
                 required
+                className="form-select text-xs"
                 value={addForm.category}
                 onChange={(e) => setAddForm({ ...addForm, category: e.target.value })}
               >
-                <option value="equipment">Heavy Machinery & Equipment</option>
-                <option value="vehicle">Vehicles & Transport</option>
-                <option value="facility">Facilities & Work Yards</option>
-                <option value="personnel">Personnel & Teams</option>
+                <option value="equipment">Heavy Equipment</option>
+                <option value="vehicle">Specialized Vehicle</option>
+                <option value="facility">Yard / Facility</option>
+                <option value="personnel">Specialist Personnel</option>
                 <option value="materials">Materials & Supplies</option>
                 <option value="technology">Technology & Surveying</option>
+                <option value="other">Other Asset</option>
               </select>
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>Total Pool Quantity *</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Pool Quantity *
+              </label>
               <input
                 type="number"
                 min="1"
                 required
+                className="form-input text-xs"
                 value={addForm.quantity}
                 onChange={(e) => setAddForm({ ...addForm, quantity: e.target.value })}
               />
             </div>
-            <div className="form-group">
-              <label>Unit Label</label>
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Unit Label
+              </label>
               <input
                 type="text"
-                placeholder="e.g. machines, trucks, units"
+                className="form-input text-xs"
+                placeholder="e.g. machines, trucks"
                 value={addForm.unit}
                 onChange={(e) => setAddForm({ ...addForm, unit: e.target.value })}
               />
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>Owner Department *</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Owner Department *
+              </label>
               <select
                 required
+                className="form-select text-xs"
                 value={addForm.ownerDepartment}
                 onChange={(e) => setAddForm({ ...addForm, ownerDepartment: e.target.value })}
               >
@@ -469,10 +517,13 @@ export function ResourcesPage() {
                 ))}
               </select>
             </div>
-            <div className="form-group">
-              <label>Physical Storage Location</label>
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Depot Location
+              </label>
               <input
                 type="text"
+                className="form-input text-xs"
                 placeholder="e.g. Sector 9 Mechanical Yard"
                 value={addForm.location}
                 onChange={(e) => setAddForm({ ...addForm, location: e.target.value })}
@@ -480,35 +531,41 @@ export function ResourcesPage() {
             </div>
           </div>
 
-          <div className="form-group">
-            <label>Tags (Comma-separated)</label>
+          <div>
+            <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+              Tags (Comma-separated)
+            </label>
             <input
               type="text"
+              className="form-input text-xs"
               placeholder="e.g. trenching, asphalt, heavy, storm-drain"
               value={addForm.tags}
               onChange={(e) => setAddForm({ ...addForm, tags: e.target.value })}
             />
           </div>
 
-          <div className="form-group">
-            <label>Technical Description & Capabilities</label>
+          <div>
+            <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+              Description & Specifications
+            </label>
             <textarea
               rows={2}
+              className="form-textarea text-xs"
               placeholder="Operational capacity, operating requirements, hydraulic specs..."
               value={addForm.description}
               onChange={(e) => setAddForm({ ...addForm, description: e.target.value })}
             />
           </div>
 
-          <div className="modal-footer">
+          <div className="pt-4 border-t border-[var(--border-subtle)] flex justify-end gap-2.5">
             <button
               type="button"
-              className="btn btn-ghost"
+              className="btn btn-secondary text-xs"
               onClick={() => setAddOpen(false)}
             >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={adding}>
+            <button type="submit" className="btn btn-primary text-xs" disabled={adding}>
               {adding ? "Registering..." : "Add to Pool"}
             </button>
           </div>
@@ -521,61 +578,76 @@ export function ResourcesPage() {
         onClose={() => setEditOpen(false)}
         title={`Update Resource — ${selectedResource?.name}`}
       >
-        <form onSubmit={handleEditSubmit} className="modal-body">
-          <div className="form-row">
-            <div className="form-group">
-              <label>Resource Name *</label>
+        <form onSubmit={handleEditSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Resource Name *
+              </label>
               <input
                 type="text"
                 required
+                className="form-input text-xs"
                 value={editForm.name}
                 onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
               />
             </div>
-            <div className="form-group">
-              <label>Category *</label>
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Category *
+              </label>
               <select
                 required
+                className="form-select text-xs"
                 value={editForm.category}
                 onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
               >
-                <option value="equipment">Heavy Machinery & Equipment</option>
-                <option value="vehicle">Vehicles & Transport</option>
-                <option value="facility">Facilities & Work Yards</option>
-                <option value="personnel">Personnel & Teams</option>
+                <option value="equipment">Heavy Equipment</option>
+                <option value="vehicle">Specialized Vehicle</option>
+                <option value="facility">Yard / Facility</option>
+                <option value="personnel">Specialist Personnel</option>
                 <option value="materials">Materials & Supplies</option>
                 <option value="technology">Technology & Surveying</option>
-                <option value="other">Other / Legacy Assets</option>
+                <option value="other">Other Asset</option>
               </select>
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>Total Quantity *</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Total Quantity *
+              </label>
               <input
                 type="number"
                 min="1"
                 required
+                className="form-input text-xs"
                 value={editForm.quantity}
                 onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })}
               />
             </div>
-            <div className="form-group">
-              <label>Unit</label>
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Unit
+              </label>
               <input
                 type="text"
+                className="form-input text-xs"
                 value={editForm.unit}
                 onChange={(e) => setEditForm({ ...editForm, unit: e.target.value })}
               />
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>Owner Department *</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Owner Department *
+              </label>
               <select
                 required
+                className="form-select text-xs"
                 value={editForm.ownerDepartment}
                 onChange={(e) => setEditForm({ ...editForm, ownerDepartment: e.target.value })}
               >
@@ -587,75 +659,86 @@ export function ResourcesPage() {
                 ))}
               </select>
             </div>
-            <div className="form-group">
-              <label>Location</label>
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Location
+              </label>
               <input
                 type="text"
+                className="form-input text-xs"
                 value={editForm.location}
                 onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
               />
             </div>
           </div>
 
-          <div className="form-group">
-            <label>Tags</label>
+          <div>
+            <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+              Tags
+            </label>
             <input
               type="text"
+              className="form-input text-xs"
               value={editForm.tags}
               onChange={(e) => setEditForm({ ...editForm, tags: e.target.value })}
             />
           </div>
 
-          <div className="form-group">
-            <label>Description</label>
+          <div>
+            <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+              Description
+            </label>
             <textarea
               rows={2}
+              className="form-textarea text-xs"
               value={editForm.description}
               onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
             />
           </div>
 
-          <div className="modal-footer">
-            <button type="button" className="btn btn-ghost" onClick={() => setEditOpen(false)}>
+          <div className="pt-4 border-t border-[var(--border-subtle)] flex justify-end gap-2.5">
+            <button
+              type="button"
+              className="btn btn-secondary text-xs"
+              onClick={() => setEditOpen(false)}
+            >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={updating}>
-              {updating ? "Updating..." : "Save Changes"}
+            <button type="submit" className="btn btn-primary text-xs" disabled={updating}>
+              {updating ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>
       </Modal>
 
-      {/* Deactivate Resource Modal */}
+      {/* Deactivate Modal */}
       <Modal
         isOpen={deactivateOpen}
         onClose={() => setDeactivateOpen(false)}
         title="Confirm Resource Deactivation"
         size="sm"
       >
-        <div className="modal-body">
-          <p className="confirm-text">
-            Are you sure you want to deactivate <strong>{deactivatingResource?.name}</strong>?
+        <div className="space-y-3">
+          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+            Are you sure you want to deactivate{" "}
+            <strong className="text-[var(--text-primary)]">{deactivatingResource?.name}</strong>?
+            The resource will be removed from public booking while preserving all historical requisitions.
           </p>
-          <p className="confirm-hint">
-            The resource will be marked inactive and removed from public booking. Existing requests
-            and historical records remain intact.
-          </p>
-          <div className="modal-footer">
+          <div className="pt-3 border-t border-[var(--border-subtle)] flex justify-end gap-2">
             <button
               type="button"
-              className="btn btn-ghost"
+              className="btn btn-secondary text-xs"
               onClick={() => setDeactivateOpen(false)}
             >
               Cancel
             </button>
             <button
               type="button"
-              className="btn btn-danger"
+              className="btn btn-danger text-xs"
               onClick={handleDeactivateConfirm}
               disabled={deactivating}
             >
-              {deactivating ? "Deactivating..." : "Deactivate Resource"}
+              {deactivating ? "Deactivating..." : "Deactivate"}
             </button>
           </div>
         </div>

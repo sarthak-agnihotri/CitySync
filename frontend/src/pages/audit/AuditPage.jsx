@@ -1,4 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
+import {
+  ScrollText,
+  Filter,
+  RotateCcw,
+  Eye,
+  ShieldCheck,
+  Calendar,
+  Layers,
+  Building2
+} from "lucide-react";
 import { AuditAPI, DepartmentsAPI } from "../../api";
 import { useToast } from "../../context/ToastContext";
 import { Modal } from "../../components/common/Modal";
@@ -155,10 +165,12 @@ export function AuditPage() {
 
         <div className="filter-actions-row">
           <button className="btn btn-primary btn-sm" onClick={loadLogs}>
-            Apply Filters
+            <Filter size={14} />
+            <span>Apply Filters</span>
           </button>
           <button className="btn btn-ghost btn-sm" onClick={clearFilters}>
-            Reset Filters
+            <RotateCcw size={14} />
+            <span>Reset Filters</span>
           </button>
           <span className="results-count">
             Found <strong>{logs.length}</strong> matching entries
@@ -170,7 +182,7 @@ export function AuditPage() {
         <LoadingSpinner text="Retrieving cryptographic audit events..." />
       ) : logs.length === 0 ? (
         <EmptyState
-          icon="📜"
+          icon={ScrollText}
           title="No audit entries found"
           message="No recorded actions match the active query parameters."
         />
@@ -223,7 +235,8 @@ export function AuditPage() {
                           setInspectOpen(true);
                         }}
                       >
-                        Inspect
+                        <Eye size={13} />
+                        <span>Inspect</span>
                       </button>
                     </td>
                   </tr>

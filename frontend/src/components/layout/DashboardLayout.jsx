@@ -5,7 +5,7 @@ import { TopBar } from "./TopBar";
 import { NotificationsAPI } from "../../api";
 
 const PAGE_TITLES = {
-  "/": "Overview & Analytics",
+  "/dashboard": "Overview & Analytics",
   "/resources": "Resource & Equipment Inventory",
   "/requests": "Requisitions & Requests",
   "/notifications": "Alerts & Notifications",
@@ -33,7 +33,6 @@ export function DashboardLayout() {
 
   useEffect(() => {
     fetchUnreadCount();
-    // Refresh count on window focus
     const onFocus = () => fetchUnreadCount();
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
@@ -42,21 +41,20 @@ export function DashboardLayout() {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await fetchUnreadCount();
-    // Emit global refresh event so active page can re-fetch
     window.dispatchEvent(new CustomEvent("citysync:refresh-data"));
     setTimeout(() => setIsRefreshing(false), 600);
   };
 
-  const currentTitle = PAGE_TITLES[location.pathname] || "CitySync";
+  const currentTitle = PAGE_TITLES[location.pathname] || "CitySync Portal";
 
   return (
-    <div className="dashboard">
+    <div className="min-h-screen flex bg-[var(--bg-page)] text-[var(--text-primary)] transition-colors">
       <Sidebar
         unreadCount={unreadCount}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
-      <main className="main-content">
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden">
         <TopBar
           title={currentTitle}
           onRefresh={handleRefresh}
@@ -64,10 +62,10 @@ export function DashboardLayout() {
           unreadCount={unreadCount}
           onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
         />
-        <div className="page-content">
+        <main className="p-4 sm:p-8 flex-1">
           <Outlet context={{ refreshUnreadCount: fetchUnreadCount }} />
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

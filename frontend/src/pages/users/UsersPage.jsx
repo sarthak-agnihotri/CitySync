@@ -1,4 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
+import {
+  Users,
+  Search,
+  Building2,
+  Shield,
+  UserCheck
+} from "lucide-react";
 import { UsersAPI, DepartmentsAPI } from "../../api";
 import { useToast } from "../../context/ToastContext";
 import { Modal } from "../../components/common/Modal";
@@ -96,13 +103,27 @@ export function UsersPage() {
       </div>
 
       <div className="page-actions">
-        <input
-          type="text"
-          className="search-input"
-          placeholder="Search by name, email, or department..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div style={{ position: "relative", flex: 1, minWidth: 260 }}>
+          <Search
+            size={16}
+            style={{
+              position: "absolute",
+              left: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "var(--text-muted)",
+              pointerEvents: "none"
+            }}
+          />
+          <input
+            type="text"
+            className="search-input"
+            style={{ paddingLeft: 36, width: "100%" }}
+            placeholder="Search by name, email, or department..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
         <select
           className="select-input"
@@ -124,7 +145,7 @@ export function UsersPage() {
         <LoadingSpinner text="Loading user records and departments..." />
       ) : filteredUsers.length === 0 ? (
         <EmptyState
-          icon="👥"
+          icon={Users}
           title="No users match your criteria"
           message="Try adjusting your search query or role filter."
         />
@@ -184,7 +205,8 @@ export function UsersPage() {
                         className="btn btn-ghost btn-sm"
                         onClick={() => openAssignModal(u)}
                       >
-                        Assign Dept
+                        <Building2 size={13} />
+                        <span>Assign Dept</span>
                       </button>
                     </td>
                   </tr>

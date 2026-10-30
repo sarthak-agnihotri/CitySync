@@ -1,4 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
+import {
+  Building2,
+  Plus,
+  Search,
+  Mail,
+  MapPin,
+  Edit3,
+  PowerOff,
+  AlertTriangle
+} from "lucide-react";
 import { DepartmentsAPI } from "../../api";
 import { useToast } from "../../context/ToastContext";
 import { Modal } from "../../components/common/Modal";
@@ -138,18 +148,33 @@ export function DepartmentsPage() {
           </p>
         </div>
         <button className="btn btn-primary" onClick={() => setCreateOpen(true)}>
-          + Add New Department
+          <Plus size={16} />
+          <span>Add New Department</span>
         </button>
       </div>
 
       <div className="page-actions">
-        <input
-          type="text"
-          className="search-input"
-          placeholder="Search by name, code or location..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div style={{ position: "relative", flex: 1, minWidth: 260 }}>
+          <Search
+            size={16}
+            style={{
+              position: "absolute",
+              left: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "var(--text-muted)",
+              pointerEvents: "none"
+            }}
+          />
+          <input
+            type="text"
+            className="search-input"
+            style={{ paddingLeft: 36, width: "100%" }}
+            placeholder="Search by name, code or location..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
         <span className="results-count">
           Showing <strong>{filtered.length}</strong> of {departments.length} departments
         </span>
@@ -159,7 +184,7 @@ export function DepartmentsPage() {
         <LoadingSpinner text="Retrieving registered departments..." />
       ) : filtered.length === 0 ? (
         <EmptyState
-          icon="🏛️"
+          icon={Building2}
           title="No departments found"
           message={
             search
@@ -169,7 +194,8 @@ export function DepartmentsPage() {
           actionButton={
             !search && (
               <button className="btn btn-primary" onClick={() => setCreateOpen(true)}>
-                Add Department
+                <Plus size={15} />
+                <span>Add Department</span>
               </button>
             )
           }
@@ -190,12 +216,18 @@ export function DepartmentsPage() {
               </p>
               <div className="dept-meta">
                 <div className="dept-meta-item">
-                  <span className="meta-label">Location:</span>
+                  <span className="meta-label flex items-center gap-1">
+                    <MapPin size={13} />
+                    <span>Location:</span>
+                  </span>
                   <span className="meta-val">{dept.location || "Central HQ"}</span>
                 </div>
                 {dept.contactEmail && (
                   <div className="dept-meta-item">
-                    <span className="meta-label">Contact:</span>
+                    <span className="meta-label flex items-center gap-1">
+                      <Mail size={13} />
+                      <span>Contact:</span>
+                    </span>
                     <span className="meta-val">{dept.contactEmail}</span>
                   </div>
                 )}
@@ -205,7 +237,8 @@ export function DepartmentsPage() {
                   className="btn btn-ghost btn-sm"
                   onClick={() => openEditModal(dept)}
                 >
-                  Edit Details
+                  <Edit3 size={13} />
+                  <span>Edit Details</span>
                 </button>
                 <button
                   className="btn btn-danger btn-sm"
@@ -214,7 +247,8 @@ export function DepartmentsPage() {
                     setDeactivateOpen(true);
                   }}
                 >
-                  Deactivate
+                  <PowerOff size={13} />
+                  <span>Deactivate</span>
                 </button>
               </div>
             </div>
@@ -347,13 +381,18 @@ export function DepartmentsPage() {
         size="sm"
       >
         <div className="modal-body">
-          <p className="confirm-text">
-            Are you sure you want to deactivate <strong>{deactivatingDept?.name}</strong>?
-          </p>
-          <p className="confirm-hint">
-            The department will be soft-deactivated and hidden from active assignment, but historical
-            records and audit logs will remain intact.
-          </p>
+          <div className="flex items-start gap-3">
+            <AlertTriangle size={24} className="text-danger flex-shrink-0" />
+            <div>
+              <p className="confirm-text">
+                Are you sure you want to deactivate <strong>{deactivatingDept?.name}</strong>?
+              </p>
+              <p className="confirm-hint">
+                The department will be soft-deactivated and hidden from active assignment, but historical
+                records and audit logs will remain intact.
+              </p>
+            </div>
+          </div>
           <div className="modal-footer">
             <button
               type="button"
