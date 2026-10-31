@@ -11,7 +11,9 @@ import {
   ScrollText,
   LogOut,
   X,
-  ExternalLink
+  ExternalLink,
+  FolderKanban,
+  AlertTriangle
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -90,6 +92,36 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
           </NavLink>
 
           <NavLink
+            to="/projects"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${
+                isActive
+                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
+                  : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
+              }`
+            }
+            onClick={handleNavClick}
+          >
+            <FolderKanban className="w-4 h-4 shrink-0" aria-hidden="true" />
+            <span>City Projects</span>
+          </NavLink>
+
+          <NavLink
+            to="/conflicts"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${
+                isActive
+                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
+                  : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
+              }`
+            }
+            onClick={handleNavClick}
+          >
+            <AlertTriangle className="w-4 h-4 shrink-0 text-amber-500" aria-hidden="true" />
+            <span>Project Conflicts</span>
+          </NavLink>
+
+          <NavLink
             to="/resources"
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${
@@ -139,26 +171,6 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
                 {unreadCount}
               </span>
             )}
-          </NavLink>
-
-
-
-          <NavLink
-            to="/projects"
-            className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
-            onClick={handleNavClick}
-          >
-            <span className="nav-icon">📁</span>
-            <span className="nav-label">Projects</span>
-          </NavLink>
-
-          <NavLink
-            to="/conflicts"
-            className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
-            onClick={handleNavClick}
-          >
-            <span className="nav-icon">⚠️</span>
-            <span className="nav-label">Conflicts</span>
           </NavLink>
 
           {/* City Admin Only Section */}

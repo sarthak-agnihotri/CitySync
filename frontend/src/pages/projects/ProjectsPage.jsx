@@ -1,7 +1,22 @@
-
 import React, { useCallback, useEffect, useState } from "react";
+import {
+  FolderKanban,
+  Plus,
+  Search,
+  Building2,
+  Calendar,
+  MapPin,
+  AlertTriangle,
+  Layers,
+  IndianRupee,
+  ShieldAlert
+} from "lucide-react";
 import { ProjectsAPI, DepartmentsAPI } from "../../api";
 import { useToast } from "../../context/ToastContext";
+import { Modal } from "../../components/common/Modal";
+import { StatusPill } from "../../components/common/StatusPill";
+import { LoadingSpinner } from "../../components/common/LoadingSpinner";
+import { EmptyState } from "../../components/common/EmptyState";
 
 const initialForm = {
   title: "",
@@ -19,22 +34,13 @@ const initialForm = {
 };
 
 const categories = [
-  ["roadwork", "Roadwork"],
-  ["water_sewage", "Water and Sewage"],
-  ["electricity", "Electricity"],
-  ["telecom", "Telecom"],
-  ["metro_transit", "Metro Transit"],
-  ["other", "Other"],
+  ["roadwork", "Roadwork & Paving"],
+  ["water_sewage", "Water & Sewage Mains"],
+  ["electricity", "Power & Electrical Grid"],
+  ["telecom", "Telecom & Fiber Conduit"],
+  ["metro_transit", "Metro Transit & Rail"],
+  ["other", "General Civil Works"],
 ];
-
-const statusLabels = {
-  proposed: "Proposed",
-  approved: "Approved",
-  in_progress: "In Progress",
-  delayed: "Delayed",
-  completed: "Completed",
-  cancelled: "Cancelled",
-};
 
 export function ProjectsPage() {
   const [projects, setProjects] = useState([]);
@@ -42,6 +48,8 @@ export function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [form, setForm] = useState(initialForm);
   const { showToast } = useToast();
 
@@ -64,6 +72,9 @@ export function ProjectsPage() {
 
   useEffect(() => {
     fetchData();
+    const handleRefresh = () => fetchData();
+    window.addEventListener("citysync:refresh-data", handleRefresh);
+    return () => window.removeEventListener("citysync:refresh-data", handleRefresh);
   }, [fetchData]);
 
   const updateField = (event) => {
@@ -75,7 +86,7 @@ export function ProjectsPage() {
     event.preventDefault();
 
     if (new Date(form.startDate) >= new Date(form.endDate)) {
-      showToast("End date must be after start date", "error");
+      showToast("End date must be strictly after the start date", "error");
       return;
     }
 
@@ -103,8 +114,8 @@ export function ProjectsPage() {
 
       showToast(
         conflictCount > 0
-          ? `Project created. ${conflictCount} potential conflict(s) detected.`
-          : "Project created successfully. No conflicts detected.",
+          ? `Project registered! ${conflictCount} potential spatial/timeline conflict(s) detected.`
+          : "Project registered successfully. Zero conflicts detected.",
         conflictCount > 0 ? "warning" : "success"
       );
 
@@ -118,208 +129,360 @@ export function ProjectsPage() {
     }
   };
 
-  const fieldStyle = {
-    display: "flex",
-    flexDirection: "column",
-    gap: "6px",
-    marginBottom: "14px",
-  };
+  const filteredProjects = projects.filter((p) => {
+    const q = search.toLowerCase();
+    const matchesSearch =
+      p.title.toLowerCase().includes(q) ||
+      (p.zone && p.zone.toLowerCase().includes(q)) ||
+      (p.address && p.address.toLowerCase().includes(q)) ||
+      (p.department?.name && p.department.name.toLowerCase().includes(q));
 
-  const inputStyle = {
-    width: "100%",
-    boxSizing: "border-box",
-    padding: "10px",
-    border: "1px solid #cbd5e1",
-    borderRadius: "6px",
-    font: "inherit",
-  };
-
-  const buttonStyle = {
-    padding: "10px 16px",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    font: "inherit",
-  };
-
-  const renderInput = (label, name, type = "text", required = true) => (
-    <label style={fieldStyle} key={name}>
-      <span>{label}</span>
-      <input
-        style={inputStyle}
-        name={name}
-        type={type}
-        value={form[name]}
-        onChange={updateField}
-        required={required}
-        min={type === "number" ? (name === "latitude" ? -90 : name === "longitude" ? -180 : 0) : undefined}
-        max={name === "latitude" ? 90 : name === "longitude" ? 180 : undefined}
-        step={type === "number" ? "any" : undefined}
-      />
-    </label>
-  );
+    const matchesCategory = categoryFilter ? p.category === categoryFilter : true;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
-    <main style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
-      <header
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "12px",
-          flexWrap: "wrap",
-          marginBottom: "24px",
-        }}
-      >
+    <div className="page projects-page">
+      <div className="page-header-row">
         <div>
-          <h1 style={{ marginBottom: "6px" }}>City Projects</h1>
-          <p>Plan projects across departments and identify possible conflicts.</p>
+          <h3 className="section-title">Municipal Infrastructure Projects</h3>
+          <p className="section-hint">
+            Statutory registry of cross-department civil works with automated conflict detection
+          </p>
         </div>
 
-        <button
-          style={{ ...buttonStyle, background: "#2563eb", color: "white" }}
-          onClick={() => setFormOpen((open) => !open)}
-        >
-          {formOpen ? "Close Form" : "+ Create Project"}
+        <button className="btn btn-primary" onClick={() => setFormOpen(true)}>
+          <Plus size={16} />
+          <span>New Infrastructure Project</span>
         </button>
-      </header>
+      </div>
 
-      {formOpen && (
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            padding: "20px",
-            marginBottom: "24px",
-            border: "1px solid #cbd5e1",
-            borderRadius: "10px",
-          }}
-        >
-          <h2>Create a Project</h2>
-
-          {renderInput("Project title", "title")}
-          {renderInput("Description", "description", "text", false)}
-
-          <label style={fieldStyle}>
-            <span>Department</span>
-            <select
-              style={inputStyle}
-              name="department"
-              value={form.department}
-              onChange={updateField}
-              required
-            >
-              <option value="">Select department</option>
-              {departments.map((department) => (
-                <option key={department._id} value={department._id}>
-                  {department.name} ({department.code})
-                </option>
-              ))}
-            </select>
-            {departments.length === 0 && (
-              <small>Create or activate a department before adding a project.</small>
-            )}
-          </label>
-
-          <label style={fieldStyle}>
-            <span>Category</span>
-            <select
-              style={inputStyle}
-              name="category"
-              value={form.category}
-              onChange={updateField}
-              required
-            >
-              {categories.map(([value, label]) => (
-                <option key={value} value={value}>{label}</option>
-              ))}
-            </select>
-          </label>
-
-          {renderInput("Zone / area", "zone")}
-          {renderInput("Full address", "address")}
-          {renderInput("Latitude", "latitude", "number")}
-          {renderInput("Longitude", "longitude", "number")}
-          {renderInput("Start date", "startDate", "date")}
-          {renderInput("End date", "endDate", "date")}
-          {renderInput("Estimated budget (₹)", "estimatedBudget", "number", false)}
-
-          <label style={fieldStyle}>
-            <span>Priority</span>
-            <select
-              style={inputStyle}
-              name="priority"
-              value={form.priority}
-              onChange={updateField}
-            >
-              {["low", "medium", "high", "critical"].map((priority) => (
-                <option key={priority} value={priority}>
-                  {priority.charAt(0).toUpperCase() + priority.slice(1)}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <button
-            type="submit"
-            disabled={saving || departments.length === 0}
+      <div className="page-actions">
+        <div style={{ position: "relative", flex: 1, minWidth: 260 }}>
+          <Search
+            size={16}
             style={{
-              ...buttonStyle,
-              background: "#15803d",
-              color: "white",
-              opacity: saving || departments.length === 0 ? 0.6 : 1,
+              position: "absolute",
+              left: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "var(--text-muted)",
+              pointerEvents: "none",
             }}
-          >
-            {saving ? "Creating..." : "Create Project"}
-          </button>
-        </form>
+          />
+          <input
+            type="text"
+            className="search-input"
+            style={{ paddingLeft: 36, width: "100%" }}
+            placeholder="Search projects by title, zone, corridor, or department..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+        <select
+          className="select-input"
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+        >
+          <option value="">All Civil Categories</option>
+          {categories.map(([val, label]) => (
+            <option key={val} value={val}>
+              {label}
+            </option>
+          ))}
+        </select>
+
+        <span className="results-count">
+          Showing <strong>{filteredProjects.length}</strong> of {projects.length} projects
+        </span>
+      </div>
+
+      {loading ? (
+        <LoadingSpinner text="Retrieving civil project registry..." />
+      ) : filteredProjects.length === 0 ? (
+        <EmptyState
+          icon={FolderKanban}
+          title="No civil projects found"
+          message={
+            search || categoryFilter
+              ? "No infrastructure projects match your active search filters."
+              : "No municipal projects have been registered in the system yet."
+          }
+          actionButton={
+            !search &&
+            !categoryFilter && (
+              <button className="btn btn-primary" onClick={() => setFormOpen(true)}>
+                <Plus size={15} />
+                <span>Register First Project</span>
+              </button>
+            )
+          }
+        />
+      ) : (
+        <div className="table-card">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Project & Corridor</th>
+                <th>Executing Line Department</th>
+                <th>Category</th>
+                <th>Scheduled Timeline</th>
+                <th>Priority</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProjects.map((project) => (
+                <tr key={project._id}>
+                  <td>
+                    <div className="flex flex-col gap-1">
+                      <span className="font-bold text-[var(--text-primary)]">
+                        {project.title}
+                      </span>
+                      <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
+                        <MapPin size={13} className="text-emerald-700 dark:text-emerald-400 shrink-0" />
+                        <span>
+                          {project.zone ? `${project.zone} — ` : ""}
+                          {project.address || "Location on corridor"}
+                        </span>
+                      </div>
+                      {project.estimatedBudget ? (
+                        <div className="flex items-center gap-1 text-[11px] text-[var(--text-muted)]">
+                          <IndianRupee size={11} />
+                          <span>Budget: ₹{Number(project.estimatedBudget).toLocaleString()}</span>
+                        </div>
+                      ) : null}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="flex items-center gap-1.5 font-medium text-[var(--text-secondary)]">
+                      <Building2 size={14} className="text-[var(--text-muted)]" />
+                      <span>{project.department?.name || "Unassigned Agency"}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span className="target-tag capitalize">
+                      {project.category?.replace(/_/g, " ")}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] whitespace-nowrap">
+                      <Calendar size={13} />
+                      <span>
+                        {new Date(project.startDate).toLocaleDateString()} –{" "}
+                        {new Date(project.endDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <StatusPill status={project.priority || "medium"} type="priority" />
+                  </td>
+                  <td>
+                    <StatusPill status={project.status || "proposed"} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
-      <section>
-        <h2>All Projects ({projects.length})</h2>
-
-        {loading ? (
-          <p>Loading projects...</p>
-        ) : projects.length === 0 ? (
-          <p>No projects found. Create your first project to get started.</p>
-        ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ textAlign: "left", borderBottom: "2px solid #cbd5e1" }}>
-                  {["Project", "Department", "Category", "Dates", "Status", "Priority"].map((heading) => (
-                    <th key={heading} style={{ padding: "12px 8px" }}>{heading}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {projects.map((project) => (
-                  <tr key={project._id} style={{ borderBottom: "1px solid #e2e8f0" }}>
-                    <td style={{ padding: "12px 8px" }}>
-                      <strong>{project.title}</strong>
-                      <div>{project.zone}</div>
-                      <small>{project.address}</small>
-                    </td>
-                    <td style={{ padding: "12px 8px" }}>
-                      {project.department?.name || "Unknown"}
-                    </td>
-                    <td style={{ padding: "12px 8px" }}>
-                      {project.category?.replaceAll("_", " ")}
-                    </td>
-                    <td style={{ padding: "12px 8px", whiteSpace: "nowrap" }}>
-                      {new Date(project.startDate).toLocaleDateString()} –{" "}
-                      {new Date(project.endDate).toLocaleDateString()}
-                    </td>
-                    <td style={{ padding: "12px 8px" }}>
-                      {statusLabels[project.status] || project.status}
-                    </td>
-                    <td style={{ padding: "12px 8px" }}>{project.priority}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Create Project Modal */}
+      <Modal
+        isOpen={formOpen}
+        onClose={() => setFormOpen(false)}
+        title="Register New Infrastructure Project"
+        size="lg"
+      >
+        <form onSubmit={handleSubmit} className="modal-body">
+          <div className="form-group">
+            <label>Project Title *</label>
+            <input
+              type="text"
+              name="title"
+              required
+              placeholder="e.g. Ring Road Main Water Conduit Trenching & Relaying"
+              value={form.title}
+              onChange={updateField}
+            />
           </div>
-        )}
-      </section>
-    </main>
+
+          <div className="form-group">
+            <label>Scope of Works / Description</label>
+            <textarea
+              name="description"
+              rows={2}
+              placeholder="Underground utility installation, trenching dimensions, traffic diversion schedule..."
+              value={form.description}
+              onChange={updateField}
+            />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Executing Department *</label>
+              <select
+                name="department"
+                required
+                value={form.department}
+                onChange={updateField}
+              >
+                <option value="">Choose municipal department...</option>
+                {departments.map((d) => (
+                  <option key={d._id} value={d._id}>
+                    {d.name} ({d.code})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Civil Category *</label>
+              <select
+                name="category"
+                required
+                value={form.category}
+                onChange={updateField}
+              >
+                {categories.map(([val, label]) => (
+                  <option key={val} value={val}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Zone / Ward Area *</label>
+              <input
+                type="text"
+                name="zone"
+                required
+                placeholder="e.g. Zone 4 (North Corridor)"
+                value={form.zone}
+                onChange={updateField}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Full Site / Corridor Address *</label>
+              <input
+                type="text"
+                name="address"
+                required
+                placeholder="e.g. Outer Ring Road, KM 14 to 18"
+                value={form.address}
+                onChange={updateField}
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Corridor Latitude (-90 to 90) *</label>
+              <input
+                type="number"
+                name="latitude"
+                step="any"
+                min="-90"
+                max="90"
+                required
+                placeholder="e.g. 12.9716"
+                value={form.latitude}
+                onChange={updateField}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Corridor Longitude (-180 to 180) *</label>
+              <input
+                type="number"
+                name="longitude"
+                step="any"
+                min="-180"
+                max="180"
+                required
+                placeholder="e.g. 77.5946"
+                value={form.longitude}
+                onChange={updateField}
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Commencement Date *</label>
+              <input
+                type="date"
+                name="startDate"
+                required
+                value={form.startDate}
+                onChange={updateField}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Completion Date *</label>
+              <input
+                type="date"
+                name="endDate"
+                required
+                value={form.endDate}
+                onChange={updateField}
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Estimated Civil Budget (₹)</label>
+              <input
+                type="number"
+                name="estimatedBudget"
+                min="0"
+                placeholder="e.g. 2500000"
+                value={form.estimatedBudget}
+                onChange={updateField}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Priority Level *</label>
+              <select
+                name="priority"
+                required
+                value={form.priority}
+                onChange={updateField}
+              >
+                <option value="low">Low (Routine maintenance)</option>
+                <option value="medium">Medium (Standard capital works)</option>
+                <option value="high">High (High-density arterial)</option>
+                <option value="critical">Critical (Emergency main restoration)</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => setFormOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={saving || departments.length === 0}
+            >
+              {saving ? "Registering & Checking Clashes..." : "Register Infrastructure Project"}
+            </button>
+          </div>
+        </form>
+      </Modal>
+    </div>
   );
 }

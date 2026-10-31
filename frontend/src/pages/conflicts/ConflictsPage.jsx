@@ -1,20 +1,26 @@
-
 import React, { useCallback, useEffect, useState } from "react";
+import {
+  AlertTriangle,
+  RotateCcw,
+  CheckCircle2,
+  Building2,
+  Calendar,
+  MapPin,
+  ArrowRight,
+  ShieldCheck,
+  Check
+} from "lucide-react";
 import { ConflictsAPI } from "../../api";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
-
-const statusLabels = {
-  detected: "Detected",
-  under_review: "Under Review",
-  resolved: "Resolved",
-  ignored: "Ignored",
-};
+import { Modal } from "../../components/common/Modal";
+import { LoadingSpinner } from "../../components/common/LoadingSpinner";
+import { EmptyState } from "../../components/common/EmptyState";
 
 const typeLabels = {
-  location_and_date_overlap: "Location and date overlap",
-  date_overlap: "Date overlap",
-  zone_overlap: "Zone overlap",
+  location_and_date_overlap: "Spatial & Timeline Overlap",
+  date_overlap: "Schedule Clash",
+  zone_overlap: "Zonal Proximity Clash",
 };
 
 export function ConflictsPage() {
@@ -25,7 +31,7 @@ export function ConflictsPage() {
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const { user, isRole } = useAuth();
+  const { isRole } = useAuth();
   const { showToast } = useToast();
 
   const canResolve = isRole("city_admin") || isRole("department_head");
@@ -45,6 +51,9 @@ export function ConflictsPage() {
 
   useEffect(() => {
     fetchConflicts();
+    const handleRefresh = () => fetchConflicts();
+    window.addEventListener("citysync:refresh-data", handleRefresh);
+    return () => window.removeEventListener("citysync:refresh-data", handleRefresh);
   }, [fetchConflicts]);
 
   const visibleConflicts = conflicts.filter((conflict) => {
@@ -69,10 +78,10 @@ export function ConflictsPage() {
     try {
       await ConflictsAPI.resolve(selected._id, {
         status: "resolved",
-        resolutionNotes: notes.trim() || "Reviewed and resolved by the department team",
+        resolutionNotes: notes.trim() || "Reviewed and coordinated between line departments.",
       });
 
-      showToast("Conflict resolved successfully", "success");
+      showToast("Civil conflict marked resolved & logged to audit trail", "success");
       setSelected(null);
       setNotes("");
       await fetchConflicts();
@@ -83,245 +92,215 @@ export function ConflictsPage() {
     }
   };
 
-  const cardStyle = {
-    border: "1px solid #dbe2ea",
-    borderRadius: "10px",
-    padding: "18px",
-    marginBottom: "16px",
-  };
-
-  const buttonStyle = {
-    padding: "9px 14px",
-    borderRadius: "6px",
-    border: "1px solid #cbd5e1",
-    cursor: "pointer",
-    font: "inherit",
-  };
-
-  const severityColor = {
-    low: "#64748b",
-    medium: "#b45309",
-    high: "#c2410c",
-    critical: "#b91c1c",
+  const getSeverityBadgeClass = (severity) => {
+    switch (severity?.toLowerCase()) {
+      case "critical":
+        return "badge-danger";
+      case "high":
+        return "badge-danger";
+      case "medium":
+        return "badge-warning";
+      case "low":
+      default:
+        return "badge-info";
+    }
   };
 
   return (
-    <main style={{ padding: "24px", maxWidth: "1100px", margin: "0 auto" }}>
-      <header style={{ marginBottom: "24px" }}>
-        <h1>Project Conflicts</h1>
-        <p>
-          Review overlapping project locations and schedules, then coordinate
-          with the departments involved.
-        </p>
-      </header>
+    <div className="page conflicts-page">
+      <div className="page-header-row">
+        <div>
+          <h3 className="section-title">Dig-Later Infrastructure Conflict Registry</h3>
+          <p className="section-hint">
+            Automated spatial proximity and schedule clash detection across municipal agencies
+          </p>
+        </div>
 
-      <div
-        style={{
-          display: "flex",
-          gap: "10px",
-          flexWrap: "wrap",
-          marginBottom: "22px",
-        }}
-      >
-        {[
-          ["active", "Active Conflicts"],
-          ["all", "All Conflicts"],
-          ["resolved", "Resolved / Ignored"],
-        ].map(([value, label]) => (
-          <button
-            key={value}
-            onClick={() => setFilter(value)}
-            style={{
-              ...buttonStyle,
-              background: filter === value ? "#1d4ed8" : "transparent",
-              color: filter === value ? "#fff" : "inherit",
-            }}
-          >
-            {label}
-          </button>
-        ))}
-
-        <button
-          onClick={fetchConflicts}
-          style={{ ...buttonStyle, marginLeft: "auto" }}
-          disabled={loading}
-        >
-          {loading ? "Refreshing..." : "Refresh"}
+        <button className="btn btn-ghost btn-sm" onClick={fetchConflicts} disabled={loading}>
+          <RotateCcw size={14} className={loading ? "spinning" : ""} />
+          <span>Refresh Analysis</span>
         </button>
       </div>
 
-      {!loading && (
-        <p>
-          Showing <strong>{visibleConflicts.length}</strong> conflict(s)
-        </p>
-      )}
+      <div className="page-actions">
+        <div className="flex items-center gap-2">
+          {[
+            ["active", "Active Clashes"],
+            ["all", "All Recorded Conflicts"],
+            ["resolved", "Resolved & Coordinated"],
+          ].map(([value, label]) => (
+            <button
+              key={value}
+              onClick={() => setFilter(value)}
+              className={`btn btn-sm ${
+                filter === value ? "btn-primary" : "btn-secondary"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <span className="results-count">
+          Showing <strong>{visibleConflicts.length}</strong> recorded clash(es)
+        </span>
+      </div>
 
       {loading ? (
-        <p>Loading conflicts...</p>
+        <LoadingSpinner text="Analyzing spatial coordinates and work schedules..." />
       ) : visibleConflicts.length === 0 ? (
-        <div style={cardStyle}>
-          <h3>No conflicts in this view</h3>
-          <p>
-            {filter === "active"
-              ? "No active conflicts are currently recorded. Create another project with an overlapping schedule and location to test detection."
-              : "Try another filter to view recorded conflicts."}
-          </p>
-        </div>
+        <EmptyState
+          icon={ShieldCheck}
+          title={
+            filter === "active"
+              ? "Zero Active Clashes Detected"
+              : "No conflicts recorded in this view"
+          }
+          message={
+            filter === "active"
+              ? "All registered civil works are currently temporally and spatially deconflicted under Dig-Later policy."
+              : "Adjust your filter tab to view archived or resolved inter-departmental conflicts."
+          }
+        />
       ) : (
-        visibleConflicts.map((conflict) => (
-          <article key={conflict._id} style={cardStyle}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                gap: "12px",
-                flexWrap: "wrap",
-              }}
-            >
-              <div>
-                <h3 style={{ marginTop: 0, marginBottom: "8px" }}>
-                  {conflict.projectA?.title || "Project A"} ↔{" "}
-                  {conflict.projectB?.title || "Project B"}
-                </h3>
-                <p style={{ margin: "4px 0" }}>
-                  <strong>Type:</strong>{" "}
-                  {typeLabels[conflict.conflictType] || conflict.conflictType}
-                </p>
-                <p style={{ margin: "4px 0" }}>
-                  <strong>Departments:</strong>{" "}
-                  {(conflict.departmentsInvolved || [])
-                    .map((department) =>
-                      typeof department === "object"
-                        ? department.name
-                        : department
-                    )
-                    .join(", ") || "Not specified"}
-                </p>
-              </div>
+        <div className="card-list">
+          {visibleConflicts.map((conflict) => {
+            const isResolved = ["resolved", "ignored"].includes(conflict.status);
 
-              <div style={{ textAlign: "right" }}>
-                <div
-                  style={{
-                    color: severityColor[conflict.severity] || "inherit",
-                    fontWeight: "bold",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {conflict.severity || "Medium"} severity
+            return (
+              <div key={conflict._id} className="surface-card p-5 flex flex-col gap-4">
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  <div className="flex flex-col gap-1.5 flex-1 min-w-[280px]">
+                    <div className="flex items-center gap-2">
+                      <span className={`audit-badge ${getSeverityBadgeClass(conflict.severity)}`}>
+                        {conflict.severity?.toUpperCase()} SEVERITY
+                      </span>
+                      <span className="target-tag font-semibold">
+                        {typeLabels[conflict.conflictType] || conflict.conflictType}
+                      </span>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${
+                        isResolved
+                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400"
+                          : "bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-400"
+                      }`}>
+                        {conflict.status?.replace(/_/g, " ")}
+                      </span>
+                    </div>
+
+                    <h4 className="text-base font-bold text-[var(--text-primary)] m-0 flex items-center gap-2">
+                      <span>{conflict.projectA?.title || "Corridor Project A"}</span>
+                      <ArrowRight size={15} className="text-[var(--text-muted)] shrink-0" />
+                      <span>{conflict.projectB?.title || "Corridor Project B"}</span>
+                    </h4>
+
+                    <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] flex-wrap">
+                      <span className="flex items-center gap-1">
+                        <Building2 size={13} />
+                        <strong>Agencies Involved:</strong>{" "}
+                        {(conflict.departmentsInvolved || [])
+                          .map((d) => (typeof d === "object" ? d.name : d))
+                          .join(", ") || "Multiple Line Departments"}
+                      </span>
+                      {conflict.distanceMeters != null && (
+                        <>
+                          <span className="dot-sep">•</span>
+                          <span className="flex items-center gap-1 font-semibold text-rose-700 dark:text-rose-400">
+                            <MapPin size={13} />
+                            Separation: {Math.round(conflict.distanceMeters)} meters
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {canResolve && !isResolved && (
+                    <button
+                      className="btn btn-primary btn-sm shrink-0"
+                      onClick={() => {
+                        setSelected(conflict);
+                        setNotes("");
+                      }}
+                    >
+                      <CheckCircle2 size={14} />
+                      <span>Resolve & Coordinate</span>
+                    </button>
+                  )}
                 </div>
-                <div style={{ marginTop: "6px" }}>
-                  {statusLabels[conflict.status] || conflict.status}
+
+                {/* Conflict Details Comparison Box */}
+                <div className="detail-grid">
+                  <div className="detail-item">
+                    <span className="detail-label">Project A Location & Timeline</span>
+                    <span className="detail-val">
+                      {conflict.projectA?.zone ? `${conflict.projectA.zone} — ` : ""}
+                      {conflict.projectA?.address || "Address unavailable"}
+                    </span>
+                    <span className="text-xs text-[var(--text-muted)] mt-1 flex items-center gap-1">
+                      <Calendar size={12} />
+                      {conflict.projectA?.startDate ? new Date(conflict.projectA.startDate).toLocaleDateString() : "—"}{" "}
+                      to {conflict.projectA?.endDate ? new Date(conflict.projectA.endDate).toLocaleDateString() : "—"}
+                    </span>
+                  </div>
+
+                  <div className="detail-item">
+                    <span className="detail-label">Project B Location & Timeline</span>
+                    <span className="detail-val">
+                      {conflict.projectB?.zone ? `${conflict.projectB.zone} — ` : ""}
+                      {conflict.projectB?.address || "Address unavailable"}
+                    </span>
+                    <span className="text-xs text-[var(--text-muted)] mt-1 flex items-center gap-1">
+                      <Calendar size={12} />
+                      {conflict.projectB?.startDate ? new Date(conflict.projectB.startDate).toLocaleDateString() : "—"}{" "}
+                      to {conflict.projectB?.endDate ? new Date(conflict.projectB.endDate).toLocaleDateString() : "—"}
+                    </span>
+                  </div>
                 </div>
+
+                {conflict.resolutionNotes && (
+                  <div className="review-box text-xs text-[var(--text-secondary)]">
+                    <strong>Coordination Record:</strong> {conflict.resolutionNotes}
+                  </div>
+                )}
               </div>
-            </div>
-
-            <div
-              style={{
-                background: "#f8fafc",
-                padding: "12px",
-                borderRadius: "6px",
-                marginTop: "14px",
-              }}
-            >
-              <p>
-                <strong>Project A:</strong>{" "}
-                {conflict.projectA?.zone || "Zone unavailable"} —{" "}
-                {conflict.projectA?.address || "Address unavailable"}
-              </p>
-              <p>
-                <strong>Project B:</strong>{" "}
-                {conflict.projectB?.zone || "Zone unavailable"} —{" "}
-                {conflict.projectB?.address || "Address unavailable"}
-              </p>
-              {conflict.distanceMeters != null && (
-                <p>
-                  <strong>Distance:</strong>{" "}
-                  {Math.round(conflict.distanceMeters)} metres
-                </p>
-              )}
-              {conflict.resolutionNotes && (
-                <p>
-                  <strong>Resolution notes:</strong> {conflict.resolutionNotes}
-                </p>
-              )}
-            </div>
-
-            {canResolve &&
-              ["detected", "under_review"].includes(conflict.status) && (
-                <button
-                  style={{
-                    ...buttonStyle,
-                    background: "#15803d",
-                    color: "#fff",
-                    marginTop: "14px",
-                  }}
-                  onClick={() => {
-                    setSelected(conflict);
-                    setNotes("");
-                  }}
-                >
-                  Resolve Conflict
-                </button>
-              )}
-          </article>
-        ))
+            );
+          })}
+        </div>
       )}
 
-      {selected && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.45)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: "16px",
-            zIndex: 1000,
-          }}
-        >
-          <form
-            onSubmit={handleResolve}
-            style={{
-              background: "white",
-              color: "#111827",
-              padding: "24px",
-              borderRadius: "10px",
-              width: "100%",
-              maxWidth: "480px",
-            }}
-          >
-            <h2>Resolve Conflict</h2>
-            <p>
-              {selected.projectA?.title || "Project A"} and{" "}
-              {selected.projectB?.title || "Project B"}
-            </p>
+      {/* Resolution Coordination Modal */}
+      <Modal
+        isOpen={Boolean(selected)}
+        onClose={() => setSelected(null)}
+        title="Inter-Agency Conflict Resolution Protocol"
+        size="md"
+      >
+        {selected && (
+          <form onSubmit={handleResolve} className="modal-body">
+            <div className="confirm-text">
+              Coordinating clash between <strong>{selected.projectA?.title}</strong> and{" "}
+              <strong>{selected.projectB?.title}</strong>.
+            </div>
 
-            <label style={{ display: "block", marginBottom: "16px" }}>
-              Resolution notes
+            <div className="form-group">
+              <label>Joint Department Coordination Agreement & Notes *</label>
               <textarea
                 value={notes}
-                onChange={(event) => setNotes(event.target.value)}
-                placeholder="Describe the agreed schedule or coordination plan..."
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="e.g. Water Board agrees to complete underground main pipe trenching by 15th Nov, prior to PWD resurfacing on 20th Nov..."
                 rows={4}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  boxSizing: "border-box",
-                  padding: "10px",
-                  marginTop: "8px",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: "6px",
-                  font: "inherit",
-                }}
+                required
               />
-            </label>
+            </div>
 
-            <div style={{ display: "flex", gap: "10px" }}>
+            <p className="confirm-hint">
+              Resolving this conflict formally confirms inter-departmental alignment under Dig-Later
+              statutory rules and records the action into the municipal immutable audit trail.
+            </p>
+
+            <div className="modal-footer">
               <button
                 type="button"
-                style={buttonStyle}
+                className="btn btn-ghost"
                 onClick={() => setSelected(null)}
                 disabled={saving}
               >
@@ -329,19 +308,15 @@ export function ConflictsPage() {
               </button>
               <button
                 type="submit"
-                style={{
-                  ...buttonStyle,
-                  background: "#15803d",
-                  color: "#fff",
-                }}
-                disabled={saving}
+                className="btn btn-primary"
+                disabled={saving || !notes.trim()}
               >
-                {saving ? "Saving..." : "Confirm Resolution"}
+                {saving ? "Logging Resolution..." : "Confirm Deconfliction"}
               </button>
             </div>
           </form>
-        </div>
-      )}
-    </main>
+        )}
+      </Modal>
+    </div>
   );
 }
