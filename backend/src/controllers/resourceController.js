@@ -1,4 +1,4 @@
-
+const mongoose = require("mongoose");
 const Resource = require("../models/Resource");
 const { logAudit, createNotification } = require("../utils/notifyAudit");
 const User = require("../models/User");
@@ -99,6 +99,10 @@ const getAllResources = async (req, res) => {
 
 // ─── GET SINGLE RESOURCE ──────────────────────────────────────────────────────
 const getResourceById = async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(404).json({ message: "Resource not found" });
+  }
+
   try {
     const resource = await Resource.findById(req.params.id).populate(
       "ownerDepartment",
@@ -118,6 +122,10 @@ const getResourceById = async (req, res) => {
 
 // ─── UPDATE RESOURCE ──────────────────────────────────────────────────────────
 const updateResource = async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(404).json({ message: "Resource not found" });
+  }
+
   try {
     const resource = await Resource.findById(req.params.id);
     if (!resource || !resource.isActive) {
@@ -198,6 +206,10 @@ const updateResource = async (req, res) => {
 
 // ─── DEACTIVATE RESOURCE ──────────────────────────────────────────────────────
 const deactivateResource = async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(404).json({ message: "Resource not found" });
+  }
+
   try {
     const resource = await Resource.findById(req.params.id);
     if (!resource || !resource.isActive) {
