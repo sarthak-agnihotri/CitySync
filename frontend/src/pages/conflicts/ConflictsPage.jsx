@@ -26,6 +26,7 @@ const typeLabels = {
 export function ConflictsPage() {
   const [conflicts, setConflicts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [filter, setFilter] = useState("active");
   const [selected, setSelected] = useState(null);
   const [notes, setNotes] = useState("");
@@ -36,25 +37,28 @@ export function ConflictsPage() {
 
   const canResolve = isRole("city_admin") || isRole("department_head");
 
-  const fetchConflicts = useCallback(async () => {
-    setLoading(true);
+  const fetchConflicts = useCallback(async (isSilent = false) => {
+    if (!isSilent && !hasLoadedOnce) {
+      setLoading(true);
+    }
 
     try {
       const result = await ConflictsAPI.getAll();
       setConflicts(result.conflicts || []);
+      setHasLoadedOnce(true);
     } catch (err) {
       showToast(err.message || "Could not load conflicts", "error");
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, hasLoadedOnce]);
 
   useEffect(() => {
-    fetchConflicts();
-    const handleRefresh = () => fetchConflicts();
+    fetchConflicts(hasLoadedOnce);
+    const handleRefresh = () => fetchConflicts(false);
     window.addEventListener("citysync:refresh-data", handleRefresh);
     return () => window.removeEventListener("citysync:refresh-data", handleRefresh);
-  }, [fetchConflicts]);
+  }, [fetchConflicts, hasLoadedOnce]);
 
   const visibleConflicts = conflicts.filter((conflict) => {
     if (filter === "active") {

@@ -46,6 +46,7 @@ export function ProjectsPage() {
   const [projects, setProjects] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
@@ -53,8 +54,10 @@ export function ProjectsPage() {
   const [form, setForm] = useState(initialForm);
   const { showToast } = useToast();
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  const fetchData = useCallback(async (isSilent = false) => {
+    if (!isSilent && !hasLoadedOnce) {
+      setLoading(true);
+    }
     try {
       const [projectData, departmentData] = await Promise.all([
         ProjectsAPI.getAll(),
@@ -63,19 +66,20 @@ export function ProjectsPage() {
 
       setProjects(projectData.projects || []);
       setDepartments(departmentData.departments || []);
+      setHasLoadedOnce(true);
     } catch (err) {
       showToast(err.message || "Could not load projects", "error");
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, hasLoadedOnce]);
 
   useEffect(() => {
-    fetchData();
-    const handleRefresh = () => fetchData();
+    fetchData(hasLoadedOnce);
+    const handleRefresh = () => fetchData(false);
     window.addEventListener("citysync:refresh-data", handleRefresh);
     return () => window.removeEventListener("citysync:refresh-data", handleRefresh);
-  }, [fetchData]);
+  }, [fetchData, hasLoadedOnce]);
 
   const updateField = (event) => {
     const { name, value } = event.target;

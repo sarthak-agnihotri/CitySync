@@ -18,6 +18,7 @@ import { EmptyState } from "../../components/common/EmptyState";
 export function DepartmentsPage() {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [search, setSearch] = useState("");
   const { showToast } = useToast();
 
@@ -47,24 +48,27 @@ export function DepartmentsPage() {
   const [deactivatingDept, setDeactivatingDept] = useState(null);
   const [deactivating, setDeactivating] = useState(false);
 
-  const fetchDepartments = useCallback(async () => {
-    setLoading(true);
+  const fetchDepartments = useCallback(async (isSilent = false) => {
+    if (!isSilent && !hasLoadedOnce) {
+      setLoading(true);
+    }
     try {
       const data = await DepartmentsAPI.list();
       setDepartments(data.departments || []);
+      setHasLoadedOnce(true);
     } catch (err) {
       showToast(err.message || "Failed to load departments", "error");
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, hasLoadedOnce]);
 
   useEffect(() => {
-    fetchDepartments();
-    const handleRefresh = () => fetchDepartments();
+    fetchDepartments(hasLoadedOnce);
+    const handleRefresh = () => fetchDepartments(false);
     window.addEventListener("citysync:refresh-data", handleRefresh);
     return () => window.removeEventListener("citysync:refresh-data", handleRefresh);
-  }, [fetchDepartments]);
+  }, [fetchDepartments, hasLoadedOnce]);
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault();

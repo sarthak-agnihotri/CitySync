@@ -23,28 +23,32 @@ export function NotificationsPage() {
   const { refreshUnreadCount } = useOutletContext() || {};
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [unreadOnly, setUnreadOnly] = useState(false);
   const { showToast } = useToast();
 
-  const loadNotifications = useCallback(async () => {
-    setLoading(true);
+  const loadNotifications = useCallback(async (isSilent = false) => {
+    if (!isSilent && !hasLoadedOnce) {
+      setLoading(true);
+    }
     try {
       const data = await NotificationsAPI.list(unreadOnly);
       setNotifications(data.notifications || []);
+      setHasLoadedOnce(true);
       if (refreshUnreadCount) refreshUnreadCount();
     } catch (err) {
       showToast(err.message || "Failed to load notifications", "error");
     } finally {
       setLoading(false);
     }
-  }, [unreadOnly, refreshUnreadCount, showToast]);
+  }, [unreadOnly, refreshUnreadCount, showToast, hasLoadedOnce]);
 
   useEffect(() => {
-    loadNotifications();
-    const handleRefresh = () => loadNotifications();
+    loadNotifications(hasLoadedOnce);
+    const handleRefresh = () => loadNotifications(false);
     window.addEventListener("citysync:refresh-data", handleRefresh);
     return () => window.removeEventListener("citysync:refresh-data", handleRefresh);
-  }, [loadNotifications]);
+  }, [loadNotifications, hasLoadedOnce]);
 
   const handleMarkRead = async (id) => {
     try {

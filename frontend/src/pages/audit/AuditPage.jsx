@@ -19,6 +19,7 @@ export function AuditPage() {
   const [logs, setLogs] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const { showToast } = useToast();
 
   // Filters
@@ -32,8 +33,10 @@ export function AuditPage() {
   const [selectedLog, setSelectedLog] = useState(null);
   const [inspectOpen, setInspectOpen] = useState(false);
 
-  const loadLogs = useCallback(async () => {
-    setLoading(true);
+  const loadLogs = useCallback(async (isSilent = false) => {
+    if (!isSilent && !hasLoadedOnce) {
+      setLoading(true);
+    }
     try {
       const params = {};
       if (actionFilter) params.action = actionFilter;
@@ -49,19 +52,20 @@ export function AuditPage() {
 
       setLogs(auditData.logs || []);
       setDepartments(deptData.departments || []);
+      setHasLoadedOnce(true);
     } catch (err) {
       showToast(err.message || "Failed to query audit trail", "error");
     } finally {
       setLoading(false);
     }
-  }, [actionFilter, targetTypeFilter, deptFilter, startDate, endDate, showToast]);
+  }, [actionFilter, targetTypeFilter, deptFilter, startDate, endDate, showToast, hasLoadedOnce]);
 
   useEffect(() => {
-    loadLogs();
-    const handleRefresh = () => loadLogs();
+    loadLogs(hasLoadedOnce);
+    const handleRefresh = () => loadLogs(false);
     window.addEventListener("citysync:refresh-data", handleRefresh);
     return () => window.removeEventListener("citysync:refresh-data", handleRefresh);
-  }, [loadLogs]);
+  }, [loadLogs, hasLoadedOnce]);
 
   const clearFilters = () => {
     setActionFilter("");

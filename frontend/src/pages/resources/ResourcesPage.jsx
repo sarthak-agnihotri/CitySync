@@ -29,6 +29,7 @@ export function ResourcesPage() {
   const [resources, setResources] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   // Filters
   const [search, setSearch] = useState("");
@@ -69,8 +70,10 @@ export function ResourcesPage() {
   const [deactivatingResource, setDeactivatingResource] = useState(null);
   const [deactivating, setDeactivating] = useState(false);
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
+  const loadData = useCallback(async (isSilent = false) => {
+    if (!isSilent && !hasLoadedOnce) {
+      setLoading(true);
+    }
     try {
       const [resData, deptData] = await Promise.all([
         ResourcesAPI.list(),
@@ -79,6 +82,7 @@ export function ResourcesPage() {
       setResources(resData.resources || []);
       const activeDepts = deptData.departments || [];
       setDepartments(activeDepts);
+      setHasLoadedOnce(true);
 
       if (user?.department && typeof user.department === "object" && user.department._id) {
         setAddForm((prev) => ({ ...prev, ownerDepartment: user.department._id }));
@@ -90,14 +94,14 @@ export function ResourcesPage() {
     } finally {
       setLoading(false);
     }
-  }, [showToast, user]);
+  }, [showToast, user, hasLoadedOnce]);
 
   useEffect(() => {
-    loadData();
-    const handleRefresh = () => loadData();
+    loadData(hasLoadedOnce);
+    const handleRefresh = () => loadData(false);
     window.addEventListener("citysync:refresh-data", handleRefresh);
     return () => window.removeEventListener("citysync:refresh-data", handleRefresh);
-  }, [loadData]);
+  }, [loadData, hasLoadedOnce]);
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();

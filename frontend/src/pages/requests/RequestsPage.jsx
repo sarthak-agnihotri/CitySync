@@ -31,6 +31,7 @@ export function RequestsPage() {
   const [resources, setResources] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState("");
@@ -60,8 +61,10 @@ export function RequestsPage() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedReqDetail, setSelectedReqDetail] = useState(null);
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
+  const loadData = useCallback(async (isSilent = false) => {
+    if (!isSilent && !hasLoadedOnce) {
+      setLoading(true);
+    }
     try {
       const [reqData, resData, deptData] = await Promise.all([
         RequestsAPI.list(),
@@ -71,6 +74,7 @@ export function RequestsPage() {
       setRequests(reqData.requests || []);
       setResources(resData.resources || []);
       setDepartments(deptData.departments || []);
+      setHasLoadedOnce(true);
 
       // Check URL search param for pre-selection
       const paramResourceId = searchParams.get("resourceId");
@@ -87,14 +91,14 @@ export function RequestsPage() {
     } finally {
       setLoading(false);
     }
-  }, [searchParams, setSearchParams, showToast]);
+  }, [searchParams, setSearchParams, showToast, hasLoadedOnce]);
 
   useEffect(() => {
-    loadData();
-    const handleRefresh = () => loadData();
+    loadData(hasLoadedOnce);
+    const handleRefresh = () => loadData(false);
     window.addEventListener("citysync:refresh-data", handleRefresh);
     return () => window.removeEventListener("citysync:refresh-data", handleRefresh);
-  }, [loadData]);
+  }, [loadData, hasLoadedOnce]);
 
   const handleNewSubmit = async (e) => {
     e.preventDefault();

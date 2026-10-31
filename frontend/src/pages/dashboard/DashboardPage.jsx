@@ -34,6 +34,7 @@ export function DashboardPage() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [stats, setStats] = useState({
     totalResources: 0,
     availableResources: 0,
@@ -48,15 +49,20 @@ export function DashboardPage() {
   const [recentConflicts, setRecentConflicts] = useState([]);
   const [lowStockResources, setLowStockResources] = useState([]);
 
-  const loadDashboardData = useCallback(async () => {
-    setLoading(true);
+  const loadDashboardData = useCallback(async (isSilent = false) => {
+    if (!isSilent && !hasLoadedOnce) {
+      setLoading(true);
+    }
     try {
-      const [resData, reqData, notifData, projData, confData] = await Promise.allSettled([
+      const isAdmin = isRole("city_admin");
+      const [resData, reqData, notifData, projData, confData, deptData, usrData] = await Promise.allSettled([
         ResourcesAPI.list(),
         RequestsAPI.list(),
         NotificationsAPI.list(true),
         ProjectsAPI.getAll(),
-        ConflictsAPI.getAll()
+        ConflictsAPI.getAll(),
+        isAdmin ? DepartmentsAPI.list() : Promise.resolve(null),
+        isAdmin ? UsersAPI.list() : Promise.resolve(null)
       ]);
 
       const resources = resData.status === "fulfilled" && resData.value?.resources ? resData.value.resources : [];
@@ -76,11 +82,7 @@ export function DashboardPage() {
       let deptsCount = 0;
       let usersCount = 0;
 
-      if (isRole("city_admin")) {
-        const [deptData, usrData] = await Promise.allSettled([
-          DepartmentsAPI.list(),
-          UsersAPI.list()
-        ]);
+      if (isAdmin) {
         if (deptData.status === "fulfilled" && deptData.value?.departments) {
           deptsCount = deptData.value.departments.length;
         }
@@ -103,19 +105,20 @@ export function DashboardPage() {
       setRecentRequests(requests.slice(0, 5));
       setRecentConflicts(activeClashes.slice(0, 3));
       setLowStockResources(lowStock.slice(0, 4));
+      setHasLoadedOnce(true);
     } catch (err) {
       console.error("Dashboard data load error:", err);
     } finally {
       setLoading(false);
     }
-  }, [isRole]);
+  }, [isRole, hasLoadedOnce]);
 
   useEffect(() => {
-    loadDashboardData();
-    const handleRefresh = () => loadDashboardData();
+    loadDashboardData(hasLoadedOnce);
+    const handleRefresh = () => loadDashboardData(false);
     window.addEventListener("citysync:refresh-data", handleRefresh);
     return () => window.removeEventListener("citysync:refresh-data", handleRefresh);
-  }, [loadDashboardData]);
+  }, [loadDashboardData, hasLoadedOnce]);
 
   if (loading) {
     return <LoadingSpinner text="Aggregating municipal metrics and requisition logs..." />;

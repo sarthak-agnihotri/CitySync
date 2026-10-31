@@ -17,6 +17,7 @@ export function UsersPage() {
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const { showToast } = useToast();
@@ -27,8 +28,10 @@ export function UsersPage() {
   const [selectedDeptId, setSelectedDeptId] = useState("");
   const [assigning, setAssigning] = useState(false);
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
+  const loadData = useCallback(async (isSilent = false) => {
+    if (!isSilent && !hasLoadedOnce) {
+      setLoading(true);
+    }
     try {
       const [userData, deptData] = await Promise.all([
         UsersAPI.list(),
@@ -36,19 +39,20 @@ export function UsersPage() {
       ]);
       setUsers(userData.users || []);
       setDepartments(deptData.departments || []);
+      setHasLoadedOnce(true);
     } catch (err) {
       showToast(err.message || "Failed to load users and departments", "error");
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, hasLoadedOnce]);
 
   useEffect(() => {
-    loadData();
-    const handleRefresh = () => loadData();
+    loadData(hasLoadedOnce);
+    const handleRefresh = () => loadData(false);
     window.addEventListener("citysync:refresh-data", handleRefresh);
     return () => window.removeEventListener("citysync:refresh-data", handleRefresh);
-  }, [loadData]);
+  }, [loadData, hasLoadedOnce]);
 
   const openAssignModal = (user) => {
     setSelectedUser(user);
