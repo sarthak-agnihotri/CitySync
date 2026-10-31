@@ -1,6 +1,16 @@
 import React from "react";
 
 export function StatCard({ icon, count, label, subtitle, onClick }) {
+  const renderIcon = () => {
+    if (!icon) return null;
+    if (React.isValidElement(icon)) return icon;
+    if (typeof icon === "function" || (typeof icon === "object" && icon !== null && "$$typeof" in icon)) {
+      const IconComp = icon;
+      return <IconComp className="w-6 h-6" aria-hidden="true" />;
+    }
+    return icon;
+  };
+
   return (
     <div
       className={`surface-card p-5 flex items-start gap-4 transition-all ${
@@ -23,7 +33,7 @@ export function StatCard({ icon, count, label, subtitle, onClick }) {
       }
     >
       <div className="w-12 h-12 rounded-lg bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] flex items-center justify-center text-emerald-700 dark:text-emerald-400 shrink-0">
-        {icon}
+        {renderIcon()}
       </div>
       <div className="flex flex-col min-w-0">
         <span className="text-2xl font-extrabold text-[var(--text-primary)] leading-tight">

@@ -86,12 +86,15 @@ export function NotificationsPage() {
       case "request_submitted":
         return <ClipboardList size={size} />;
       case "request_approved":
+      case "conflict_resolved":
         return <CheckCircle2 size={size} className="text-success" />;
       case "request_rejected":
         return <XCircle size={size} className="text-danger" />;
       case "resource_returned":
         return <Package size={size} />;
       case "resource_conflict":
+      case "project_conflict_detected":
+      case "conflict_detected":
         return <AlertTriangle size={size} className="text-warning" />;
       case "inventory_low":
         return <TrendingDown size={size} className="text-warning" />;
@@ -102,6 +105,10 @@ export function NotificationsPage() {
       default:
         return <Bell size={size} />;
     }
+  };
+
+  const cleanTitle = (title = "") => {
+    return title.replace(/^[\s?⚠️✅📋❌🚫📦📉⏰]+/, "").trim() || title;
   };
 
   return (
@@ -160,7 +167,7 @@ export function NotificationsPage() {
               <div className="notif-icon">{renderNotifIcon(notif.type)}</div>
               <div className="notif-body">
                 <div className="notif-title-row">
-                  <h4 className="notif-title">{notif.title}</h4>
+                  <h4 className="notif-title">{cleanTitle(notif.title)}</h4>
                   <span className="notif-time">
                     {new Date(notif.createdAt).toLocaleString()}
                   </span>

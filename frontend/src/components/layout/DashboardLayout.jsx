@@ -6,6 +6,8 @@ import { NotificationsAPI } from "../../api";
 
 const PAGE_TITLES = {
   "/dashboard": "Overview & Analytics",
+  "/projects": "Municipal Infrastructure Projects",
+  "/conflicts": "Dig-Later Conflict Registry",
   "/resources": "Resource & Equipment Inventory",
   "/requests": "Requisitions & Requests",
   "/notifications": "Alerts & Notifications",

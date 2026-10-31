@@ -85,6 +85,7 @@ export function ConflictsPage() {
       setSelected(null);
       setNotes("");
       await fetchConflicts();
+      window.dispatchEvent(new CustomEvent("citysync:refresh-data"));
     } catch (err) {
       showToast(err.message || "Could not resolve conflict", "error");
     } finally {
@@ -198,7 +199,7 @@ export function ConflictsPage() {
                         <Building2 size={13} />
                         <strong>Agencies Involved:</strong>{" "}
                         {(conflict.departmentsInvolved || [])
-                          .map((d) => (typeof d === "object" ? d.name : d))
+                          .map((d) => (typeof d === "object" && d !== null ? (d.name || d.code) : d))
                           .join(", ") || "Multiple Line Departments"}
                       </span>
                       {conflict.distanceMeters != null && (

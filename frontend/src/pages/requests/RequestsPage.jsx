@@ -10,12 +10,11 @@ import {
   Ban,
   Calendar,
   Building2,
-  User,
   Boxes,
   Eye,
   AlertCircle
 } from "lucide-react";
-import { RequestsAPI, ResourcesAPI } from "../../api";
+import { RequestsAPI, ResourcesAPI, DepartmentsAPI } from "../../api";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import { Modal } from "../../components/common/Modal";
@@ -30,6 +29,7 @@ export function RequestsPage() {
 
   const [requests, setRequests] = useState([]);
   const [resources, setResources] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Filters
@@ -40,6 +40,7 @@ export function RequestsPage() {
   const [newOpen, setNewOpen] = useState(false);
   const [newForm, setNewForm] = useState({
     resourceId: "",
+    requestingDepartment: "",
     quantityRequested: 1,
     purpose: "",
     startDate: "",
@@ -62,13 +63,14 @@ export function RequestsPage() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [reqData, resData] = await Promise.all([
+      const [reqData, resData, deptData] = await Promise.all([
         RequestsAPI.list(),
-        ResourcesAPI.list()
+        ResourcesAPI.list(),
+        DepartmentsAPI.list()
       ]);
       setRequests(reqData.requests || []);
-      const activeRes = resData.resources || [];
-      setResources(activeRes);
+      setResources(resData.resources || []);
+      setDepartments(deptData.departments || []);
 
       // Check URL search param for pre-selection
       const paramResourceId = searchParams.get("resourceId");
@@ -78,7 +80,6 @@ export function RequestsPage() {
           resourceId: paramResourceId
         }));
         setNewOpen(true);
-        // Clear search param so opening doesn't trigger on future refreshes
         setSearchParams({});
       }
     } catch (err) {
@@ -107,10 +108,18 @@ export function RequestsPage() {
       return;
     }
 
+    const deptId =
+      newForm.requestingDepartment ||
+      (user?.department && typeof user.department === "object"
+        ? user.department._id
+        : user?.department) ||
+      (departments.length > 0 ? departments[0]._id : undefined);
+
     setSubmitting(true);
     try {
       await RequestsAPI.submit({
         resourceId: newForm.resourceId,
+        requestingDepartment: deptId,
         quantityRequested: Number(newForm.quantityRequested),
         purpose: newForm.purpose.trim(),
         startDate: newForm.startDate,
@@ -123,6 +132,7 @@ export function RequestsPage() {
       setNewOpen(false);
       setNewForm({
         resourceId: "",
+        requestingDepartment: "",
         quantityRequested: 1,
         purpose: "",
         startDate: "",
@@ -446,6 +456,26 @@ export function RequestsPage() {
             </div>
           )}
 
+          {/* Department selector if user has no assigned department or wants to specify */}
+          <div className="form-group">
+            <label>Requesting Department *</label>
+            <select
+              value={newForm.requestingDepartment}
+              onChange={(e) =>
+                setNewForm({ ...newForm, requestingDepartment: e.target.value })
+              }
+            >
+              <option value="">
+                {user?.department?.name || "Select requesting department..."}
+              </option>
+              {departments.map((d) => (
+                <option key={d._id} value={d._id}>
+                  {d.name} ({d.code})
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="form-row">
             <div className="form-group">
               <label>Quantity Needed *</label>
@@ -582,7 +612,7 @@ export function RequestsPage() {
             <div className="detail-grid">
               <div className="detail-item">
                 <span className="detail-label">Asset:</span>
-                <span className="detail-val">{selectedReqDetail.resource?.name}</span>
+                <span className="detail-val">{selectedReqDetail.resource?.name || "Machinery Item"}</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Status:</span>
@@ -601,13 +631,13 @@ export function RequestsPage() {
               <div className="detail-item">
                 <span className="detail-label">Requester:</span>
                 <span className="detail-val">
-                  {selectedReqDetail.requestedBy?.name} ({selectedReqDetail.requestedBy?.email})
+                  {selectedReqDetail.requestedBy?.name || "Officer"} ({selectedReqDetail.requestedBy?.email || "—"})
                 </span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Department:</span>
                 <span className="detail-val">
-                  {selectedReqDetail.requestingDepartment?.name}
+                  {selectedReqDetail.requestingDepartment?.name || "Unassigned"}
                 </span>
               </div>
               <div className="detail-item">
@@ -640,7 +670,7 @@ export function RequestsPage() {
               <div className="detail-section review-box">
                 <span className="detail-label">Review Information:</span>
                 <p className="detail-paragraph">
-                  Reviewed by <strong>{selectedReqDetail.reviewedBy.name}</strong> on{" "}
+                  Reviewed by <strong>{selectedReqDetail.reviewedBy.name || "Officer"}</strong> on{" "}
                   {selectedReqDetail.reviewedAt
                     ? new Date(selectedReqDetail.reviewedAt).toLocaleString()
                     : "—"}
