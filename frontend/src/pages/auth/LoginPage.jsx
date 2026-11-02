@@ -90,7 +90,7 @@ export function LoginPage() {
                 type="email"
                 required
                 autoFocus
-                placeholder="officer@citysync.gov"
+                placeholder="Email"
                 style={{ paddingLeft: 36, width: "100%" }}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -117,7 +117,7 @@ export function LoginPage() {
                 id="login-password"
                 type="password"
                 required
-                placeholder="••••••••"
+                placeholder="Password"
                 style={{ paddingLeft: 36, width: "100%" }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
