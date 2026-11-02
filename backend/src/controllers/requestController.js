@@ -137,23 +137,23 @@ const getAllRequests = async (req, res) => {
     const { status, department, priority, resourceId } = req.query;
     const filter = {};
 
-    // Officers only see their own requests
+    // Officers only see requests they submitted
     if (req.user.role === "officer") {
       filter.requestedBy = req.user.userId;
-    } else if (req.user.role === "department_head") {
-      // Department heads see requests made by their department AND incoming requests for their department's resources
-      if (!req.user.department) {
-        filter.requestedBy = req.user.userId;
-      } else {
-        const ownedResourceIds = await Resource.find({
-          ownerDepartment: req.user.department
-        }).distinct("_id");
+    }
 
-        filter.$or = [
-          { requestingDepartment: req.user.department },
-          { resource: { $in: ownedResourceIds } }
-        ];
-      }
+    // Central department head can see all requests.
+    // Assigned department heads see requests from their department
+    // and incoming requests for their department's resources.
+    else if (req.user.role === "department_head" && req.user.department) {
+      const ownedResourceIds = await Resource.find({
+        ownerDepartment: req.user.department
+      }).distinct("_id");
+
+      filter.$or = [
+        { requestingDepartment: req.user.department },
+        { resource: { $in: ownedResourceIds } }
+      ];
     }
 
     if (status) filter.status = status;
@@ -164,7 +164,14 @@ const getAllRequests = async (req, res) => {
     if (resourceId) filter.resource = resourceId;
 
     const requests = await ResourceRequest.find(filter)
-      .populate("resource", "name category unit")
+      .populate({
+        path: "resource",
+        select: "name category unit ownerDepartment",
+        populate: {
+          path: "ownerDepartment",
+          select: "name code"
+        }
+      })
       .populate("requestedBy", "name email")
       .populate("requestingDepartment", "name code")
       .populate("reviewedBy", "name email")
@@ -181,7 +188,14 @@ const getAllRequests = async (req, res) => {
 const getRequestById = async (req, res) => {
   try {
     const request = await ResourceRequest.findById(req.params.id)
-      .populate("resource", "name category unit status")
+      .populate({
+        path: "resource",
+        select: "name category unit status ownerDepartment",
+        populate: {
+          path: "ownerDepartment",
+          select: "name code"
+        }
+      })
       .populate("requestedBy", "name email")
       .populate("requestingDepartment", "name code")
       .populate("reviewedBy", "name email");
@@ -190,12 +204,32 @@ const getRequestById = async (req, res) => {
       return res.status(404).json({ message: "Request not found" });
     }
 
-    // Officers can only see their own requests
-    if (
-      req.user.role === "officer" &&
-      request.requestedBy._id.toString() !== req.user.userId
-    ) {
-      return res.status(403).json({ message: "Access denied" });
+    // Officers can only view requests they submitted
+    if (req.user.role === "officer") {
+      if (request.requestedBy._id.toString() !== req.user.userId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
+    // Assigned department heads can view requests related to their department
+    else if (req.user.role === "department_head" && req.user.department) {
+      const requestingDepartmentId =
+        request.requestingDepartment?._id?.toString() ||
+        request.requestingDepartment?.toString();
+
+      const resourceDepartmentId =
+        request.resource?.ownerDepartment?._id?.toString() ||
+        request.resource?.ownerDepartment?.toString();
+
+      const userDepartmentId = req.user.department.toString();
+
+      const hasAccess =
+        requestingDepartmentId === userDepartmentId ||
+        resourceDepartmentId === userDepartmentId;
+
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
     }
 
     return res.json({ request });
@@ -226,7 +260,8 @@ const approveRequest = async (req, res) => {
 
     if (
       req.user.role === "department_head" &&
-      resource.ownerDepartment.toString() !== req.user.department?.toString()
+      req.user.department &&
+      resource.ownerDepartment.toString() !== req.user.department.toString()
     ) {
       return res.status(403).json({
         message: "You can only approve requests for resources owned by your department"
@@ -301,7 +336,8 @@ const rejectRequest = async (req, res) => {
 
     if (
       req.user.role === "department_head" &&
-      request.resource?.ownerDepartment?.toString() !== req.user.department?.toString()
+      req.user.department &&
+      request.resource?.ownerDepartment?.toString() !== req.user.department.toString()
     ) {
       return res.status(403).json({
         message: "You can only reject requests for resources owned by your department"
@@ -364,7 +400,8 @@ const returnResource = async (req, res) => {
 
     if (
       req.user.role === "department_head" &&
-      resource.ownerDepartment.toString() !== req.user.department?.toString()
+      req.user.department &&
+      resource.ownerDepartment.toString() !== req.user.department.toString()
     ) {
       return res.status(403).json({
         message: "You can only mark resources returned for your department"

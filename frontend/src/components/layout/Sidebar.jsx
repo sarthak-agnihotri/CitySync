@@ -25,9 +25,10 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
   };
 
   const departmentName =
-    user?.department && typeof user.department === "object"
-      ? user.department.name
-      : user?.department || "General Municipal Services";
+  user?.departmentName ||
+  (user?.role === "department_head" && !user?.department
+    ? "All Departments"
+    : "General Municipal Services");
 
   return (
     <>

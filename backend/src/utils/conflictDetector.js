@@ -38,9 +38,9 @@ function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return Math.round(R * c);
@@ -136,7 +136,7 @@ async function detectAndRecordConflicts(targetProject) {
     if (
       pB.department &&
       (pB.department._id || pB.department).toString() !==
-        (pA.department._id || pA.department).toString()
+      (pA.department._id || pA.department).toString()
     ) {
       departmentsInvolved.push(pB.department._id || pB.department);
     }
@@ -163,9 +163,8 @@ async function detectAndRecordConflicts(targetProject) {
       try {
         const admins = await User.find({ role: "city_admin" }).select("_id");
         const deptHeads = await User.find({
-          role: "department_head",
-          department: { $in: departmentsInvolved }
-        }).select("_id department");
+          role: "department_head"
+        }).select("_id");
 
         const notifyUserIds = new Set();
         admins.forEach((u) => notifyUserIds.add(u._id.toString()));
@@ -176,9 +175,8 @@ async function detectAndRecordConflicts(targetProject) {
             recipient: recipientId,
             type: "project_conflict_detected",
             title: `⚠️ ${severity.toUpperCase()} Conflict Detected`,
-            message: `Conflict detected between "${pA.title}" and "${pB.title}". Distance: ${
-              distance !== null ? distance + "m" : "Same Zone"
-            }.`,
+            message: `Conflict detected between "${pA.title}" and "${pB.title}". Distance: ${distance !== null ? distance + "m" : "Same Zone"
+              }.`,
             relatedProject: targetProject._id
           });
         }
@@ -202,9 +200,13 @@ async function detectAndRecordConflicts(targetProject) {
 /**
  * Dry-run simulation for checking conflicts before creating/updating a project
  */
-async function checkConflictsDraft(draftData, excludeProjectId = null) {
+async function checkConflictsDraft(draftData, excludeProjectId = null, departmentId = null) {
   const activeStatuses = ["proposed", "approved", "in_progress", "delayed"];
   const query = { status: { $in: activeStatuses } };
+
+  if (departmentId) {
+    query.department = { $ne: departmentId };
+  }
   if (excludeProjectId) {
     query._id = { $ne: excludeProjectId };
   }

@@ -17,12 +17,10 @@ const createResource = async (req, res) => {
       tags
     } = req.body;
 
-    if (req.user.role === "department_head") {
-      if (!ownerDepartment && req.user.department) {
+    if (req.user.role === "department_head" && req.user.department) {
+      if (!ownerDepartment) {
         ownerDepartment = req.user.department;
       } else if (
-        ownerDepartment &&
-        req.user.department &&
         ownerDepartment.toString() !== req.user.department.toString()
       ) {
         return res.status(403).json({
@@ -76,7 +74,19 @@ const getAllResources = async (req, res) => {
     const { department, category, status, search } = req.query;
     const filter = { isActive: true };
 
-    if (department) filter.ownerDepartment = department;
+    // Officers can only view their own department's resources
+    if (req.user.role === "officer") {
+      if (!req.user.department) {
+        return res.status(403).json({
+          message: "You are not assigned to any department"
+        });
+      }
+
+      filter.ownerDepartment = req.user.department;
+    } else if (department) {
+      // City admin and department head can filter by department
+      filter.ownerDepartment = department;
+    }
     if (category) filter.category = category;
     if (status) filter.status = status;
     if (search) {
@@ -112,6 +122,21 @@ const getResourceById = async (req, res) => {
     if (!resource || !resource.isActive) {
       return res.status(404).json({ message: "Resource not found" });
     }
+    // Officers can only access resources from their own department
+    const resourceDepartmentId =
+  resource.ownerDepartment?._id?.toString() ||
+  resource.ownerDepartment?.toString();
+
+const userDepartmentId = req.user.department?.toString();
+
+if (
+  req.user.role === "officer" &&
+  resourceDepartmentId !== userDepartmentId
+) {
+  return res.status(403).json({
+    message: "You do not have access to this department's resource"
+  });
+}
 
     return res.json({ resource });
   } catch (error) {
@@ -133,13 +158,14 @@ const updateResource = async (req, res) => {
     }
 
     if (
-      req.user.role === "department_head" &&
-      resource.ownerDepartment.toString() !== req.user.department?.toString()
-    ) {
-      return res.status(403).json({
-        message: "You can only update resources belonging to your department"
-      });
-    }
+  req.user.role === "department_head" &&
+  req.user.department &&
+  resource.ownerDepartment.toString() !== req.user.department.toString()
+) {
+  return res.status(403).json({
+    message: "You can only update resources belonging to your department"
+  });
+}
 
     const allowedFields = [
       "name",
@@ -164,14 +190,22 @@ const updateResource = async (req, res) => {
 
     // Notify if inventory is running low (< 20% available)
     if (resource.availableQuantity / resource.quantity < 0.2) {
-      const adminUsers = await User.find({ role: "city_admin" }).select("_id");
-      const departmentHead = await User.findOne({
-        department: resource.ownerDepartment,
-        role: "department_head"
+      const adminUsers = await User.find({
+        role: "city_admin"
       }).select("_id");
 
-      const recipients = adminUsers.map((u) => u._id);
-      if (departmentHead) recipients.push(departmentHead._id);
+      const departmentHeads = await User.find({
+        role: "department_head",
+        $or: [
+          { department: resource.ownerDepartment },
+          { department: null }
+        ]
+      }).select("_id");
+
+      const recipients = new Set([
+        ...adminUsers.map((u) => u._id.toString()),
+        ...departmentHeads.map((u) => u._id.toString())
+      ]);
 
       for (const recipientId of recipients) {
         await createNotification({

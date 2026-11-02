@@ -21,20 +21,19 @@ const createProject = async (req, res) => {
       priority
     } = req.body;
 
-    // Check department authorization for department_head
-    if (req.user.role === "department_head") {
-      if (!department && req.user.department) {
-        department = req.user.department;
-      } else if (
-        department &&
-        req.user.department &&
-        department.toString() !== req.user.department.toString()
-      ) {
+    // Department officers can only create projects for their department
+    if (req.user.role === "officer") {
+      if (!req.user.department) {
         return res.status(403).json({
-          message: "Department heads can only create projects for their own department"
+          message: "You are not assigned to any department"
         });
       }
+
+      department = req.user.department;
     }
+
+    // Department heads can create projects across all departments.
+    // City admins retain administrative access.
 
     if (!department && req.user.department) {
       department = req.user.department;
@@ -127,7 +126,22 @@ const getAllProjects = async (req, res) => {
 
     const filter = {};
 
-    if (department) filter.department = department;
+    if (req.user.role === "officer") {
+      if (!req.user.department) {
+        return res.status(403).json({
+          message: "You are not assigned to any department"
+        });
+      }
+
+      filter.department = req.user.department;
+    }
+
+    if (
+      department &&
+      req.user.role !== "officer"
+    ) {
+      filter.department = department;
+    }
     if (status) filter.status = status;
     if (category) filter.category = category;
     if (zone) filter.zone = zone;
@@ -175,6 +189,24 @@ const getProjectById = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
+    // Officers can access only projects from their own department
+    if (req.user.role === "officer") {
+      if (!req.user.department) {
+        return res.status(403).json({
+          message: "You are not assigned to any department"
+        });
+      }
+
+      if (
+        project.department._id.toString() !==
+        req.user.department.toString()
+      ) {
+        return res.status(403).json({
+          message: "You do not have permission to access this project's details"
+        });
+      }
+    }
+
     // Find all conflicts involving this project
     const conflicts = await Conflict.find({
       $or: [{ projectA: project._id }, { projectB: project._id }]
@@ -192,8 +224,11 @@ const getProjectById = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({ message: "Invalid project ID" });
     }
+
     console.error("getProjectById error:", error.message);
-    return res.status(500).json({ message: "Server error while fetching project" });
+    return res.status(500).json({
+      message: "Server error while fetching project"
+    });
   }
 };
 
@@ -206,14 +241,21 @@ const updateProject = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // Role check: Only city_admin or project's own department_head
-    if (
-      req.user.role === "department_head" &&
-      project.department.toString() !== req.user.department?.toString()
-    ) {
-      return res.status(403).json({
-        message: "You can only update projects belonging to your department"
-      });
+    // Officers can update only projects belonging to their department
+    if (req.user.role === "officer") {
+      if (!req.user.department) {
+        return res.status(403).json({
+          message: "You are not assigned to any department"
+        });
+      }
+
+      if (
+        project.department.toString() !== req.user.department.toString()
+      ) {
+        return res.status(403).json({
+          message: "You can only update projects belonging to your department"
+        });
+      }
     }
 
     const previousState = project.toObject();
@@ -292,13 +334,21 @@ const deleteProject = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    if (
-      req.user.role === "department_head" &&
-      project.department.toString() !== req.user.department?.toString()
-    ) {
-      return res.status(403).json({
-        message: "You can only cancel projects belonging to your department"
-      });
+    // Officers can cancel only projects belonging to their department
+    if (req.user.role === "officer") {
+      if (!req.user.department) {
+        return res.status(403).json({
+          message: "You are not assigned to any department"
+        });
+      }
+
+      if (
+        project.department.toString() !== req.user.department.toString()
+      ) {
+        return res.status(403).json({
+          message: "You can only cancel projects belonging to your department"
+        });
+      }
     }
 
     // Soft delete: set status to cancelled
@@ -344,7 +394,18 @@ const getTimelineSchedule = async (req, res) => {
     const { department, category, status } = req.query;
     const filter = { status: { $ne: "cancelled" } };
 
-    if (department) filter.department = department;
+    // Officers can see only their own department's timeline
+    if (req.user.role === "officer") {
+      if (!req.user.department) {
+        return res.status(403).json({
+          message: "You are not assigned to any department"
+        });
+      }
+
+      filter.department = req.user.department;
+    } else if (department) {
+      filter.department = department;
+    }
     if (category) filter.category = category;
     if (status) filter.status = status;
 
@@ -394,6 +455,19 @@ const getCalendarSchedule = async (req, res) => {
   try {
     const { year, month } = req.query;
     const filter = { status: { $ne: "cancelled" } };
+
+    // Officers can see only their own department's calendar
+    if (req.user.role === "officer") {
+      if (!req.user.department) {
+        return res.status(403).json({
+          message: "You are not assigned to any department"
+        });
+      }
+
+      filter.department = req.user.department;
+    } else if (req.query.department) {
+      filter.department = req.query.department;
+    }
 
     if (year && month) {
       const startOfMonth = new Date(year, month - 1, 1);

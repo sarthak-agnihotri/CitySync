@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
@@ -9,7 +10,6 @@ import {
   RotateCcw,
   Ban,
   Calendar,
-  Building2,
   Boxes,
   Eye,
   AlertCircle
@@ -26,6 +26,17 @@ export function RequestsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user, isRole } = useAuth();
   const { showToast } = useToast();
+
+  // Get the logged-in user's department ID
+  const userDepartmentId =
+    typeof user?.department === "object"
+      ? user.department?._id
+      : user?.department;
+
+  // Only City Admin and Central Department Head can select a department
+  const canSelectDepartment =
+    isRole("city_admin") ||
+    (isRole("department_head") && !userDepartmentId);
 
   const [requests, setRequests] = useState([]);
   const [resources, setResources] = useState([]);
@@ -61,28 +72,33 @@ export function RequestsPage() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedReqDetail, setSelectedReqDetail] = useState(null);
 
+  // Load requests, resources and departments
   const loadData = useCallback(async (isSilent = false) => {
     if (!isSilent && !hasLoadedOnce) {
       setLoading(true);
     }
+
     try {
       const [reqData, resData, deptData] = await Promise.all([
         RequestsAPI.list(),
         ResourcesAPI.list(),
         DepartmentsAPI.list()
       ]);
+
       setRequests(reqData.requests || []);
       setResources(resData.resources || []);
       setDepartments(deptData.departments || []);
       setHasLoadedOnce(true);
 
-      // Check URL search param for pre-selection
+      // Check URL search param for resource pre-selection
       const paramResourceId = searchParams.get("resourceId");
+
       if (paramResourceId) {
         setNewForm((prev) => ({
           ...prev,
           resourceId: paramResourceId
         }));
+
         setNewOpen(true);
         setSearchParams({});
       }
@@ -95,13 +111,19 @@ export function RequestsPage() {
 
   useEffect(() => {
     loadData(hasLoadedOnce);
+
     const handleRefresh = () => loadData(false);
+
     window.addEventListener("citysync:refresh-data", handleRefresh);
-    return () => window.removeEventListener("citysync:refresh-data", handleRefresh);
+
+    return () =>
+      window.removeEventListener("citysync:refresh-data", handleRefresh);
   }, [loadData, hasLoadedOnce]);
 
+  // Submit new request
   const handleNewSubmit = async (e) => {
     e.preventDefault();
+
     if (!newForm.resourceId) {
       showToast("Please select a resource from the pool", "warning");
       return;
@@ -112,14 +134,16 @@ export function RequestsPage() {
       return;
     }
 
-    const deptId =
-      newForm.requestingDepartment ||
-      (user?.department && typeof user.department === "object"
-        ? user.department._id
-        : user?.department) ||
-      (departments.length > 0 ? departments[0]._id : undefined);
+    // Use assigned department or selected department
+    const deptId = userDepartmentId || newForm.requestingDepartment;
+
+    if (!deptId) {
+      showToast("Please select a requesting department", "warning");
+      return;
+    }
 
     setSubmitting(true);
+
     try {
       await RequestsAPI.submit({
         resourceId: newForm.resourceId,
@@ -134,6 +158,7 @@ export function RequestsPage() {
 
       showToast("Requisition submitted successfully", "success");
       setNewOpen(false);
+
       setNewForm({
         resourceId: "",
         requestingDepartment: "",
@@ -144,6 +169,7 @@ export function RequestsPage() {
         priority: "medium",
         notes: ""
       });
+
       loadData();
     } catch (err) {
       showToast(err.message || "Failed to submit request", "error");
@@ -152,6 +178,7 @@ export function RequestsPage() {
     }
   };
 
+  // Approve request
   const handleApprove = async (reqId) => {
     try {
       await RequestsAPI.approve(reqId);
@@ -162,11 +189,18 @@ export function RequestsPage() {
     }
   };
 
+  // Reject request
   const handleRejectConfirm = async () => {
     if (!selectedReqForReject) return;
+
     setRejecting(true);
+
     try {
-      await RequestsAPI.reject(selectedReqForReject._id, rejectionReason.trim());
+      await RequestsAPI.reject(
+        selectedReqForReject._id,
+        rejectionReason.trim()
+      );
+
       showToast("Request marked rejected", "info");
       setRejectOpen(false);
       setRejectionReason("");
@@ -178,6 +212,7 @@ export function RequestsPage() {
     }
   };
 
+  // Return resource
   const handleReturn = async (reqId) => {
     try {
       await RequestsAPI.returnResource(reqId);
@@ -188,6 +223,7 @@ export function RequestsPage() {
     }
   };
 
+  // Cancel request
   const handleCancel = async (reqId) => {
     try {
       await RequestsAPI.cancel(reqId);
@@ -198,8 +234,27 @@ export function RequestsPage() {
     }
   };
 
-  const canApproveReject = isRole("city_admin", "department_head");
+  // Check whether the logged-in user can approve/reject/return a request
+  const canApproveReject = (req) => {
+    if (isRole("city_admin")) return true;
 
+    if (isRole("department_head")) {
+      // Central Department Head can review all departments
+      if (!userDepartmentId) return true;
+
+      const resourceDepartmentId =
+        req.resource?.ownerDepartment?._id ||
+        req.resource?.ownerDepartment;
+
+      return (
+        String(resourceDepartmentId) === String(userDepartmentId)
+      );
+    }
+
+    return false;
+  };
+
+  // Search and status filters
   const filteredRequests = requests.filter((r) => {
     const q = search.toLowerCase();
     const resName = r.resource?.name || "";
@@ -211,22 +266,34 @@ export function RequestsPage() {
       purpose.toLowerCase().includes(q) ||
       requester.toLowerCase().includes(q);
 
-    const matchesStatus = statusFilter ? r.status === statusFilter : true;
+    const matchesStatus = statusFilter
+      ? r.status === statusFilter
+      : true;
+
     return matchesSearch && matchesStatus;
   });
 
-  const selectedResourceMeta = resources.find((r) => r._id === newForm.resourceId);
+  const selectedResourceMeta = resources.find(
+    (r) => r._id === newForm.resourceId
+  );
 
   return (
     <div className="page requests-page">
       <div className="page-header-row">
         <div>
-          <h3 className="section-title">Equipment Requisitions & Approvals</h3>
+          <h3 className="section-title">
+            Equipment Requisitions & Approvals
+          </h3>
+
           <p className="section-hint">
             Cross-department equipment transfers, booking lifecycle, and return logging
           </p>
         </div>
-        <button className="btn btn-primary" onClick={() => setNewOpen(true)}>
+
+        <button
+          className="btn btn-primary"
+          onClick={() => setNewOpen(true)}
+        >
           <Plus size={16} />
           <span>New Resource Request</span>
         </button>
@@ -245,6 +312,7 @@ export function RequestsPage() {
               pointerEvents: "none"
             }}
           />
+
           <input
             type="text"
             className="search-input"
@@ -269,7 +337,8 @@ export function RequestsPage() {
         </select>
 
         <span className="results-count">
-          Showing <strong>{filteredRequests.length}</strong> of {requests.length} requests
+          Showing <strong>{filteredRequests.length}</strong> of{" "}
+          {requests.length} requests
         </span>
       </div>
 
@@ -287,7 +356,10 @@ export function RequestsPage() {
           actionButton={
             !search &&
             !statusFilter && (
-              <button className="btn btn-primary" onClick={() => setNewOpen(true)}>
+              <button
+                className="btn btn-primary"
+                onClick={() => setNewOpen(true)}
+              >
                 <Plus size={15} />
                 <span>Submit First Request</span>
               </button>
@@ -299,9 +371,15 @@ export function RequestsPage() {
           {filteredRequests.map((req) => {
             const resName = req.resource?.name || "Machinery Asset";
             const requesterName = req.requestedBy?.name || "Officer";
-            const requesterDept = req.requestingDepartment?.name || "Municipal Agency";
+            const requesterDept =
+              req.requestingDepartment?.name || "Municipal Agency";
+
+            const currentUserId =
+              user?.id || user?.userId || user?._id;
+
             const isRequester =
-              user?._id === req.requestedBy?._id || user?._id === req.requestedBy;
+              String(currentUserId) ===
+              String(req.requestedBy?._id || req.requestedBy);
 
             return (
               <div key={req._id} className="req-card-expanded">
@@ -310,8 +388,10 @@ export function RequestsPage() {
                     <span className="req-asset-icon">
                       <Boxes size={20} />
                     </span>
+
                     <div>
                       <h4 className="req-asset-name">{resName}</h4>
+
                       <span className="req-requester-info">
                         Requested by <strong>{requesterName}</strong> ({requesterDept})
                       </span>
@@ -328,15 +408,18 @@ export function RequestsPage() {
                   <p className="req-purpose-text">
                     <strong>Purpose:</strong> {req.purpose}
                   </p>
+
                   {req.rejectionReason && (
                     <div className="rejection-box">
                       <div className="flex items-center gap-1.5 font-semibold mb-1">
                         <AlertCircle size={14} />
                         <span>Rejection Reason:</span>
                       </div>
+
                       <p className="m-0">{req.rejectionReason}</p>
                     </div>
                   )}
+
                   {req.notes && (
                     <p className="req-notes-text">
                       <strong>Notes:</strong> {req.notes}
@@ -348,10 +431,17 @@ export function RequestsPage() {
                   <div className="req-date-range">
                     <span className="flex items-center gap-1.5">
                       <Calendar size={14} />
-                      <strong>{new Date(req.startDate).toLocaleDateString()}</strong> to{" "}
-                      <strong>{new Date(req.endDate).toLocaleDateString()}</strong>
+                      <strong>
+                        {new Date(req.startDate).toLocaleDateString()}
+                      </strong>{" "}
+                      to{" "}
+                      <strong>
+                        {new Date(req.endDate).toLocaleDateString()}
+                      </strong>
                     </span>
+
                     <span className="dot-sep">•</span>
+
                     <span>
                       Qty: <strong>{req.quantityRequested}</strong> unit(s)
                     </span>
@@ -370,49 +460,53 @@ export function RequestsPage() {
                     </button>
 
                     {/* Pending actions */}
-                    {req.status === "pending" && canApproveReject && (
-                      <>
-                        <button
-                          className="btn btn-success btn-sm"
-                          onClick={() => handleApprove(req._id)}
-                        >
-                          <CheckCircle2 size={14} />
-                          <span>Approve</span>
-                        </button>
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={() => {
-                            setSelectedReqForReject(req);
-                            setRejectOpen(true);
-                          }}
-                        >
-                          <XCircle size={14} />
-                          <span>Reject</span>
-                        </button>
-                      </>
-                    )}
+                    {req.status === "pending" &&
+                      canApproveReject(req) && (
+                        <>
+                          <button
+                            className="btn btn-success btn-sm"
+                            onClick={() => handleApprove(req._id)}
+                          >
+                            <CheckCircle2 size={14} />
+                            <span>Approve</span>
+                          </button>
+
+                          <button
+                            className="btn btn-danger btn-sm"
+                            onClick={() => {
+                              setSelectedReqForReject(req);
+                              setRejectOpen(true);
+                            }}
+                          >
+                            <XCircle size={14} />
+                            <span>Reject</span>
+                          </button>
+                        </>
+                      )}
 
                     {/* Cancel action for pending */}
-                    {req.status === "pending" && (isRequester || isRole("city_admin")) && (
-                      <button
-                        className="btn btn-ghost btn-sm text-danger"
-                        onClick={() => handleCancel(req._id)}
-                      >
-                        <Ban size={14} />
-                        <span>Cancel</span>
-                      </button>
-                    )}
+                    {req.status === "pending" &&
+                      (isRequester || isRole("city_admin")) && (
+                        <button
+                          className="btn btn-ghost btn-sm text-danger"
+                          onClick={() => handleCancel(req._id)}
+                        >
+                          <Ban size={14} />
+                          <span>Cancel</span>
+                        </button>
+                      )}
 
                     {/* Return action for approved */}
-                    {req.status === "approved" && canApproveReject && (
-                      <button
-                        className="btn btn-primary btn-sm"
-                        onClick={() => handleReturn(req._id)}
-                      >
-                        <RotateCcw size={14} />
-                        <span>Mark Returned</span>
-                      </button>
-                    )}
+                    {req.status === "approved" &&
+                      canApproveReject(req) && (
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={() => handleReturn(req._id)}
+                        >
+                          <RotateCcw size={14} />
+                          <span>Mark Returned</span>
+                        </button>
+                      )}
                   </div>
                 </div>
               </div>
@@ -428,78 +522,117 @@ export function RequestsPage() {
         title="Submit Inter-Agency Resource Request"
       >
         <form onSubmit={handleNewSubmit} className="modal-body">
+
+          {/* Only one Requesting Department field */}
           <div className="form-group">
-            <label>Select Machinery / Resource from Pool *</label>
+            <label>Requesting Department *</label>
+
+            {canSelectDepartment ? (
+              <select
+                required
+                value={newForm.requestingDepartment}
+                onChange={(e) =>
+                  setNewForm({
+                    ...newForm,
+                    requestingDepartment: e.target.value
+                  })
+                }
+              >
+                <option value="">
+                  Select requesting department...
+                </option>
+
+                {departments.map((d) => (
+                  <option key={d._id} value={d._id}>
+                    {d.name} ({d.code})
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                value={
+                  user?.departmentName ||
+                  user?.department?.name ||
+                  "Assigned Department"
+                }
+                disabled
+              />
+            )}
+          </div>
+
+          <div className="form-group">
+            <label>Select Resource *</label>
+
             <select
               required
               value={newForm.resourceId}
-              onChange={(e) => setNewForm({ ...newForm, resourceId: e.target.value })}
+              onChange={(e) =>
+                setNewForm({
+                  ...newForm,
+                  resourceId: e.target.value
+                })
+              }
             >
-              <option value="">Choose available resource...</option>
-              {resources.map((r) => {
-                const dept = r.ownerDepartment?.name || "Depot";
-                return (
-                  <option key={r._id} value={r._id}>
-                    {r.name} — {r.availableQuantity} {r.unit || "units"} available ({dept})
-                  </option>
-                );
-              })}
+              <option value="">Select a resource...</option>
+
+              {resources.map((resource) => (
+                <option key={resource._id} value={resource._id}>
+                  {resource.name} - Available: {resource.availableQuantity} {resource.unit || "units"}
+                </option>
+              ))}
             </select>
           </div>
 
+          {/* Selected resource information */}
           {selectedResourceMeta && (
             <div className="selected-res-preview">
-              <span className="preview-label">Category: {selectedResourceMeta.category}</span>
+              <span className="preview-label">
+                Category: {selectedResourceMeta.category}
+              </span>
+
               <span className="preview-label">
                 Available: {selectedResourceMeta.availableQuantity} of{" "}
-                {selectedResourceMeta.quantity} {selectedResourceMeta.unit || "units"}
+                {selectedResourceMeta.quantity}{" "}
+                {selectedResourceMeta.unit || "units"}
               </span>
+
               <span className="preview-label">
                 Location: {selectedResourceMeta.location || "Central Yard"}
               </span>
             </div>
           )}
 
-          {/* Department selector if user has no assigned department or wants to specify */}
-          <div className="form-group">
-            <label>Requesting Department *</label>
-            <select
-              value={newForm.requestingDepartment}
-              onChange={(e) =>
-                setNewForm({ ...newForm, requestingDepartment: e.target.value })
-              }
-            >
-              <option value="">
-                {user?.department?.name || "Select requesting department..."}
-              </option>
-              {departments.map((d) => (
-                <option key={d._id} value={d._id}>
-                  {d.name} ({d.code})
-                </option>
-              ))}
-            </select>
-          </div>
-
           <div className="form-row">
             <div className="form-group">
               <label>Quantity Needed *</label>
+
               <input
                 type="number"
                 min="1"
                 required
                 value={newForm.quantityRequested}
                 onChange={(e) =>
-                  setNewForm({ ...newForm, quantityRequested: e.target.value })
+                  setNewForm({
+                    ...newForm,
+                    quantityRequested: e.target.value
+                  })
                 }
               />
             </div>
 
             <div className="form-group">
               <label>Requisition Priority *</label>
+
               <select
                 required
                 value={newForm.priority}
-                onChange={(e) => setNewForm({ ...newForm, priority: e.target.value })}
+                onChange={(e) =>
+                  setNewForm({
+                    ...newForm,
+                    priority: e.target.value
+                  })
+                }
               >
                 <option value="low">Low (Routine maintenance)</option>
                 <option value="medium">Medium (Scheduled works)</option>
@@ -512,51 +645,84 @@ export function RequestsPage() {
           <div className="form-row">
             <div className="form-group">
               <label>Deployment Start Date *</label>
+
               <input
                 type="date"
                 required
                 value={newForm.startDate}
-                onChange={(e) => setNewForm({ ...newForm, startDate: e.target.value })}
+                onChange={(e) =>
+                  setNewForm({
+                    ...newForm,
+                    startDate: e.target.value
+                  })
+                }
               />
             </div>
 
             <div className="form-group">
               <label>Estimated Return Date *</label>
+
               <input
                 type="date"
                 required
                 value={newForm.endDate}
-                onChange={(e) => setNewForm({ ...newForm, endDate: e.target.value })}
+                onChange={(e) =>
+                  setNewForm({
+                    ...newForm,
+                    endDate: e.target.value
+                  })
+                }
               />
             </div>
           </div>
 
           <div className="form-group">
             <label>Purpose of Requisition *</label>
+
             <textarea
               rows={2}
               required
               placeholder="e.g. Pipeline replacement at Sector 14 crossing prior to asphalt resurfacing..."
               value={newForm.purpose}
-              onChange={(e) => setNewForm({ ...newForm, purpose: e.target.value })}
+              onChange={(e) =>
+                setNewForm({
+                  ...newForm,
+                  purpose: e.target.value
+                })
+              }
             />
           </div>
 
           <div className="form-group">
             <label>Additional Notes / Site Access Requirements</label>
+
             <textarea
               rows={2}
               placeholder="Operator details, trailer transportation requirements..."
               value={newForm.notes}
-              onChange={(e) => setNewForm({ ...newForm, notes: e.target.value })}
+              onChange={(e) =>
+                setNewForm({
+                  ...newForm,
+                  notes: e.target.value
+                })
+              }
             />
           </div>
 
           <div className="modal-footer">
-            <button type="button" className="btn btn-ghost" onClick={() => setNewOpen(false)}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => setNewOpen(false)}
+            >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={submitting}>
+
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={submitting}
+            >
               {submitting ? "Submitting..." : "Submit Requisition"}
             </button>
           </div>
@@ -575,8 +741,10 @@ export function RequestsPage() {
             Provide an official justification for rejecting request for{" "}
             <strong>{selectedReqForReject?.resource?.name}</strong>:
           </p>
+
           <div className="form-group">
             <label>Rejection Reason *</label>
+
             <textarea
               rows={3}
               required
@@ -585,6 +753,7 @@ export function RequestsPage() {
               onChange={(e) => setRejectionReason(e.target.value)}
             />
           </div>
+
           <div className="modal-footer">
             <button
               type="button"
@@ -593,6 +762,7 @@ export function RequestsPage() {
             >
               Cancel
             </button>
+
             <button
               type="button"
               className="btn btn-danger"
@@ -616,40 +786,53 @@ export function RequestsPage() {
             <div className="detail-grid">
               <div className="detail-item">
                 <span className="detail-label">Asset:</span>
-                <span className="detail-val">{selectedReqDetail.resource?.name || "Machinery Item"}</span>
+                <span className="detail-val">
+                  {selectedReqDetail.resource?.name || "Machinery Item"}
+                </span>
               </div>
+
               <div className="detail-item">
                 <span className="detail-label">Status:</span>
                 <StatusPill status={selectedReqDetail.status} />
               </div>
+
               <div className="detail-item">
                 <span className="detail-label">Quantity:</span>
                 <span className="detail-val">
                   {selectedReqDetail.quantityRequested} unit(s)
                 </span>
               </div>
+
               <div className="detail-item">
                 <span className="detail-label">Priority:</span>
-                <StatusPill status={selectedReqDetail.priority} type="priority" />
+                <StatusPill
+                  status={selectedReqDetail.priority}
+                  type="priority"
+                />
               </div>
+
               <div className="detail-item">
                 <span className="detail-label">Requester:</span>
                 <span className="detail-val">
-                  {selectedReqDetail.requestedBy?.name || "Officer"} ({selectedReqDetail.requestedBy?.email || "—"})
+                  {selectedReqDetail.requestedBy?.name || "Officer"}{" "}
+                  ({selectedReqDetail.requestedBy?.email || "—"})
                 </span>
               </div>
+
               <div className="detail-item">
                 <span className="detail-label">Department:</span>
                 <span className="detail-val">
                   {selectedReqDetail.requestingDepartment?.name || "Unassigned"}
                 </span>
               </div>
+
               <div className="detail-item">
                 <span className="detail-label">Start Date:</span>
                 <span className="detail-val">
                   {new Date(selectedReqDetail.startDate).toLocaleDateString()}
                 </span>
               </div>
+
               <div className="detail-item">
                 <span className="detail-label">End Date:</span>
                 <span className="detail-val">
@@ -660,28 +843,41 @@ export function RequestsPage() {
 
             <div className="detail-section">
               <span className="detail-label">Purpose:</span>
-              <p className="detail-paragraph">{selectedReqDetail.purpose}</p>
+              <p className="detail-paragraph">
+                {selectedReqDetail.purpose}
+              </p>
             </div>
 
             {selectedReqDetail.notes && (
               <div className="detail-section">
                 <span className="detail-label">Notes:</span>
-                <p className="detail-paragraph">{selectedReqDetail.notes}</p>
+                <p className="detail-paragraph">
+                  {selectedReqDetail.notes}
+                </p>
               </div>
             )}
 
             {selectedReqDetail.reviewedBy && (
               <div className="detail-section review-box">
                 <span className="detail-label">Review Information:</span>
+
                 <p className="detail-paragraph">
-                  Reviewed by <strong>{selectedReqDetail.reviewedBy.name || "Officer"}</strong> on{" "}
+                  Reviewed by{" "}
+                  <strong>
+                    {selectedReqDetail.reviewedBy.name || "Officer"}
+                  </strong>{" "}
+                  on{" "}
                   {selectedReqDetail.reviewedAt
-                    ? new Date(selectedReqDetail.reviewedAt).toLocaleString()
+                    ? new Date(
+                      selectedReqDetail.reviewedAt
+                    ).toLocaleString()
                     : "—"}
                 </p>
+
                 {selectedReqDetail.rejectionReason && (
                   <p className="text-danger m-0 mt-1">
-                    <strong>Rejection reason:</strong> {selectedReqDetail.rejectionReason}
+                    <strong>Rejection reason:</strong>{" "}
+                    {selectedReqDetail.rejectionReason}
                   </p>
                 )}
               </div>

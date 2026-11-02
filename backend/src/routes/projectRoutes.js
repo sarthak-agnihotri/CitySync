@@ -25,7 +25,16 @@ router.get("/schedule/calendar", getCalendarSchedule);
 router.get("/", getAllProjects);
 router.get("/:id", getProjectById);
 router.post("/", roleMiddleware("city_admin", "department_head", "officer"), createProject);
-router.put("/:id", roleMiddleware("city_admin", "department_head"), updateProject);
-router.delete("/:id", roleMiddleware("city_admin", "department_head"), deleteProject);
+router.put(
+  "/:id",
+  roleMiddleware("city_admin", "department_head", "officer"),
+  updateProject
+);
+
+router.delete(
+  "/:id",
+  roleMiddleware("city_admin", "department_head", "officer"),
+  deleteProject
+);
 
 module.exports = router;

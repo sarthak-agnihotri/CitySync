@@ -17,7 +17,8 @@ const authMiddleware = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await User.findById(decoded.userId)
-      .select("_id name email role department");
+      .select("_id name email role department")
+      .populate("department", "name");
 
     if (!user) {
       return res.status(401).json({
@@ -31,7 +32,8 @@ const authMiddleware = async (req, res, next) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      department: user.department
+      department: user.department?._id?.toString() || null,
+      departmentName: user.department?.name || null
     };
 
     next();
