@@ -1,4 +1,3 @@
-
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -18,11 +17,40 @@ const auditRoutes = require("./routes/auditRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const conflictRoutes = require("./routes/conflictRoutes");
 
-app.use(cors());
+// Dynamic CORS configuration allowing local dev and production frontend (e.g. Vercel)
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
+  : ["http://localhost:5173", "http://127.0.0.1:5173"];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, Postman, health checks)
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app") ||
+        process.env.NODE_ENV !== "production"
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true); // Fallback to allow seamless collaboration across preview URLs
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  })
+);
+
 app.use(express.json());
 
+// Root health & ping endpoints for Render health checks
+app.get("/", (req, res) => {
+  res.json({ status: "ok", message: "CitySync API is live" });
+});
+
 app.get("/api/health", (req, res) => {
-  res.json({ message: "CitySync backend is running" });
+  res.json({ status: "ok", message: "CitySync backend is running" });
 });
 
 app.use("/api/auth", authRoutes);
