@@ -16,9 +16,11 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
   const { user, logout, isRole } = useAuth();
+  const { t } = useLanguage();
 
   const handleNavClick = () => {
     if (onClose) onClose();
@@ -59,7 +61,7 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
                 CitySync
               </span>
               <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
-                Coordination Cell
+                {t("portal.coordinationCell")}
               </span>
             </div>
           </Link>
@@ -89,7 +91,7 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
             onClick={handleNavClick}
           >
             <LayoutDashboard className="w-4 h-4 shrink-0" aria-hidden="true" />
-            <span>Overview & Metrics</span>
+            <span>{t("sidebar.dashboard")}</span>
           </NavLink>
 
           <NavLink
@@ -104,7 +106,7 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
             onClick={handleNavClick}
           >
             <FolderKanban className="w-4 h-4 shrink-0" aria-hidden="true" />
-            <span>City Projects</span>
+            <span>{t("sidebar.projects")}</span>
           </NavLink>
 
           <NavLink
@@ -119,7 +121,7 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
             onClick={handleNavClick}
           >
             <AlertTriangle className="w-4 h-4 shrink-0 text-amber-500" aria-hidden="true" />
-            <span>Project Conflicts</span>
+            <span>{t("sidebar.conflicts")}</span>
           </NavLink>
 
           <NavLink
@@ -134,7 +136,7 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
             onClick={handleNavClick}
           >
             <Boxes className="w-4 h-4 shrink-0" aria-hidden="true" />
-            <span>Equipment Directory</span>
+            <span>{t("sidebar.resources")}</span>
           </NavLink>
 
           <NavLink
@@ -149,7 +151,7 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
             onClick={handleNavClick}
           >
             <ClipboardList className="w-4 h-4 shrink-0" aria-hidden="true" />
-            <span>Requisitions</span>
+            <span>{t("sidebar.requests")}</span>
           </NavLink>
 
           <NavLink
@@ -165,7 +167,7 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
           >
             <div className="flex items-center gap-3">
               <Bell className="w-4 h-4 shrink-0" aria-hidden="true" />
-              <span>Alerts & Notices</span>
+              <span>{t("sidebar.notifications")}</span>
             </div>
             {unreadCount > 0 && (
               <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-600 text-white">
@@ -179,7 +181,7 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
             <>
               <div className="pt-4 pb-1 px-3">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                  Statutory Administration
+                  {t("portal.adminSection")}
                 </span>
               </div>
 
@@ -195,7 +197,7 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
                 onClick={handleNavClick}
               >
                 <Building2 className="w-4 h-4 shrink-0" aria-hidden="true" />
-                <span>Line Departments</span>
+                <span>{t("sidebar.departments")}</span>
               </NavLink>
 
               <NavLink
@@ -210,7 +212,7 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
                 onClick={handleNavClick}
               >
                 <Users className="w-4 h-4 shrink-0" aria-hidden="true" />
-                <span>Officers & Roles</span>
+                <span>{t("sidebar.users")}</span>
               </NavLink>
 
               <NavLink
@@ -225,7 +227,7 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
                 onClick={handleNavClick}
               >
                 <ScrollText className="w-4 h-4 shrink-0" aria-hidden="true" />
-                <span>Audit Logs</span>
+                <span>{t("sidebar.audit")}</span>
               </NavLink>
             </>
           )}
@@ -237,7 +239,7 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
               className="flex items-center gap-2 text-[11px] font-medium text-[var(--text-muted)] hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors"
               onClick={handleNavClick}
             >
-              <span>View Public Landing Page</span>
+              <span>{t("portal.viewPublic")}</span>
               <ExternalLink className="w-3 h-3" />
             </Link>
           </div>
@@ -267,7 +269,7 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
             className="w-full flex items-center justify-center gap-2 py-1.5 px-3 rounded-md border border-[var(--border-strong)] text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>Sign Out</span>
+            <span>{t("portal.signOut")}</span>
           </button>
         </div>
       </aside>

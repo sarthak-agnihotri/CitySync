@@ -1,7 +1,9 @@
 import React from "react";
 import { Landmark, ArrowUp, ShieldCheck, Mail, Phone, ExternalLink } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext";
 
 export function LandingFooter() {
+  const { t } = useLanguage();
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -20,36 +22,34 @@ export function LandingFooter() {
               <span className="text-base font-bold text-[var(--text-primary)]">CitySync</span>
             </div>
             <p className="text-xs leading-relaxed text-[var(--text-muted)]">
-              Digital Platform for Inter-Departmental Infrastructure Cooperation. Enforcing
-              coordinated planning, shared equipment pools, and utility excavation moratoriums
-              across municipal line departments.
+              {t("footer.overview")}
             </p>
             <div className="flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-400 font-semibold">
               <ShieldCheck className="w-4 h-4" aria-hidden="true" />
-              <span>Statutory Civic Governance Layer</span>
+              <span>{t("footer.governanceLayer")}</span>
             </div>
           </div>
 
           {/* Col 2: Participating Agencies */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)]">
-              Line Agencies
+              {t("footer.lineAgencies")}
             </h4>
             <ul className="space-y-2 text-xs">
               <li className="hover:text-[var(--text-primary)] transition-colors">
-                Municipal Corporation (ULB / City Roads)
+                {t("footer.a1")}
               </li>
               <li className="hover:text-[var(--text-primary)] transition-colors">
-                Water Supply & Sewerage Board (BWSSB)
+                {t("footer.a2")}
               </li>
               <li className="hover:text-[var(--text-primary)] transition-colors">
-                Electricity Supply Undertaking (DISCOM)
+                {t("footer.a3")}
               </li>
               <li className="hover:text-[var(--text-primary)] transition-colors">
-                Public Works Department (PWD Arterial transit)
+                {t("footer.a4")}
               </li>
               <li className="hover:text-[var(--text-primary)] transition-colors">
-                Metro Rail Corporation & City Gas Utilities
+                {t("footer.a5")}
               </li>
             </ul>
           </div>
@@ -57,7 +57,7 @@ export function LandingFooter() {
           {/* Col 3: Policy & Statutory Framework */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)]">
-              Governance Framework
+              {t("footer.framework")}
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
@@ -65,7 +65,7 @@ export function LandingFooter() {
                   href="#framework"
                   className="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors"
                 >
-                  5-Step "Dig-Later" Moratorium
+                  {t("footer.f1")}
                 </a>
               </li>
               <li>
@@ -73,7 +73,7 @@ export function LandingFooter() {
                   href="#services"
                   className="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors"
                 >
-                  Heavy Equipment Requisition Pool
+                  {t("footer.f2")}
                 </a>
               </li>
               <li>
@@ -81,11 +81,11 @@ export function LandingFooter() {
                   href="#faq"
                   className="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors"
                 >
-                  Statutory Coordination Cell (ICC)
+                  {t("footer.f3")}
                 </a>
               </li>
               <li className="text-[var(--text-muted)]">
-                Road Restoration & Penalty Fund
+                {t("footer.f4")}
               </li>
             </ul>
           </div>
@@ -93,19 +93,19 @@ export function LandingFooter() {
           {/* Col 4: Official Helpline & Support */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)]">
-              Civic Operations
+              {t("footer.operations")}
             </h4>
             <div className="space-y-2 text-xs">
               <div className="flex items-start gap-2">
                 <Phone className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400 mt-0.5" />
-                <span>Inter-Agency Desk: 1800-120-CITY</span>
+                <span>{t("footer.desk")}</span>
               </div>
               <div className="flex items-start gap-2">
                 <Mail className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400 mt-0.5" />
                 <span>coordination@citysync.gov.in</span>
               </div>
               <p className="text-[11px] text-[var(--text-muted)] pt-2 leading-relaxed">
-                Operating 24x7 for emergency main fractures and urgent arterial road approvals.
+                {t("footer.hours")}
               </p>
             </div>
           </div>
@@ -116,20 +116,20 @@ export function LandingFooter() {
       <div className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] py-4 text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-[var(--text-muted)]">
           <div className="text-center sm:text-left">
-            <span>© 2026 CitySync — Urban Governance Capstone Project.</span>
+            <span>{t("footer.copyright")}</span>
             <span className="block sm:inline sm:ml-2">
-              Designed according to Ministry of Urban Development & Smart Cities Mission guidelines.
+              {t("footer.guidelines")}
             </span>
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-[11px]">WCAG 2.2 AA Compliant</span>
+            <span className="text-[11px]">{t("footer.wcag")}</span>
             <button
               onClick={scrollToTop}
               className="inline-flex items-center gap-1 text-[var(--text-secondary)] hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors cursor-pointer text-xs"
-              aria-label="Back to top"
+              aria-label={t("footer.backToTop")}
             >
-              <span>Back to top</span>
+              <span>{t("footer.backToTop")}</span>
               <ArrowUp className="w-3.5 h-3.5" aria-hidden="true" />
             </button>
           </div>

@@ -20,10 +20,12 @@ import { GovernmentHeaderStrip } from "../components/layout/GovernmentHeaderStri
 import { LandingNavbar } from "../components/layout/LandingNavbar";
 import { LandingFooter } from "../components/layout/LandingFooter";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import { ResourcesAPI, DepartmentsAPI, RequestsAPI } from "../api";
 
 export function LandingPage() {
   const { isAuthenticated, user } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   // Real backend statistics state
@@ -71,22 +73,10 @@ export function LandingPage() {
   }, []);
 
   const faqs = [
-    {
-      q: "What is the primary mandate of the CitySync platform?",
-      a: "CitySync serves as an inter-departmental statutory governance layer that synchronizes road resurfacing, underground water/sewerage works, electric cable ducting, and telecom installations across independent city agencies to prevent the chronic 'dig–repair–dig' cycle on municipal roads."
-    },
-    {
-      q: "How does the cross-department equipment sharing pool operate?",
-      a: "Agencies maintain registered heavy machinery (hydraulic excavators, asphalt compactors, suction trucks, mobile generators) in a shared pool. Department heads and officers can submit requisitions for idle equipment from peer agencies, receive automated approvals, and track equipment return to minimize duplicate government procurement."
-    },
-    {
-      q: "What is the 5-Part 'Dig-Later' policy framework?",
-      a: "It is an institutional mechanism comprising: (1) Declaring 3–5 year underground utility requirements before road construction; (2) Co-laying shared utility ducts; (3) Enforcing a strict 2-to-3 year No-Dig Moratorium on newly carpeted asphalt; (4) Mandating Trenchless Technology (HDD/micro-trenching) for unavoidable works; and (5) Imposing financial penalties for unauthorized road cutting into a municipal repair fund."
-    },
-    {
-      q: "Who is authorized to access the officer operations portal?",
-      a: "Designated municipal officers, department engineers, and city administrative authorities belonging to recognized line agencies (ULBs, BWSSB, DISCOM, PWD, Metro Rail) receive authenticated credentials with Role-Based Access Control (RBAC)."
-    }
+    { q: t("faq.q1"), a: t("faq.a1") },
+    { q: t("faq.q2"), a: t("faq.a2") },
+    { q: t("faq.q3"), a: t("faq.a3") },
+    { q: t("faq.q4"), a: t("faq.a4") }
   ];
 
   return (
@@ -105,22 +95,20 @@ export function LandingPage() {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 mb-6">
                 <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
-                <span>Smart Cities Governance Layer — Statutory Coordination Cell</span>
+                <span>{t("hero.badge")}</span>
               </div>
 
               {/* Title */}
               <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--text-primary)] leading-tight">
-                One Platform. One City.
+                {t("hero.titleLine1")}
                 <span className="block text-emerald-700 dark:text-emerald-400 font-serif font-bold italic mt-1">
-                  No More Digging in the Dark.
+                  {t("hero.titleLine2")}
                 </span>
               </h1>
 
               {/* Subtitle */}
               <p className="mt-5 text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed">
-                CitySync breaks departmental silos across municipal corporations, water supply boards,
-                electricity DISCOMs, and road transit authorities. Providing joint scheduling, shared
-                machinery pools, and strict corridor moratorium enforcement.
+                {t("hero.subtitle")}
               </p>
 
               {/* Action Buttons */}
@@ -130,7 +118,7 @@ export function LandingPage() {
                     onClick={() => navigate("/dashboard")}
                     className="btn btn-primary text-sm py-2.5 px-5 shadow-sm"
                   >
-                    <span>Open Officer Portal</span>
+                    <span>{t("hero.openPortal")}</span>
                     <ArrowRight className="w-4 h-4" aria-hidden="true" />
                   </button>
                 ) : (
@@ -139,14 +127,14 @@ export function LandingPage() {
                       to="/login"
                       className="btn btn-primary text-sm py-2.5 px-5 shadow-sm"
                     >
-                      <span>Official Portal Sign In</span>
+                      <span>{t("hero.portalSignIn")}</span>
                       <ArrowRight className="w-4 h-4" aria-hidden="true" />
                     </Link>
                     <Link
                       to="/register"
                       className="btn btn-secondary text-sm py-2.5 px-5"
                     >
-                      <span>Register Officer Account</span>
+                      <span>{t("hero.registerAccount")}</span>
                     </Link>
                   </>
                 )}
@@ -155,7 +143,7 @@ export function LandingPage() {
                   href="#services"
                   className="btn btn-ghost text-sm py-2.5 px-4 text-[var(--text-secondary)]"
                 >
-                  Explore Services
+                  {t("hero.exploreServices")}
                 </a>
               </div>
 
@@ -163,7 +151,7 @@ export function LandingPage() {
               <div className="mt-8 pt-6 border-t border-[var(--border-subtle)] flex items-center gap-3 text-xs text-[var(--text-muted)]">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>
-                  All active utility trenching permits are regulated under the Urban Civil Works Moratorium Act.
+                  {t("hero.notice")}
                 </span>
               </div>
             </div>
@@ -179,7 +167,7 @@ export function LandingPage() {
                   {statsLoading ? "—" : liveStats.departmentsCount ?? "0"}
                 </div>
                 <div className="text-xs font-semibold text-[var(--text-muted)] mt-1 uppercase tracking-wider">
-                  Line Departments
+                  {t("metrics.departments")}
                 </div>
               </div>
 
@@ -188,7 +176,7 @@ export function LandingPage() {
                   {statsLoading ? "—" : liveStats.resourcesCount ?? "0"}
                 </div>
                 <div className="text-xs font-semibold text-[var(--text-muted)] mt-1 uppercase tracking-wider">
-                  Equipment Pool Items
+                  {t("metrics.equipmentPool")}
                 </div>
               </div>
 
@@ -197,7 +185,7 @@ export function LandingPage() {
                   {statsLoading ? "—" : liveStats.availableUnits ?? "0"}
                 </div>
                 <div className="text-xs font-semibold text-[var(--text-muted)] mt-1 uppercase tracking-wider">
-                  Available Machinery Units
+                  {t("metrics.availableUnits")}
                 </div>
               </div>
 
@@ -206,7 +194,7 @@ export function LandingPage() {
                   {statsLoading ? "—" : liveStats.requestsCount ?? "0"}
                 </div>
                 <div className="text-xs font-semibold text-[var(--text-muted)] mt-1 uppercase tracking-wider">
-                  Requisitions Handled
+                  {t("metrics.requisitions")}
                 </div>
               </div>
             </div>
@@ -218,13 +206,13 @@ export function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-12">
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                Core Capabilities
+                {t("services.eyebrow")}
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mt-1">
-                Inter-Departmental Municipal Services
+                {t("services.title")}
               </h2>
               <p className="text-sm text-[var(--text-secondary)] mt-2">
-                Unified workflows to ensure cross-agency resource mobilization and statutory transparency.
+                {t("services.subtitle")}
               </p>
             </div>
 
@@ -236,11 +224,10 @@ export function LandingPage() {
                     <Boxes className="w-5 h-5" aria-hidden="true" />
                   </div>
                   <h3 className="text-base font-bold text-[var(--text-primary)]">
-                    Shared Heavy Equipment Pool
+                    {t("services.c1.title")}
                   </h3>
                   <p className="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
-                    Searchable real-time inventory of hydraulic excavators, asphalt compactors,
-                    suction trucks, and specialized trenchless machinery across all municipal agencies.
+                    {t("services.c1.desc")}
                   </p>
                 </div>
                 <div className="mt-5 pt-4 border-t border-[var(--border-subtle)]">
@@ -248,7 +235,7 @@ export function LandingPage() {
                     to={isAuthenticated ? "/resources" : "/login"}
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline"
                   >
-                    <span>Browse Equipment Directory</span>
+                    <span>{t("services.c1.cta")}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -261,11 +248,10 @@ export function LandingPage() {
                     <ClipboardList className="w-5 h-5" aria-hidden="true" />
                   </div>
                   <h3 className="text-base font-bold text-[var(--text-primary)]">
-                    Requisition & Transfer Approvals
+                    {t("services.c2.title")}
                   </h3>
                   <p className="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
-                    Formal multi-tier approval workflow for peer departments to request idle machinery,
-                    complete with automated stock deduction and deployment schedules.
+                    {t("services.c2.desc")}
                   </p>
                 </div>
                 <div className="mt-5 pt-4 border-t border-[var(--border-subtle)]">
@@ -273,7 +259,7 @@ export function LandingPage() {
                     to={isAuthenticated ? "/requests" : "/login"}
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline"
                   >
-                    <span>Submit Requisition</span>
+                    <span>{t("services.c2.cta")}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -286,11 +272,10 @@ export function LandingPage() {
                     <Building2 className="w-5 h-5" aria-hidden="true" />
                   </div>
                   <h3 className="text-base font-bold text-[var(--text-primary)]">
-                    Line Agency Directory
+                    {t("services.c3.title")}
                   </h3>
                   <p className="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
-                    Official directory of registered city departments, nodal contact emails,
-                    jurisdictional offices, and administrative personnel assignments.
+                    {t("services.c3.desc")}
                   </p>
                 </div>
                 <div className="mt-5 pt-4 border-t border-[var(--border-subtle)]">
@@ -298,7 +283,7 @@ export function LandingPage() {
                     href="#departments"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline"
                   >
-                    <span>View Registered Agencies</span>
+                    <span>{t("services.c3.cta")}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </a>
                 </div>
@@ -311,16 +296,15 @@ export function LandingPage() {
                     <AlertTriangle className="w-5 h-5" aria-hidden="true" />
                   </div>
                   <h3 className="text-base font-bold text-[var(--text-primary)]">
-                    Conflict Prevention Engine
+                    {t("services.c4.title")}
                   </h3>
                   <p className="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
-                    Double-layer spatial and temporal checks preventing duplicate corridor permits
-                    and enforcing moratorium periods on freshly paved roads.
+                    {t("services.c4.desc")}
                   </p>
                 </div>
                 <div className="mt-5 pt-4 border-t border-[var(--border-subtle)]">
                   <span className="text-xs text-[var(--text-muted)] font-medium">
-                    Integrated at Permit Approval Stage
+                    {t("services.c4.note")}
                   </span>
                 </div>
               </div>
@@ -332,11 +316,10 @@ export function LandingPage() {
                     <FileText className="w-5 h-5" aria-hidden="true" />
                   </div>
                   <h3 className="text-base font-bold text-[var(--text-primary)]">
-                    Statutory Audit Trail
+                    {t("services.c5.title")}
                   </h3>
                   <p className="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
-                    Tamper-resistant audit logging capturing all resource transfers, permit reviews,
-                    and departmental assignments for public accountability and RTI compliance.
+                    {t("services.c5.desc")}
                   </p>
                 </div>
                 <div className="mt-5 pt-4 border-t border-[var(--border-subtle)]">
@@ -344,7 +327,7 @@ export function LandingPage() {
                     to={isAuthenticated ? "/audit" : "/login"}
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline"
                   >
-                    <span>Inspect Governance Log</span>
+                    <span>{t("services.c5.cta")}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -357,11 +340,10 @@ export function LandingPage() {
                     <HardHat className="w-5 h-5" aria-hidden="true" />
                   </div>
                   <h3 className="text-base font-bold text-[var(--text-primary)]">
-                    Unified Civil Sequencing
+                    {t("services.c6.title")}
                   </h3>
                   <p className="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
-                    Sub-surface utility ducts (water/gas/power) laid first, followed by base compaction,
-                    concluding with final asphalt carpeting to eliminate recurring road cuts.
+                    {t("services.c6.desc")}
                   </p>
                 </div>
                 <div className="mt-5 pt-4 border-t border-[var(--border-subtle)]">
@@ -369,7 +351,7 @@ export function LandingPage() {
                     href="#framework"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline"
                   >
-                    <span>Read Policy Guidelines</span>
+                    <span>{t("services.c6.cta")}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </a>
                 </div>
@@ -383,55 +365,54 @@ export function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mb-12">
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                Statutory Governance Rule
+                {t("framework.eyebrow")}
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mt-1">
-                The 5-Part "Dig-Later" Policy Framework
+                {t("framework.title")}
               </h2>
               <p className="text-sm text-[var(--text-secondary)] mt-2">
-                Mandatory five-step protocol enforced whenever infrastructure works require
-                excavation or utility maintenance on city corridors.
+                {t("framework.subtitle")}
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div className="p-5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] flex flex-col">
                 <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">01</span>
-                <h4 className="text-sm font-bold text-[var(--text-primary)] mt-1">Declare Future Needs</h4>
+                <h4 className="text-sm font-bold text-[var(--text-primary)] mt-1">{t("framework.s1.title")}</h4>
                 <p className="text-xs text-[var(--text-muted)] mt-2 leading-relaxed">
-                  All agencies submit planned utility pipeline requirements for a 3–5 year horizon prior to new road construction.
+                  {t("framework.s1.desc")}
                 </p>
               </div>
 
               <div className="p-5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] flex flex-col">
                 <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">02</span>
-                <h4 className="text-sm font-bold text-[var(--text-primary)] mt-1">Build Shared Ducts</h4>
+                <h4 className="text-sm font-bold text-[var(--text-primary)] mt-1">{t("framework.s2.title")}</h4>
                 <p className="text-xs text-[var(--text-muted)] mt-2 leading-relaxed">
-                  Conduits and utility chambers co-laid so future fiber, power, or water lines are pulled through without cutting asphalt.
+                  {t("framework.s2.desc")}
                 </p>
               </div>
 
               <div className="p-5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] flex flex-col">
                 <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">03</span>
-                <h4 className="text-sm font-bold text-[var(--text-primary)] mt-1">No-Dig Moratorium</h4>
+                <h4 className="text-sm font-bold text-[var(--text-primary)] mt-1">{t("framework.s3.title")}</h4>
                 <p className="text-xs text-[var(--text-muted)] mt-2 leading-relaxed">
-                  Newly surfaced roads receive an enforceable 2-to-3 year moratorium preventing non-emergency open trench cuts.
+                  {t("framework.s3.desc")}
                 </p>
               </div>
 
               <div className="p-5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] flex flex-col">
                 <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">04</span>
-                <h4 className="text-sm font-bold text-[var(--text-primary)] mt-1">Trenchless Tech Mandate</h4>
+                <h4 className="text-sm font-bold text-[var(--text-primary)] mt-1">{t("framework.s4.title")}</h4>
                 <p className="text-xs text-[var(--text-muted)] mt-2 leading-relaxed">
-                  If work is unavoidable, agencies must utilize Horizontal Directional Drilling (HDD) or micro-trenching rather than surface cuts.
+                  {t("framework.s4.desc")}
                 </p>
               </div>
 
               <div className="p-5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] flex flex-col">
                 <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">05</span>
-                <h4 className="text-sm font-bold text-[var(--text-primary)] mt-1">Restoration Fund & Penalty</h4>
+                <h4 className="text-sm font-bold text-[var(--text-primary)] mt-1">{t("framework.s5.title")}</h4>
                 <p className="text-xs text-[var(--text-muted)] mt-2 leading-relaxed">
-                  Unauthorized cutting incurs heavy statutory surcharges deposited into a dedicated municipal road restoration fund.
+                  {t("framework.s5.desc")}
                 </p>
               </div>
             </div>
@@ -443,13 +424,13 @@ export function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-12">
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                Implementing Bodies
+                {t("agencies.eyebrow")}
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mt-1">
-                Participating Line Departments & Agencies
+                {t("agencies.title")}
               </h2>
               <p className="text-sm text-[var(--text-secondary)] mt-2">
-                Mandates and jurisdictions governed under the unified municipal coordination cell.
+                {t("agencies.subtitle")}
               </p>
             </div>
 
@@ -457,71 +438,71 @@ export function LandingPage() {
               <table className="gov-table">
                 <thead>
                   <tr>
-                    <th>Agency / Authority</th>
-                    <th>Institutional Mandate</th>
-                    <th>Sub-Surface Asset Types</th>
-                    <th>Coordination Status</th>
+                    <th>{t("agencies.col1")}</th>
+                    <th>{t("agencies.col2")}</th>
+                    <th>{t("agencies.col3")}</th>
+                    <th>{t("agencies.col4")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td className="font-semibold text-[var(--text-primary)]">
-                      Municipal Corporation (ULB)
+                      {t("agencies.r1.name")}
                     </td>
-                    <td>City roads, storm-water drainage networks, street lighting, waste disposal</td>
-                    <td>Storm drains, culverts, street light cabling</td>
+                    <td>{t("agencies.r1.mandate")}</td>
+                    <td>{t("agencies.r1.assets")}</td>
                     <td>
-                      <span className="status-pill pill-available">Active Coordination</span>
+                      <span className="status-pill pill-available">{t("agencies.status")}</span>
                     </td>
                   </tr>
                   <tr>
                     <td className="font-semibold text-[var(--text-primary)]">
-                      Water Supply & Sewerage Board (BWSSB)
+                      {t("agencies.r2.name")}
                     </td>
-                    <td>Potable underground water mains, sanitary sewer trunks, pumping stations</td>
-                    <td>Pressurized water pipes, sewer gravity mains</td>
+                    <td>{t("agencies.r2.mandate")}</td>
+                    <td>{t("agencies.r2.assets")}</td>
                     <td>
-                      <span className="status-pill pill-available">Active Coordination</span>
+                      <span className="status-pill pill-available">{t("agencies.status")}</span>
                     </td>
                   </tr>
                   <tr>
                     <td className="font-semibold text-[var(--text-primary)]">
-                      Electricity Supply Undertaking (DISCOM)
+                      {t("agencies.r3.name")}
                     </td>
-                    <td>High-tension overhead & underground power cabling, transformer stations</td>
-                    <td>Underground HT/LT feeder ducts, junction boxes</td>
+                    <td>{t("agencies.r3.mandate")}</td>
+                    <td>{t("agencies.r3.assets")}</td>
                     <td>
-                      <span className="status-pill pill-available">Active Coordination</span>
+                      <span className="status-pill pill-available">{t("agencies.status")}</span>
                     </td>
                   </tr>
                   <tr>
                     <td className="font-semibold text-[var(--text-primary)]">
-                      Public Works Department (PWD)
+                      {t("agencies.r4.name")}
                     </td>
-                    <td>Arterial transit corridors, flyovers, state highways, public bridges</td>
-                    <td>Corridor right-of-way, storm culverts</td>
+                    <td>{t("agencies.r4.mandate")}</td>
+                    <td>{t("agencies.r4.assets")}</td>
                     <td>
-                      <span className="status-pill pill-available">Active Coordination</span>
+                      <span className="status-pill pill-available">{t("agencies.status")}</span>
                     </td>
                   </tr>
                   <tr>
                     <td className="font-semibold text-[var(--text-primary)]">
-                      Metro Rail Corporation
+                      {t("agencies.r5.name")}
                     </td>
-                    <td>Mass rapid transit viaducts, underground tunneling, station interchanges</td>
-                    <td>Deep utility diversions, tunneling buffers</td>
+                    <td>{t("agencies.r5.mandate")}</td>
+                    <td>{t("agencies.r5.assets")}</td>
                     <td>
-                      <span className="status-pill pill-available">Active Coordination</span>
+                      <span className="status-pill pill-available">{t("agencies.status")}</span>
                     </td>
                   </tr>
                   <tr>
                     <td className="font-semibold text-[var(--text-primary)]">
-                      City Gas & Telecom Duct Operators
+                      {t("agencies.r6.name")}
                     </td>
-                    <td>Piped natural gas (PNG) mains, optical fiber underground ducting</td>
-                    <td>Steel gas mains, high-density polyethylene ducts</td>
+                    <td>{t("agencies.r6.mandate")}</td>
+                    <td>{t("agencies.r6.assets")}</td>
                     <td>
-                      <span className="status-pill pill-available">Active Coordination</span>
+                      <span className="status-pill pill-available">{t("agencies.status")}</span>
                     </td>
                   </tr>
                 </tbody>
@@ -535,13 +516,13 @@ export function LandingPage() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                Institutional Inquiries
+                {t("faq.eyebrow")}
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mt-1">
-                Frequently Asked Questions
+                {t("faq.title")}
               </h2>
               <p className="text-sm text-[var(--text-secondary)] mt-2">
-                Operational guidelines regarding equipment transfers, moratorium exemptions, and joint civil scheduling.
+                {t("faq.subtitle")}
               </p>
             </div>
 
@@ -585,11 +566,10 @@ export function LandingPage() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <Award className="w-10 h-10 text-emerald-300 mx-auto mb-4" />
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Empowering Municipal Cooperation & Seamless Urban Execution
+              {t("cta.title")}
             </h2>
             <p className="mt-3 text-sm text-emerald-100 dark:text-neutral-300 max-w-2xl mx-auto leading-relaxed">
-              Log in to the statutory coordination dashboard to review active machinery requisitions,
-              inspect departmental equipment inventory, and monitor audit compliance.
+              {t("cta.subtitle")}
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               {isAuthenticated ? (
@@ -597,7 +577,7 @@ export function LandingPage() {
                   onClick={() => navigate("/dashboard")}
                   className="btn bg-white text-emerald-900 hover:bg-neutral-100 text-xs py-2.5 px-6 font-bold shadow-md"
                 >
-                  Enter Officer Portal
+                  {t("cta.enterPortal")}
                 </button>
               ) : (
                 <>
@@ -605,13 +585,13 @@ export function LandingPage() {
                     to="/login"
                     className="btn bg-white text-emerald-900 hover:bg-neutral-100 text-xs py-2.5 px-6 font-bold shadow-md"
                   >
-                    Official Portal Sign In
+                    {t("cta.signIn")}
                   </Link>
                   <Link
                     to="/register"
                     className="btn bg-emerald-800/80 hover:bg-emerald-700 text-white border border-emerald-600 text-xs py-2.5 px-6 font-bold"
                   >
-                    Register Official Account
+                    {t("cta.register")}
                   </Link>
                 </>
               )}

@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Landmark, ArrowLeft, Lock, Mail, ShieldAlert } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 import { useToast } from "../../context/ToastContext";
 import { ThemeToggle } from "../../components/common/ThemeToggle";
+import { LanguageToggle } from "../../components/common/LanguageToggle";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -12,6 +14,7 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
+  const { t } = useLanguage();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,9 +45,12 @@ export function LoginPage() {
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-secondary hover:text-primary transition-colors py-1.5 px-3 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-surface)]"
         >
           <ArrowLeft size={14} />
-          <span>Return to Public Portal</span>
+          <span>{t("auth.returnPublic")}</span>
         </Link>
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <LanguageToggle />
+          <ThemeToggle />
+        </div>
       </div>
 
       <div className="auth-card">
@@ -53,13 +59,13 @@ export function LoginPage() {
             <Landmark size={28} />
           </div>
           <h1 className="brand-name">CitySync</h1>
-          <p className="brand-sub">Inter-Departmental Municipal Governance Portal</p>
+          <p className="brand-sub">{t("auth.portalSub")}</p>
         </div>
 
         <div className="auth-tabs">
-          <span className="auth-tab active">Official Sign In</span>
+          <span className="auth-tab active">{t("auth.tabSignIn")}</span>
           <Link to="/register" className="auth-tab">
-            Register Officer
+            {t("auth.tabRegister")}
           </Link>
         </div>
 
@@ -72,7 +78,7 @@ export function LoginPage() {
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="login-email">Municipal Officer Email Address</label>
+            <label htmlFor="login-email">{t("auth.emailLabel")}</label>
             <div style={{ position: "relative" }}>
               <Mail
                 size={16}
@@ -90,7 +96,7 @@ export function LoginPage() {
                 type="email"
                 required
                 autoFocus
-                placeholder="Email"
+                placeholder={t("auth.emailPlaceholder")}
                 style={{ paddingLeft: 36, width: "100%" }}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -100,7 +106,7 @@ export function LoginPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="login-password">Security Password</label>
+            <label htmlFor="login-password">{t("auth.passwordLabel")}</label>
             <div style={{ position: "relative" }}>
               <Lock
                 size={16}
@@ -117,7 +123,7 @@ export function LoginPage() {
                 id="login-password"
                 type="password"
                 required
-                placeholder="Password"
+                placeholder={t("auth.passwordPlaceholder")}
                 style={{ paddingLeft: 36, width: "100%" }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -130,18 +136,18 @@ export function LoginPage() {
             {loading ? (
               <>
                 <span className="spinner-inline" />
-                <span>Verifying Officer Credentials...</span>
+                <span>{t("auth.signingIn")}</span>
               </>
             ) : (
-              "Access Secure Operations Portal"
+              t("auth.signInBtn")
             )}
           </button>
         </form>
 
         <div className="auth-footer">
-          <span>New municipal personnel? </span>
+          <span>{t("auth.newPersonnel")} </span>
           <Link to="/register" className="text-link">
-            Request official registration
+            {t("auth.requestReg")}
           </Link>
         </div>
       </div>

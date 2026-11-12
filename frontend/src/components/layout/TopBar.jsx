@@ -2,11 +2,14 @@ import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Menu, RefreshCw, Bell, Home, User } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 import { ThemeToggle } from "../common/ThemeToggle";
+import { LanguageToggle } from "../common/LanguageToggle";
 
 export function TopBar({ title, onRefresh, isRefreshing, unreadCount = 0, onToggleSidebar }) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   return (
     <header className="sticky top-0 z-30 bg-[var(--bg-surface)] border-b border-[var(--border-subtle)] px-4 sm:px-8 py-3 transition-colors">
@@ -25,7 +28,7 @@ export function TopBar({ title, onRefresh, isRefreshing, unreadCount = 0, onTogg
               {title}
             </h1>
             <span className="hidden sm:block text-[11px] text-[var(--text-muted)] -mt-0.5">
-              Municipal Infrastructure Operations Hub
+              {t("portal.hubSub")}
             </span>
           </div>
         </div>
@@ -38,8 +41,11 @@ export function TopBar({ title, onRefresh, isRefreshing, unreadCount = 0, onTogg
             title="View Public Portal Landing"
           >
             <Home className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
-            <span>Public Home</span>
+            <span>{t("portal.publicHome")}</span>
           </Link>
+
+          {/* Language Toggle */}
+          <LanguageToggle />
 
           {/* Theme Toggle Button */}
           <ThemeToggle />

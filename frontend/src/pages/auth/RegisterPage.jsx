@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Landmark, ArrowLeft, User, Mail, Lock, ShieldAlert } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 import { useToast } from "../../context/ToastContext";
 import { ThemeToggle } from "../../components/common/ThemeToggle";
+import { LanguageToggle } from "../../components/common/LanguageToggle";
 
 export function RegisterPage() {
   const [name, setName] = useState("");
@@ -14,6 +16,7 @@ export function RegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const { register } = useAuth();
+  const { t } = useLanguage();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
@@ -52,9 +55,12 @@ export function RegisterPage() {
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-secondary hover:text-primary transition-colors py-1.5 px-3 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-surface)]"
         >
           <ArrowLeft size={14} />
-          <span>Return to Public Portal</span>
+          <span>{t("auth.returnPublic")}</span>
         </Link>
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <LanguageToggle />
+          <ThemeToggle />
+        </div>
       </div>
 
       <div className="auth-card">
@@ -63,14 +69,14 @@ export function RegisterPage() {
             <Landmark size={28} />
           </div>
           <h1 className="brand-name">CitySync</h1>
-          <p className="brand-sub">Register Municipal Officer Account</p>
+          <p className="brand-sub">{t("auth.regSub")}</p>
         </div>
 
         <div className="auth-tabs">
           <Link to="/login" className="auth-tab">
-            Official Sign In
+            {t("auth.tabSignIn")}
           </Link>
-          <span className="auth-tab active">Register Officer</span>
+          <span className="auth-tab active">{t("auth.tabRegister")}</span>
         </div>
 
         {error && (
@@ -82,7 +88,7 @@ export function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="reg-name">Full Name & Rank</label>
+            <label htmlFor="reg-name">{t("auth.nameLabel")}</label>
             <div style={{ position: "relative" }}>
               <User
                 size={16}
@@ -100,7 +106,7 @@ export function RegisterPage() {
                 type="text"
                 required
                 autoFocus
-                placeholder="Enter Full Name"
+                placeholder={t("auth.namePlaceholder")}
                 style={{ paddingLeft: 36, width: "100%" }}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -110,7 +116,7 @@ export function RegisterPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="reg-email">Official Department Email</label>
+            <label htmlFor="reg-email">{t("auth.deptEmailLabel")}</label>
             <div style={{ position: "relative" }}>
               <Mail
                 size={16}
@@ -127,7 +133,7 @@ export function RegisterPage() {
                 id="reg-email"
                 type="email"
                 required
-                placeholder="Enter Email"
+                placeholder={t("auth.deptEmailPlaceholder")}
                 style={{ paddingLeft: 36, width: "100%" }}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -137,7 +143,7 @@ export function RegisterPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="reg-password">Password (minimum 8 characters)</label>
+            <label htmlFor="reg-password">{t("auth.regPassLabel")}</label>
             <div style={{ position: "relative" }}>
               <Lock
                 size={16}
@@ -155,7 +161,7 @@ export function RegisterPage() {
                 type="password"
                 required
                 minLength={8}
-                placeholder="Enter Password"
+                placeholder={t("auth.regPassPlaceholder")}
                 style={{ paddingLeft: 36, width: "100%" }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -165,7 +171,7 @@ export function RegisterPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="reg-confirm">Confirm Password</label>
+            <label htmlFor="reg-confirm">{t("auth.confirmPassLabel")}</label>
             <div style={{ position: "relative" }}>
               <Lock
                 size={16}
@@ -183,7 +189,7 @@ export function RegisterPage() {
                 type="password"
                 required
                 minLength={8}
-                placeholder="Confirm Password"
+                placeholder={t("auth.confirmPassPlaceholder")}
                 style={{ paddingLeft: 36, width: "100%" }}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -196,18 +202,18 @@ export function RegisterPage() {
             {loading ? (
               <>
                 <span className="spinner-inline" />
-                <span>Registering Personnel Profile...</span>
+                <span>{t("auth.registering")}</span>
               </>
             ) : (
-              "Submit Official Registration"
+              t("auth.registerBtn")
             )}
           </button>
         </form>
 
         <div className="auth-footer">
-          <span>Already registered in the directory? </span>
+          <span>{t("auth.alreadyRegistered")} </span>
           <Link to="/login" className="text-link">
-            Sign in
+            {t("auth.signInLink")}
           </Link>
         </div>
       </div>

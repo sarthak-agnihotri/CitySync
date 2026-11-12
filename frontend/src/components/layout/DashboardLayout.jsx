@@ -3,21 +3,23 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 import { NotificationsAPI } from "../../api";
+import { useLanguage } from "../../context/LanguageContext";
 
-const PAGE_TITLES = {
-  "/dashboard": "Overview & Analytics",
-  "/projects": "Municipal Infrastructure Projects",
-  "/conflicts": "Dig-Later Conflict Registry",
-  "/resources": "Resource & Equipment Inventory",
-  "/requests": "Requisitions & Requests",
-  "/notifications": "Alerts & Notifications",
-  "/departments": "Department Management",
-  "/users": "User Directory & Role Assignment",
-  "/audit": "Citywide Audit Trail"
+const PAGE_TITLE_KEYS = {
+  "/dashboard": "pageTitle.dashboard",
+  "/projects": "pageTitle.projects",
+  "/conflicts": "pageTitle.conflicts",
+  "/resources": "pageTitle.resources",
+  "/requests": "pageTitle.requests",
+  "/notifications": "pageTitle.notifications",
+  "/departments": "pageTitle.departments",
+  "/users": "pageTitle.users",
+  "/audit": "pageTitle.audit"
 };
 
 export function DashboardLayout() {
   const location = useLocation();
+  const { t } = useLanguage();
   const [unreadCount, setUnreadCount] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -47,7 +49,8 @@ export function DashboardLayout() {
     setTimeout(() => setIsRefreshing(false), 600);
   };
 
-  const currentTitle = PAGE_TITLES[location.pathname] || "CitySync Portal";
+  const titleKey = PAGE_TITLE_KEYS[location.pathname];
+  const currentTitle = titleKey ? t(titleKey) : "CitySync Portal";
 
   return (
     <div className="min-h-screen flex bg-[var(--bg-page)] text-[var(--text-primary)] transition-colors">

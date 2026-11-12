@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
+import { LanguageProvider } from "./context/LanguageContext";
 import { AuthProvider } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
 import { ProtectedRoute } from "./components/common/ProtectedRoute";
@@ -24,8 +25,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <ThemeProvider>
-        <ToastProvider>
-          <AuthProvider>
+        <LanguageProvider>
+          <ToastProvider>
+            <AuthProvider>
             <Routes>
               {/* Public Official Landing Page */}
               <Route path="/" element={<LandingPage />} />
@@ -80,8 +82,9 @@ export default function App() {
               <Route path="/404" element={<NotFoundPage />} />
               <Route path="*" element={<Navigate to="/404" replace />} />
             </Routes>
-          </AuthProvider>
-        </ToastProvider>
+            </AuthProvider>
+          </ToastProvider>
+        </LanguageProvider>
       </ThemeProvider>
     </BrowserRouter>
   );
