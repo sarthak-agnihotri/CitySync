@@ -13,7 +13,8 @@ import {
   X,
   ExternalLink,
   FolderKanban,
-  AlertTriangle
+  AlertTriangle,
+  Map
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -27,10 +28,10 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
   };
 
   const departmentName =
-  user?.departmentName ||
-  (user?.role === "department_head" && !user?.department
-    ? "All Departments"
-    : "General Municipal Services");
+    user?.departmentName ||
+    (user?.role === "department_head" && !user?.department
+      ? "All Departments"
+      : "General Municipal Services");
 
   return (
     <>
@@ -42,9 +43,8 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
         />
       )}
       <aside
-        className={`fixed md:sticky top-0 bottom-0 left-0 w-64 bg-[var(--bg-surface)] border-r border-[var(--border-subtle)] flex flex-col z-50 transition-transform duration-200 ease-in-out ${
-          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        }`}
+        className={`fixed md:sticky top-0 bottom-0 left-0 w-64 bg-[var(--bg-surface)] border-r border-[var(--border-subtle)] flex flex-col z-50 transition-transform duration-200 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          }`}
       >
         {/* Brand Header */}
         <div className="p-4 border-b border-[var(--border-subtle)] flex items-center justify-between">
@@ -82,10 +82,9 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
           <NavLink
             to="/dashboard"
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${
-                isActive
-                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
-                  : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
+              `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${isActive
+                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
+                : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
               }`
             }
             onClick={handleNavClick}
@@ -97,10 +96,9 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
           <NavLink
             to="/projects"
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${
-                isActive
-                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
-                  : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
+              `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${isActive
+                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
+                : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
               }`
             }
             onClick={handleNavClick}
@@ -108,14 +106,26 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
             <FolderKanban className="w-4 h-4 shrink-0" aria-hidden="true" />
             <span>{t("sidebar.projects")}</span>
           </NavLink>
-
+          
+          <NavLink
+            to="/map"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${isActive
+                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
+                : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
+              }`
+            }
+            onClick={handleNavClick}
+          >
+            <Map className="w-4 h-4 shrink-0" aria-hidden="true" />
+            <span>Smart City Map</span>
+          </NavLink>
           <NavLink
             to="/conflicts"
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${
-                isActive
-                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
-                  : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
+              `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${isActive
+                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
+                : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
               }`
             }
             onClick={handleNavClick}
@@ -127,10 +137,9 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
           <NavLink
             to="/resources"
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${
-                isActive
-                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
-                  : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
+              `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${isActive
+                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
+                : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
               }`
             }
             onClick={handleNavClick}
@@ -142,10 +151,9 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
           <NavLink
             to="/requests"
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${
-                isActive
-                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
-                  : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
+              `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${isActive
+                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
+                : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
               }`
             }
             onClick={handleNavClick}
@@ -157,10 +165,9 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
           <NavLink
             to="/notifications"
             className={({ isActive }) =>
-              `flex items-center justify-between px-3 py-2 rounded-md text-xs font-semibold transition-colors ${
-                isActive
-                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
-                  : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
+              `flex items-center justify-between px-3 py-2 rounded-md text-xs font-semibold transition-colors ${isActive
+                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
+                : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
               }`
             }
             onClick={handleNavClick}
@@ -188,10 +195,9 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
               <NavLink
                 to="/departments"
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${
-                    isActive
-                      ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
-                      : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
+                  `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${isActive
+                    ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
+                    : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
                   }`
                 }
                 onClick={handleNavClick}
@@ -203,10 +209,9 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
               <NavLink
                 to="/users"
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${
-                    isActive
-                      ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
-                      : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
+                  `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${isActive
+                    ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
+                    : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
                   }`
                 }
                 onClick={handleNavClick}
@@ -218,10 +223,9 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
               <NavLink
                 to="/audit"
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${
-                    isActive
-                      ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
-                      : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
+                  `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${isActive
+                    ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
+                    : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
                   }`
                 }
                 onClick={handleNavClick}
