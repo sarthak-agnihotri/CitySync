@@ -9,3 +9,4 @@ export { AuditAPI } from "./audit";
 export { ProjectsAPI } from "./projects";
 export { ConflictsAPI } from "./conflicts";
 export { MilestonesAPI } from "./milestones";
+export { TasksAPI } from "./tasks";

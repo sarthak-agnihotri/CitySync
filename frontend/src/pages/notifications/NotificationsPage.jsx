@@ -6,6 +6,7 @@ import {
   Check,
   Trash2,
   ClipboardList,
+  ClipboardCheck,
   CheckCircle2,
   XCircle,
   Package,
@@ -89,6 +90,9 @@ export function NotificationsPage() {
     switch (type) {
       case "request_submitted":
         return <ClipboardList size={size} />;
+
+      case "task_assigned":
+        return <ClipboardCheck size={size} className="text-primary" />;
       case "request_approved":
       case "conflict_resolved":
         return <CheckCircle2 size={size} className="text-success" />;

@@ -14,6 +14,7 @@ import { MilestonesAPI } from "../../api";
 import { Modal } from "../common/Modal";
 import { useToast } from "../../context/ToastContext";
 import { useAuth } from "../../context/AuthContext";
+import MilestoneTasks from "./MilestoneTasks";
 
 const initialForm = {
   title: "",
@@ -66,7 +67,7 @@ export default function MilestonesModal({ project, onClose }) {
     (user?.role === "department_head" &&
       (!user?.department ||
         String(user.department?._id || user.department) ===
-          String(project.department?._id || project.department)));
+        String(project.department?._id || project.department)));
 
   const projectLocked = ["completed", "cancelled"].includes(project.status);
 
@@ -394,18 +395,16 @@ export default function MilestonesModal({ project, onClose }) {
 
                   <div className="flex items-center gap-2">
                     <span
-                      className={`px-2 py-1 rounded-full text-[10px] font-semibold ${
-                        priorityStyles[milestone.priority] || priorityStyles.medium
-                      }`}
+                      className={`px-2 py-1 rounded-full text-[10px] font-semibold ${priorityStyles[milestone.priority] || priorityStyles.medium
+                        }`}
                     >
                       <Flag className="inline w-3 h-3 mr-1" />
                       {formatStatus(milestone.priority)}
                     </span>
 
                     <span
-                      className={`px-2 py-1 rounded-full text-[10px] font-semibold ${
-                        statusStyles[milestone.status] || statusStyles.pending
-                      }`}
+                      className={`px-2 py-1 rounded-full text-[10px] font-semibold ${statusStyles[milestone.status] || statusStyles.pending
+                        }`}
                     >
                       {formatStatus(milestone.status)}
                     </span>
@@ -429,6 +428,11 @@ export default function MilestonesModal({ project, onClose }) {
                   {milestone.createdBy?.name &&
                     ` • Created by ${milestone.createdBy.name}`}
                 </div>
+                <MilestoneTasks
+                  milestone={milestone}
+                  canManage={canManage}
+                  projectLocked={projectLocked}
+                />
 
                 {canManage && !projectLocked && (
                   <div className="flex justify-end gap-2 pt-2 border-t border-[var(--border-subtle)]">

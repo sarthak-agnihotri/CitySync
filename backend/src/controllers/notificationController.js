@@ -12,6 +12,8 @@ const getMyNotifications = async (req, res) => {
     const notifications = await Notification.find(filter)
       .populate("relatedRequest", "status purpose")
       .populate("relatedResource", "name category")
+      .populate("relatedProject", "title status")
+      .populate("relatedTask", "title status dueDate priority")
       .sort({ createdAt: -1 })
       .limit(100);
 

@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   assignDepartment,
   getUsers,
+  getDepartmentOfficers,
   createOfficer,
   createDepartmentHead
 } = require("../controllers/userController");
@@ -16,6 +17,14 @@ router.use(authMiddleware);
 
 // Only City Admin can view all users
 router.get("/", roleMiddleware("city_admin"), getUsers);
+
+// Get officers belonging to a department
+// City Admin and Department Heads can access this route
+router.get(
+  "/department/:departmentId/officers",
+  roleMiddleware("city_admin", "department_head"),
+  getDepartmentOfficers
+);
 
 // Only City Admin can create officer accounts
 router.post(

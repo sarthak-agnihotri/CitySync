@@ -31,7 +31,8 @@ const notificationSchema = new mongoose.Schema(
         "project_created",
         "project_conflict_detected",
         "conflict_resolved",
-        "project_updated"
+        "project_updated",
+        "task_assigned"
       ],
       required: true
     },
@@ -66,6 +67,11 @@ const notificationSchema = new mongoose.Schema(
       default: null
     },
 
+    relatedTask: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Task",
+      default: null
+    },
     isRead: {
       type: Boolean,
       default: false
