@@ -20,6 +20,7 @@ import { Modal } from "../../components/common/Modal";
 import { StatusPill } from "../../components/common/StatusPill";
 import { LoadingSpinner } from "../../components/common/LoadingSpinner";
 import { EmptyState } from "../../components/common/EmptyState";
+import MilestonesModal from "../../components/milestones/MilestonesModal";
 
 const initialForm = {
   title: "",
@@ -53,6 +54,7 @@ export function ProjectsPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [milestoneProject, setMilestoneProject] = useState(null);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [form, setForm] = useState(initialForm);
@@ -349,7 +351,19 @@ export function ProjectsPage() {
                   <td>
                     <StatusPill status={project.status || "proposed"} />
                   </td>
-                  <td>
+                                    <td>
+                    {/* Milestones button - all project viewers */}
+                    <div className="flex items-center gap-2 flex-wrap mb-2">
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => setMilestoneProject(project)}
+                      >
+                        <Calendar size={15} />
+                        Milestones
+                      </button>
+                    </div>
+
                     {(
                       isRole("city_admin") ||
                       (isRole("department_head") && !user?.department) ||
@@ -605,6 +619,13 @@ export function ProjectsPage() {
           </div>
         </form>
       </Modal>
+            {/* Project Milestones Modal */}
+      {milestoneProject && (
+        <MilestonesModal
+          project={milestoneProject}
+          onClose={() => setMilestoneProject(null)}
+        />
+      )}
     </div>
   );
 }

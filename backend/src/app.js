@@ -16,6 +16,7 @@ const auditRoutes = require("./routes/auditRoutes");
 // Member 3 — Project Management & Scheduling
 const projectRoutes = require("./routes/projectRoutes");
 const conflictRoutes = require("./routes/conflictRoutes");
+const milestoneRoutes = require("./routes/milestoneRoutes");
 
 // Dynamic CORS configuration allowing local dev and production frontend (e.g. Vercel)
 const allowedOrigins = process.env.ALLOWED_ORIGINS
@@ -74,5 +75,7 @@ app.use("/api/audit", auditRoutes);
 // Member 3 — Project Registry & Conflict Engine
 app.use("/api/projects", projectRoutes);
 app.use("/api/conflicts", conflictRoutes);
+// Project Milestone & Progress Tracking
+app.use("/api/milestones", milestoneRoutes);
 
 module.exports = app;
