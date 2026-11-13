@@ -24,25 +24,22 @@ L.Icon.Default.mergeOptions({
     shadowUrl: markerShadow,
 });
 
-function MapBounds({ projects }) {
+function MapBounds({ locations }) {
     const map = useMap();
 
     React.useEffect(() => {
-        if (projects.length === 0) return;
+        if (locations.length === 0) return;
 
-        if (projects.length === 1) {
-            const { latitude, longitude } = projects[0].coordinates;
-            map.setView([Number(latitude), Number(longitude)], 13);
+        if (locations.length === 1) {
+            map.setView(locations[0], 13);
             return;
         }
 
-        const bounds = projects.map((project) => [
-            Number(project.coordinates.latitude),
-            Number(project.coordinates.longitude),
-        ]);
-
-        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 });
-    }, [projects, map]);
+        map.fitBounds(locations, {
+            padding: [40, 40],
+            maxZoom: 13,
+        });
+    }, [locations, map]);
 
     return null;
 }
@@ -62,46 +59,99 @@ function getProjectIcon(status) {
     return L.divIcon({
         className: "custom-project-marker",
         html: `<div style="
-      width: 18px;
-      height: 18px;
-      background: ${color};
-      border: 3px solid white;
-      border-radius: 50%;
-      box-shadow: 0 1px 5px rgba(0,0,0,0.5);
-    "></div>`,
+            width: 18px;
+            height: 18px;
+            background: ${color};
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.5);
+        "></div>`,
         iconSize: [18, 18],
         iconAnchor: [9, 9],
     });
 }
 
-export function MapView({ projects = [] }) {
+function getResourceIcon() {
+    return L.divIcon({
+        className: "custom-resource-marker",
+        html: `<div style="
+            width: 18px;
+            height: 18px;
+            background: #ea580c;
+            border: 3px solid white;
+            border-radius: 3px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.5);
+            transform: rotate(45deg);
+        "></div>`,
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+    });
+}
+
+function hasValidCoordinates(latitudeValue, longitudeValue) {
+    if (
+        latitudeValue === null ||
+        latitudeValue === undefined ||
+        longitudeValue === null ||
+        longitudeValue === undefined ||
+        latitudeValue === "" ||
+        longitudeValue === ""
+    ) {
+        return false;
+    }
+
+    const latitude = Number(latitudeValue);
+    const longitude = Number(longitudeValue);
+
+    return (
+        Number.isFinite(latitude) &&
+        Number.isFinite(longitude) &&
+        latitude >= -90 &&
+        latitude <= 90 &&
+        longitude >= -180 &&
+        longitude <= 180
+    );
+}
+
+export function MapView({ projects = [], resources = [] }) {
     const validProjects = useMemo(
         () =>
-            projects.filter((project) => {
-                const latitude = Number(project.coordinates?.latitude);
-                const longitude = Number(project.coordinates?.longitude);
-
-                return (
-                    project.coordinates?.latitude !== null &&
-                    project.coordinates?.latitude !== undefined &&
-                    project.coordinates?.longitude !== null &&
-                    project.coordinates?.longitude !== undefined &&
-                    Number.isFinite(latitude) &&
-                    Number.isFinite(longitude) &&
-                    latitude >= -90 &&
-                    latitude <= 90 &&
-                    longitude >= -180 &&
-                    longitude <= 180
-                );
-            }),
+            projects.filter((project) =>
+                hasValidCoordinates(
+                    project.coordinates?.latitude,
+                    project.coordinates?.longitude
+                )
+            ),
         [projects]
     );
 
-    const center = validProjects.length
-        ? [
-            Number(validProjects[0].coordinates.latitude),
-            Number(validProjects[0].coordinates.longitude),
-        ]
+    const validResources = useMemo(
+        () =>
+            resources.filter((resource) =>
+                hasValidCoordinates(
+                    resource.latitude,
+                    resource.longitude
+                )
+            ),
+        [resources]
+    );
+
+    const allLocations = useMemo(
+        () => [
+            ...validProjects.map((project) => [
+                Number(project.coordinates.latitude),
+                Number(project.coordinates.longitude),
+            ]),
+            ...validResources.map((resource) => [
+                Number(resource.latitude),
+                Number(resource.longitude),
+            ]),
+        ],
+        [validProjects, validResources]
+    );
+
+    const center = allLocations.length
+        ? allLocations[0]
         : [20.5937, 78.9629];
 
     return (
@@ -117,11 +167,12 @@ export function MapView({ projects = [] }) {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
-                <MapBounds projects={validProjects} />
+                <MapBounds locations={allLocations} />
 
+                {/* Project markers */}
                 {validProjects.map((project) => (
                     <Marker
-                        key={project._id}
+                        key={`project-${project._id}`}
                         position={[
                             Number(project.coordinates.latitude),
                             Number(project.coordinates.longitude),
@@ -161,28 +212,87 @@ export function MapView({ projects = [] }) {
                         </Popup>
                     </Marker>
                 ))}
+
+                {/* Resource markers */}
+                {validResources.map((resource) => (
+                    <Marker
+                        key={`resource-${resource._id}`}
+                        position={[
+                            Number(resource.latitude),
+                            Number(resource.longitude),
+                        ]}
+                        icon={getResourceIcon()}
+                    >
+                        <Popup>
+                            <div className="map-popup">
+                                <strong>{resource.name}</strong>
+                                <p>
+                                    <b>Type:</b>{" "}
+                                    {resource.category?.replace(/_/g, " ") || "Other"}
+                                </p>
+                                <p>
+                                    <b>Department:</b>{" "}
+                                    {resource.ownerDepartment?.name || "Unassigned"}
+                                </p>
+                                <p>
+                                    <b>Status:</b> {resource.status || "Available"}
+                                </p>
+                                <p>
+                                    <b>Quantity:</b>{" "}
+                                    {resource.availableQuantity ?? 0} / {resource.quantity ?? 0}{" "}
+                                    {resource.unit || ""}
+                                </p>
+                                <p>
+                                    <b>Location:</b> {resource.location || "Not specified"}
+                                </p>
+                                <p>
+                                    <b>Latitude:</b> {resource.latitude}
+                                </p>
+                                <p>
+                                    <b>Longitude:</b> {resource.longitude}
+                                </p>
+                            </div>
+                        </Popup>
+                    </Marker>
+                ))}
             </MapContainer>
+
             <div className="map-legend">
-                <strong>Project Status</strong>
+                <strong>Map Legend</strong>
 
                 <div>
                     <span className="legend-dot proposed"></span>
-                    Proposed
+                    Proposed Project
                 </div>
 
                 <div>
                     <span className="legend-dot in-progress"></span>
-                    In Progress
+                    In Progress Project
                 </div>
 
                 <div>
                     <span className="legend-dot completed"></span>
-                    Completed
+                    Completed Project
                 </div>
 
                 <div>
                     <span className="legend-dot cancelled"></span>
-                    Cancelled
+                    Cancelled Project
+                </div>
+
+                <div>
+                    <span
+                        style={{
+                            display: "inline-block",
+                            width: "12px",
+                            height: "12px",
+                            background: "#ea580c",
+                            borderRadius: "2px",
+                            transform: "rotate(45deg)",
+                            marginRight: "8px",
+                        }}
+                    ></span>
+                    Resource
                 </div>
             </div>
         </div>

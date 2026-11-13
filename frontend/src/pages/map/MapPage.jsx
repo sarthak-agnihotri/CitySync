@@ -1,34 +1,41 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { MapPin, RefreshCw } from "lucide-react";
-import { ProjectsAPI } from "../../api";
+import { ProjectsAPI, ResourcesAPI } from "../../api";
 import { useToast } from "../../context/ToastContext";
 import { LoadingSpinner } from "../../components/common/LoadingSpinner";
 import { MapView } from "./MapView";
 
 export function MapPage() {
   const [projects, setProjects] = useState([]);
+  const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [departmentFilter, setDepartmentFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const { showToast } = useToast();
 
-  const fetchProjects = async () => {
+  const fetchMapData = async () => {
     try {
       setLoading(true);
-      const response = await ProjectsAPI.getAll();
-      setProjects(response.projects || []);
+
+      const [projectResponse, resourceResponse] = await Promise.all([
+        ProjectsAPI.getAll(),
+        ResourcesAPI.list(),
+      ]);
+
+      setProjects(projectResponse.projects || []);
+      setResources(resourceResponse.resources || []);
     } catch (error) {
-      showToast(error.message || "Could not load map projects", "error");
+      showToast(error.message || "Could not load map data", "error");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchProjects();
+    fetchMapData();
 
-    const handleRefresh = () => fetchProjects();
+    const handleRefresh = () => fetchMapData();
     window.addEventListener("citysync:refresh-data", handleRefresh);
 
     return () => {
@@ -38,13 +45,12 @@ export function MapPage() {
 
   const departments = useMemo(() => {
     return [
-      ...new Set(
-        projects
-          .map((project) => project.department?.name)
-          .filter(Boolean)
-      ),
+      ...new Set([
+        ...projects.map((project) => project.department?.name),
+        ...resources.map((resource) => resource.ownerDepartment?.name),
+      ].filter(Boolean)),
     ];
-  }, [projects]);
+  }, [projects, resources]);
 
   const filteredProjects = useMemo(() => {
     return projects.filter((project) => {
@@ -58,6 +64,16 @@ export function MapPage() {
       return matchesDepartment && matchesStatus;
     });
   }, [projects, departmentFilter, statusFilter]);
+
+  const filteredResources = useMemo(() => {
+    return resources.filter((resource) => {
+      const matchesDepartment =
+        !departmentFilter ||
+        resource.ownerDepartment?.name === departmentFilter;
+
+      return matchesDepartment;
+    });
+  }, [resources, departmentFilter]);
 
   const mappedProjects = filteredProjects.filter((project) => {
     const latitude = Number(project.coordinates?.latitude);
@@ -83,13 +99,13 @@ export function MapPage() {
         <div>
           <h3 className="section-title">Smart City Map</h3>
           <p className="section-hint">
-            Geographic overview of municipal infrastructure projects.
+            Geographic overview of municipal projects and resources.
           </p>
         </div>
 
         <button
           className="btn btn-secondary"
-          onClick={fetchProjects}
+          onClick={fetchMapData}
           disabled={loading}
         >
           <RefreshCw size={15} />
@@ -135,7 +151,10 @@ export function MapPage() {
       {loading ? (
         <LoadingSpinner text="Loading infrastructure locations..." />
       ) : (
-        <MapView projects={mappedProjects} />
+        <MapView
+          projects={mappedProjects}
+          resources={filteredResources}
+        />
       )}
     </div>
   );

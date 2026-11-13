@@ -27,6 +27,16 @@ export function UsersPage() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedDeptId, setSelectedDeptId] = useState("");
   const [assigning, setAssigning] = useState(false);
+  // Create Department Head Modal
+  const [createHeadOpen, setCreateHeadOpen] = useState(false);
+  const [creatingHead, setCreatingHead] = useState(false);
+
+  const [headForm, setHeadForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    department: ""
+  });
 
   const loadData = useCallback(async (isSilent = false) => {
     if (!isSilent && !hasLoadedOnce) {
@@ -84,6 +94,52 @@ export function UsersPage() {
     }
   };
 
+  const handleCreateHeadSubmit = async (e) => {
+    e.preventDefault();
+
+    if (
+      !headForm.name.trim() ||
+      !headForm.email.trim() ||
+      !headForm.password ||
+      !headForm.department
+    ) {
+      showToast("Please fill in all fields", "error");
+      return;
+    }
+
+    if (headForm.password.length < 8) {
+      showToast("Password must be at least 8 characters", "error");
+      return;
+    }
+
+    setCreatingHead(true);
+
+    try {
+      await UsersAPI.createDepartmentHead({
+        name: headForm.name.trim(),
+        email: headForm.email.trim(),
+        password: headForm.password,
+        department: headForm.department
+      });
+
+      showToast("Department Head created successfully", "success");
+
+      setCreateHeadOpen(false);
+      setHeadForm({
+        name: "",
+        email: "",
+        password: "",
+        department: ""
+      });
+
+      await loadData();
+    } catch (err) {
+      showToast(err.message || "Failed to create Department Head", "error");
+    } finally {
+      setCreatingHead(false);
+    }
+  };
+
   const filteredUsers = users.filter((u) => {
     const q = search.toLowerCase();
     const matchesSearch =
@@ -104,6 +160,14 @@ export function UsersPage() {
             Manage authenticated municipal officers and department affiliations
           </p>
         </div>
+
+        <button
+          className="btn btn-primary"
+          onClick={() => setCreateHeadOpen(true)}
+        >
+          <UserCheck size={15} />
+          Create Department Head
+        </button>
       </div>
 
       <div className="page-actions">
@@ -171,8 +235,8 @@ export function UsersPage() {
                   u.department && typeof u.department === "object"
                     ? u.department.name
                     : u.department
-                    ? "Assigned"
-                    : "Unassigned";
+                      ? "Assigned"
+                      : "Unassigned";
 
                 const deptCode =
                   u.department && typeof u.department === "object" ? u.department.code : null;
@@ -266,6 +330,97 @@ export function UsersPage() {
           </div>
         </form>
       </Modal>
+
+      {/* Create Department Head Modal */}
+      <Modal
+        isOpen={createHeadOpen}
+        onClose={() => setCreateHeadOpen(false)}
+        title="Create Department Head"
+        size="md"
+      >
+        <form onSubmit={handleCreateHeadSubmit} className="modal-body">
+          <div className="form-group">
+            <label>Full Name *</label>
+            <input
+              type="text"
+              required
+              value={headForm.name}
+              onChange={(e) =>
+                setHeadForm({ ...headForm, name: e.target.value })
+              }
+              placeholder="Enter full name"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Email Address *</label>
+            <input
+              type="email"
+              required
+              value={headForm.email}
+              onChange={(e) =>
+                setHeadForm({ ...headForm, email: e.target.value })
+              }
+              placeholder="Enter email address"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Password *</label>
+            <input
+              type="password"
+              required
+              minLength={8}
+              value={headForm.password}
+              onChange={(e) =>
+                setHeadForm({ ...headForm, password: e.target.value })
+              }
+              placeholder="Minimum 8 characters"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Assigned Department *</label>
+            <select
+              required
+              value={headForm.department}
+              onChange={(e) =>
+                setHeadForm({ ...headForm, department: e.target.value })
+              }
+            >
+              <option value="">Choose department...</option>
+              {departments.map((d) => (
+                <option key={d._id} value={d._id}>
+                  {d.name} ({d.code})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <p className="confirm-hint">
+            This account will have Department Head permissions for the selected department.
+          </p>
+
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => setCreateHeadOpen(false)}
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={creatingHead}
+            >
+              {creatingHead ? "Creating..." : "Create Department Head"}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
     </div>
   );
 }

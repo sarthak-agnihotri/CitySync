@@ -1,3 +1,4 @@
+
 import { apiFetch } from "./client";
 
 export const UsersAPI = {
@@ -7,5 +8,11 @@ export const UsersAPI = {
     apiFetch(`/users/${userId}/department`, {
       method: "PATCH",
       body: JSON.stringify({ departmentId })
+    }),
+
+  createDepartmentHead: (data) =>
+    apiFetch("/users/department-head", {
+      method: "POST",
+      body: JSON.stringify(data)
     })
 };

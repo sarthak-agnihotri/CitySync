@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -46,6 +47,8 @@ export function ResourcesPage() {
     unit: "units",
     ownerDepartment: "",
     location: "",
+    latitude: "",
+    longitude: "",
     tags: ""
   });
   const [adding, setAdding] = useState(false);
@@ -61,6 +64,8 @@ export function ResourcesPage() {
     unit: "units",
     ownerDepartment: "",
     location: "",
+    latitude: "",
+    longitude: "",
     tags: ""
   });
   const [updating, setUpdating] = useState(false);
@@ -74,20 +79,33 @@ export function ResourcesPage() {
     if (!isSilent && !hasLoadedOnce) {
       setLoading(true);
     }
+
     try {
       const [resData, deptData] = await Promise.all([
         ResourcesAPI.list(),
         DepartmentsAPI.list()
       ]);
+
       setResources(resData.resources || []);
+
       const activeDepts = deptData.departments || [];
       setDepartments(activeDepts);
       setHasLoadedOnce(true);
 
-      if (user?.department && typeof user.department === "object" && user.department._id) {
-        setAddForm((prev) => ({ ...prev, ownerDepartment: user.department._id }));
+      if (
+        user?.department &&
+        typeof user.department === "object" &&
+        user.department._id
+      ) {
+        setAddForm((prev) => ({
+          ...prev,
+          ownerDepartment: user.department._id
+        }));
       } else if (activeDepts.length > 0) {
-        setAddForm((prev) => ({ ...prev, ownerDepartment: activeDepts[0]._id }));
+        setAddForm((prev) => ({
+          ...prev,
+          ownerDepartment: activeDepts[0]._id
+        }));
       }
     } catch (err) {
       showToast(err.message || "Failed to load resources", "error");
@@ -98,14 +116,21 @@ export function ResourcesPage() {
 
   useEffect(() => {
     loadData(hasLoadedOnce);
+
     const handleRefresh = () => loadData(false);
+
     window.addEventListener("citysync:refresh-data", handleRefresh);
-    return () => window.removeEventListener("citysync:refresh-data", handleRefresh);
+
+    return () => {
+      window.removeEventListener("citysync:refresh-data", handleRefresh);
+    };
   }, [loadData, hasLoadedOnce]);
 
+  // Add Resource
   const handleAddSubmit = async (e) => {
     e.preventDefault();
     setAdding(true);
+
     try {
       const tagsArray = addForm.tags
         ? addForm.tags.split(",").map((t) => t.trim()).filter(Boolean)
@@ -119,11 +144,14 @@ export function ResourcesPage() {
         unit: addForm.unit.trim() || "units",
         ownerDepartment: addForm.ownerDepartment,
         location: addForm.location.trim(),
+        latitude: addForm.latitude === "" ? null : Number(addForm.latitude),
+        longitude: addForm.longitude === "" ? null : Number(addForm.longitude),
         tags: tagsArray
       });
 
       showToast("Resource registered to pool successfully", "success");
       setAddOpen(false);
+
       setAddForm({
         name: "",
         category: "equipment",
@@ -132,8 +160,11 @@ export function ResourcesPage() {
         unit: "units",
         ownerDepartment: departments[0]?._id || "",
         location: "",
+        latitude: "",
+        longitude: "",
         tags: ""
       });
+
       loadData();
     } catch (err) {
       showToast(err.message || "Failed to add resource", "error");
@@ -142,8 +173,10 @@ export function ResourcesPage() {
     }
   };
 
+  // Open Edit Modal
   const openEditModal = (res) => {
     setSelectedResource(res);
+
     const deptId =
       res.ownerDepartment && typeof res.ownerDepartment === "object"
         ? res.ownerDepartment._id
@@ -157,15 +190,22 @@ export function ResourcesPage() {
       unit: res.unit || "units",
       ownerDepartment: deptId,
       location: res.location || "",
+      latitude: res.latitude ?? "",
+      longitude: res.longitude ?? "",
       tags: Array.isArray(res.tags) ? res.tags.join(", ") : ""
     });
+
     setEditOpen(true);
   };
 
+  // Update Resource
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+
     if (!selectedResource) return;
+
     setUpdating(true);
+
     try {
       const tagsArray = editForm.tags
         ? editForm.tags.split(",").map((t) => t.trim()).filter(Boolean)
@@ -179,6 +219,8 @@ export function ResourcesPage() {
         unit: editForm.unit.trim() || "units",
         ownerDepartment: editForm.ownerDepartment,
         location: editForm.location.trim(),
+        latitude: editForm.latitude === "" ? null : Number(editForm.latitude),
+        longitude: editForm.longitude === "" ? null : Number(editForm.longitude),
         tags: tagsArray
       });
 
@@ -192,12 +234,20 @@ export function ResourcesPage() {
     }
   };
 
+  // Deactivate Resource
   const handleDeactivateConfirm = async () => {
     if (!deactivatingResource) return;
+
     setDeactivating(true);
+
     try {
       await ResourcesAPI.deactivate(deactivatingResource._id);
-      showToast(`Resource "${deactivatingResource.name}" deactivated`, "success");
+
+      showToast(
+        `Resource "${deactivatingResource.name}" deactivated`,
+        "success"
+      );
+
       setDeactivateOpen(false);
       loadData();
     } catch (err) {
@@ -209,16 +259,24 @@ export function ResourcesPage() {
 
   const canManage = isRole("city_admin", "department_head");
 
+  // Filter Resources
   const filteredResources = resources.filter((r) => {
     const q = search.toLowerCase();
+
     const matchesSearch =
       r.name.toLowerCase().includes(q) ||
       (r.description && r.description.toLowerCase().includes(q)) ||
       (r.location && r.location.toLowerCase().includes(q)) ||
-      (r.ownerDepartment?.name && r.ownerDepartment.name.toLowerCase().includes(q));
+      (r.ownerDepartment?.name &&
+        r.ownerDepartment.name.toLowerCase().includes(q));
 
-    const matchesCategory = categoryFilter ? r.category === categoryFilter : true;
-    const matchesStatus = statusFilter ? r.status === statusFilter : true;
+    const matchesCategory = categoryFilter
+      ? r.category === categoryFilter
+      : true;
+
+    const matchesStatus = statusFilter
+      ? r.status === statusFilter
+      : true;
 
     return matchesSearch && matchesCategory && matchesStatus;
   });
@@ -231,6 +289,7 @@ export function ResourcesPage() {
           <h2 className="text-xl font-bold text-[var(--text-primary)]">
             Inter-Departmental Shared Equipment Pool
           </h2>
+
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">
             Searchable registry of heavy machinery, specialized vehicles, and excavation assets
           </p>
@@ -251,6 +310,7 @@ export function ResourcesPage() {
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[240px]">
           <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-2.5" />
+
           <input
             type="text"
             className="form-input pl-9 text-xs"
@@ -329,16 +389,23 @@ export function ResourcesPage() {
                 : "Municipal Depot";
 
             return (
-              <div key={res._id} className="surface-card p-5 flex flex-col justify-between">
+              <div
+                key={res._id}
+                className="surface-card p-5 flex flex-col justify-between"
+              >
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <h4 className="text-sm font-bold text-[var(--text-primary)]">{res.name}</h4>
+                      <h4 className="text-sm font-bold text-[var(--text-primary)]">
+                        {res.name}
+                      </h4>
+
                       <span className="text-[11px] text-[var(--text-muted)] flex items-center gap-1 mt-0.5">
                         <Building2 className="w-3 h-3 text-emerald-700 dark:text-emerald-400" />
                         {deptName}
                       </span>
                     </div>
+
                     <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] text-[var(--text-secondary)]">
                       {res.category}
                     </span>
@@ -353,26 +420,30 @@ export function ResourcesPage() {
                       <MapPin className="w-3 h-3" />
                       {res.location || "Central Yard"}
                     </span>
+
                     <StatusPill status={res.status} />
                   </div>
 
                   {/* Stock Bar */}
                   <div className="space-y-1.5 pt-1">
                     <div className="flex justify-between text-[11px]">
-                      <span className="text-[var(--text-muted)]">Stock Availability</span>
+                      <span className="text-[var(--text-muted)]">
+                        Stock Availability
+                      </span>
+
                       <strong className="text-[var(--text-primary)]">
                         {avail} / {total} {res.unit || "units"} ({pct}%)
                       </strong>
                     </div>
+
                     <div className="w-full bg-[var(--border-subtle)] rounded-full h-1.5 overflow-hidden">
                       <div
-                        className={`h-full rounded-full transition-all ${
-                          pct > 50
+                        className={`h-full rounded-full transition-all ${pct > 50
                             ? "bg-emerald-600 dark:bg-emerald-500"
                             : pct > 20
-                            ? "bg-amber-600 dark:bg-amber-500"
-                            : "bg-rose-600 dark:bg-rose-500"
-                        }`}
+                              ? "bg-amber-600 dark:bg-amber-500"
+                              : "bg-rose-600 dark:bg-rose-500"
+                          }`}
                         style={{ width: `${Math.max(5, pct)}%` }}
                       />
                     </div>
@@ -413,18 +484,26 @@ export function ResourcesPage() {
                     </button>
                   )}
 
-                  {isRole("city_admin") && (
-                    <button
-                      className="btn btn-secondary text-xs py-1.5 px-2.5 text-rose-600 hover:text-rose-700"
-                      onClick={() => {
-                        setDeactivatingResource(res);
-                        setDeactivateOpen(true);
-                      }}
-                      title="Deactivate Resource"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  {(
+                    isRole("city_admin") ||
+                    (
+                      isRole("department_head") &&
+                      user?.department &&
+                      String(user.department?._id || user.department) ===
+                      String(res.ownerDepartment?._id || res.ownerDepartment)
+                    )
+                  ) && (
+                      <button
+                        className="btn btn-secondary text-xs py-1.5 px-2.5 text-rose-600 hover:text-rose-700"
+                        onClick={() => {
+                          setDeactivatingResource(res);
+                          setDeactivateOpen(true);
+                        }}
+                        title="Deactivate Resource"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                 </div>
               </div>
             );
@@ -444,6 +523,7 @@ export function ResourcesPage() {
               <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
                 Equipment Name *
               </label>
+
               <input
                 type="text"
                 required
@@ -453,10 +533,12 @@ export function ResourcesPage() {
                 onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}
               />
             </div>
+
             <div>
               <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
                 Category *
               </label>
+
               <select
                 required
                 className="form-select text-xs"
@@ -479,6 +561,7 @@ export function ResourcesPage() {
               <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
                 Pool Quantity *
               </label>
+
               <input
                 type="number"
                 min="1"
@@ -488,10 +571,12 @@ export function ResourcesPage() {
                 onChange={(e) => setAddForm({ ...addForm, quantity: e.target.value })}
               />
             </div>
+
             <div>
               <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
                 Unit Label
               </label>
+
               <input
                 type="text"
                 className="form-input text-xs"
@@ -507,6 +592,7 @@ export function ResourcesPage() {
               <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
                 Owner Department *
               </label>
+
               <select
                 required
                 className="form-select text-xs"
@@ -514,6 +600,7 @@ export function ResourcesPage() {
                 onChange={(e) => setAddForm({ ...addForm, ownerDepartment: e.target.value })}
               >
                 <option value="">Select Department...</option>
+
                 {departments.map((d) => (
                   <option key={d._id} value={d._id}>
                     {d.name} ({d.code})
@@ -521,10 +608,12 @@ export function ResourcesPage() {
                 ))}
               </select>
             </div>
+
             <div>
               <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
                 Depot Location
               </label>
+
               <input
                 type="text"
                 className="form-input text-xs"
@@ -535,10 +624,48 @@ export function ResourcesPage() {
             </div>
           </div>
 
+          {/* Add Resource Coordinates */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Latitude
+              </label>
+
+              <input
+                type="number"
+                step="any"
+                min="-90"
+                max="90"
+                className="form-input text-xs"
+                placeholder="e.g. 30.9010"
+                value={addForm.latitude}
+                onChange={(e) => setAddForm({ ...addForm, latitude: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Longitude
+              </label>
+
+              <input
+                type="number"
+                step="any"
+                min="-180"
+                max="180"
+                className="form-input text-xs"
+                placeholder="e.g. 75.8573"
+                value={addForm.longitude}
+                onChange={(e) => setAddForm({ ...addForm, longitude: e.target.value })}
+              />
+            </div>
+          </div>
+
           <div>
             <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
               Tags (Comma-separated)
             </label>
+
             <input
               type="text"
               className="form-input text-xs"
@@ -552,6 +679,7 @@ export function ResourcesPage() {
             <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
               Description & Specifications
             </label>
+
             <textarea
               rows={2}
               className="form-textarea text-xs"
@@ -569,7 +697,12 @@ export function ResourcesPage() {
             >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary text-xs" disabled={adding}>
+
+            <button
+              type="submit"
+              className="btn btn-primary text-xs"
+              disabled={adding}
+            >
               {adding ? "Registering..." : "Add to Pool"}
             </button>
           </div>
@@ -588,6 +721,7 @@ export function ResourcesPage() {
               <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
                 Resource Name *
               </label>
+
               <input
                 type="text"
                 required
@@ -596,10 +730,12 @@ export function ResourcesPage() {
                 onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
               />
             </div>
+
             <div>
               <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
                 Category *
               </label>
+
               <select
                 required
                 className="form-select text-xs"
@@ -622,6 +758,7 @@ export function ResourcesPage() {
               <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
                 Total Quantity *
               </label>
+
               <input
                 type="number"
                 min="1"
@@ -631,10 +768,12 @@ export function ResourcesPage() {
                 onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })}
               />
             </div>
+
             <div>
               <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
                 Unit
               </label>
+
               <input
                 type="text"
                 className="form-input text-xs"
@@ -649,6 +788,7 @@ export function ResourcesPage() {
               <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
                 Owner Department *
               </label>
+
               <select
                 required
                 className="form-select text-xs"
@@ -656,6 +796,7 @@ export function ResourcesPage() {
                 onChange={(e) => setEditForm({ ...editForm, ownerDepartment: e.target.value })}
               >
                 <option value="">Select Department...</option>
+
                 {departments.map((d) => (
                   <option key={d._id} value={d._id}>
                     {d.name} ({d.code})
@@ -663,10 +804,12 @@ export function ResourcesPage() {
                 ))}
               </select>
             </div>
+
             <div>
               <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
                 Location
               </label>
+
               <input
                 type="text"
                 className="form-input text-xs"
@@ -676,10 +819,48 @@ export function ResourcesPage() {
             </div>
           </div>
 
+          {/* Edit Resource Coordinates */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Latitude
+              </label>
+
+              <input
+                type="number"
+                step="any"
+                min="-90"
+                max="90"
+                className="form-input text-xs"
+                placeholder="e.g. 30.9010"
+                value={editForm.latitude}
+                onChange={(e) => setEditForm({ ...editForm, latitude: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
+                Longitude
+              </label>
+
+              <input
+                type="number"
+                step="any"
+                min="-180"
+                max="180"
+                className="form-input text-xs"
+                placeholder="e.g. 75.8573"
+                value={editForm.longitude}
+                onChange={(e) => setEditForm({ ...editForm, longitude: e.target.value })}
+              />
+            </div>
+          </div>
+
           <div>
             <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
               Tags
             </label>
+
             <input
               type="text"
               className="form-input text-xs"
@@ -692,6 +873,7 @@ export function ResourcesPage() {
             <label className="block text-xs font-bold text-[var(--text-muted)] uppercase mb-1">
               Description
             </label>
+
             <textarea
               rows={2}
               className="form-textarea text-xs"
@@ -708,7 +890,12 @@ export function ResourcesPage() {
             >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary text-xs" disabled={updating}>
+
+            <button
+              type="submit"
+              className="btn btn-primary text-xs"
+              disabled={updating}
+            >
               {updating ? "Saving..." : "Save Changes"}
             </button>
           </div>
@@ -725,9 +912,12 @@ export function ResourcesPage() {
         <div className="space-y-3">
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             Are you sure you want to deactivate{" "}
-            <strong className="text-[var(--text-primary)]">{deactivatingResource?.name}</strong>?
+            <strong className="text-[var(--text-primary)]">
+              {deactivatingResource?.name}
+            </strong>?
             The resource will be removed from public booking while preserving all historical requisitions.
           </p>
+
           <div className="pt-3 border-t border-[var(--border-subtle)] flex justify-end gap-2">
             <button
               type="button"
@@ -736,6 +926,7 @@ export function ResourcesPage() {
             >
               Cancel
             </button>
+
             <button
               type="button"
               className="btn btn-danger text-xs"

@@ -9,10 +9,13 @@ import {
   AlertTriangle,
   Layers,
   IndianRupee,
-  ShieldAlert
+  ShieldAlert,
+  Pencil,
+  Ban
 } from "lucide-react";
 import { ProjectsAPI, DepartmentsAPI } from "../../api";
 import { useToast } from "../../context/ToastContext";
+import { useAuth } from "../../context/AuthContext";
 import { Modal } from "../../components/common/Modal";
 import { StatusPill } from "../../components/common/StatusPill";
 import { LoadingSpinner } from "../../components/common/LoadingSpinner";
@@ -49,10 +52,12 @@ export function ProjectsPage() {
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [form, setForm] = useState(initialForm);
   const { showToast } = useToast();
+  const { user, isRole } = useAuth();
 
   const fetchData = useCallback(async (isSilent = false) => {
     if (!isSilent && !hasLoadedOnce) {
@@ -86,6 +91,36 @@ export function ProjectsPage() {
     setForm((previous) => ({ ...previous, [name]: value }));
   };
 
+  const handleNewProject = () => {
+    setEditingProject(null);
+    setForm(initialForm);
+    setFormOpen(true);
+  };
+  const handleEditClick = (project) => {
+    setEditingProject(project);
+
+    setForm({
+      title: project.title || "",
+      description: project.description || "",
+      department: project.department?._id || project.department || "",
+      category: project.category || "other",
+      zone: project.zone || "",
+      address: project.address || "",
+      latitude: project.coordinates?.latitude ?? "",
+      longitude: project.coordinates?.longitude ?? "",
+      startDate: project.startDate
+        ? new Date(project.startDate).toISOString().split("T")[0]
+        : "",
+      endDate: project.endDate
+        ? new Date(project.endDate).toISOString().split("T")[0]
+        : "",
+      estimatedBudget: project.estimatedBudget ?? "",
+      priority: project.priority || "medium",
+    });
+
+    setFormOpen(true);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -97,7 +132,7 @@ export function ProjectsPage() {
     setSaving(true);
 
     try {
-      const result = await ProjectsAPI.create({
+      const payload = {
         title: form.title.trim(),
         description: form.description.trim(),
         department: form.department,
@@ -112,24 +147,52 @@ export function ProjectsPage() {
         endDate: form.endDate,
         estimatedBudget: Number(form.estimatedBudget || 0),
         priority: form.priority,
-      });
+      };
+
+      const wasEditing = Boolean(editingProject);
+
+      const result = wasEditing
+        ? await ProjectsAPI.update(editingProject._id, payload)
+        : await ProjectsAPI.create(payload);
 
       const conflictCount = result.conflictsDetected || 0;
 
       showToast(
         conflictCount > 0
-          ? `Project registered! ${conflictCount} potential spatial/timeline conflict(s) detected.`
-          : "Project registered successfully. Zero conflicts detected.",
+          ? `${wasEditing ? "Project updated!" : "Project registered!"} ${conflictCount} potential spatial/timeline conflict(s) detected.`
+          : wasEditing
+            ? "Project updated successfully."
+            : "Project registered successfully. Zero conflicts detected.",
         conflictCount > 0 ? "warning" : "success"
       );
 
       setForm(initialForm);
+      setEditingProject(null);
       setFormOpen(false);
       await fetchData();
     } catch (err) {
-      showToast(err.message || "Could not create project", "error");
+      showToast(
+        err.message || (editingProject ? "Could not update project" : "Could not create project"),
+        "error"
+      );
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleCancelProject = async (project) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to cancel "${project.title}"?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await ProjectsAPI.delete(project._id);
+      showToast("Project cancelled successfully.", "success");
+      await fetchData();
+    } catch (err) {
+      showToast(err.message || "Could not cancel project", "error");
     }
   };
 
@@ -155,7 +218,7 @@ export function ProjectsPage() {
           </p>
         </div>
 
-        <button className="btn btn-primary" onClick={() => setFormOpen(true)}>
+        <button className="btn btn-primary" onClick={handleNewProject}>
           <Plus size={16} />
           <span>New Infrastructure Project</span>
         </button>
@@ -216,7 +279,7 @@ export function ProjectsPage() {
           actionButton={
             !search &&
             !categoryFilter && (
-              <button className="btn btn-primary" onClick={() => setFormOpen(true)}>
+              <button className="btn btn-primary" onClick={handleNewProject}>
                 <Plus size={15} />
                 <span>Register First Project</span>
               </button>
@@ -234,6 +297,7 @@ export function ProjectsPage() {
                 <th>Scheduled Timeline</th>
                 <th>Priority</th>
                 <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -285,6 +349,39 @@ export function ProjectsPage() {
                   <td>
                     <StatusPill status={project.status || "proposed"} />
                   </td>
+                  <td>
+                    {(
+                      isRole("city_admin") ||
+                      (isRole("department_head") && !user?.department) ||
+                      (
+                        isRole("officer", "department_head") &&
+                        String(user?.department?._id || user?.department) ===
+                        String(project.department?._id || project.department)
+                      )
+                    ) && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            className="btn btn-ghost"
+                            onClick={() => handleEditClick(project)}
+                            title="Edit Project"
+                          >
+                            <Pencil size={15} />
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            className="btn btn-ghost"
+                            onClick={() => handleCancelProject(project)}
+                            title="Cancel Project"
+                          >
+                            <Ban size={15} />
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -295,8 +392,12 @@ export function ProjectsPage() {
       {/* Create Project Modal */}
       <Modal
         isOpen={formOpen}
-        onClose={() => setFormOpen(false)}
-        title="Register New Infrastructure Project"
+        onClose={() => {
+          setFormOpen(false);
+          setEditingProject(null);
+          setForm(initialForm);
+        }}
+        title={editingProject ? "Edit Infrastructure Project" : "Register New Infrastructure Project"}
         size="lg"
       >
         <form onSubmit={handleSubmit} className="modal-body">
@@ -331,6 +432,13 @@ export function ProjectsPage() {
                 required
                 value={form.department}
                 onChange={updateField}
+                disabled={
+                  Boolean(editingProject) &&
+                  (
+                    isRole("officer") ||
+                    (isRole("department_head") && Boolean(user?.department))
+                  )
+                }
               >
                 <option value="">Choose municipal department...</option>
                 {departments.map((d) => (
@@ -473,7 +581,11 @@ export function ProjectsPage() {
             <button
               type="button"
               className="btn btn-ghost"
-              onClick={() => setFormOpen(false)}
+              onClick={() => {
+                setFormOpen(false);
+                setEditingProject(null);
+                setForm(initialForm);
+              }}
             >
               Cancel
             </button>
@@ -482,7 +594,13 @@ export function ProjectsPage() {
               className="btn btn-primary"
               disabled={saving || departments.length === 0}
             >
-              {saving ? "Registering & Checking Clashes..." : "Register Infrastructure Project"}
+              {saving
+                ? editingProject
+                  ? "Updating Project..."
+                  : "Registering & Checking Clashes..."
+                : editingProject
+                  ? "Update Project"
+                  : "Register Infrastructure Project"}
             </button>
           </div>
         </form>

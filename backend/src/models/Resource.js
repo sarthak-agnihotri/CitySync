@@ -12,14 +12,14 @@ const resourceSchema = new mongoose.Schema(
     category: {
       type: String,
       enum: [
-  "equipment",
-  "vehicle",
-  "facility",
-  "personnel",
-  "materials",
-  "technology",
-  "other"
-],
+        "equipment",
+        "vehicle",
+        "facility",
+        "personnel",
+        "materials",
+        "technology",
+        "other"
+      ],
       required: true
     },
 
@@ -54,6 +54,20 @@ const resourceSchema = new mongoose.Schema(
     location: {
       type: String,
       default: ""
+    },
+
+    latitude: {
+      type: Number,
+      min: -90,
+      max: 90,
+      default: null
+    },
+
+    longitude: {
+      type: Number,
+      min: -180,
+      max: 180,
+      default: null
     },
 
     status: {
