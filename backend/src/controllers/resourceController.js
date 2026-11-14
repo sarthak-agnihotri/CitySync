@@ -14,7 +14,9 @@ const createResource = async (req, res) => {
       unit,
       ownerDepartment,
       location,
-      tags
+      tags,
+      latitude,
+      longitude,
     } = req.body;
 
     if (req.user.role === "department_head" && req.user.department) {
@@ -44,7 +46,9 @@ const createResource = async (req, res) => {
       unit,
       ownerDepartment,
       location,
-      tags
+      tags,
+      latitude,
+      longitude,
     });
 
     await logAudit({
@@ -83,8 +87,18 @@ const getAllResources = async (req, res) => {
       }
 
       filter.ownerDepartment = req.user.department;
-    } else if (department) {
-      // City admin and department head can filter by department
+    }
+
+    // Assigned Department Heads can only view their own department's resources
+    else if (
+      req.user.role === "department_head" &&
+      req.user.department
+    ) {
+      filter.ownerDepartment = req.user.department;
+    }
+
+    // City Admin and Central Department Head can view all departments
+    else if (department) {
       filter.ownerDepartment = department;
     }
     if (category) filter.category = category;
@@ -122,21 +136,26 @@ const getResourceById = async (req, res) => {
     if (!resource || !resource.isActive) {
       return res.status(404).json({ message: "Resource not found" });
     }
-    // Officers can only access resources from their own department
+    // Officers and assigned Department Heads can only access
+    // resources belonging to their own department.
     const resourceDepartmentId =
-  resource.ownerDepartment?._id?.toString() ||
-  resource.ownerDepartment?.toString();
+      resource.ownerDepartment?._id?.toString() ||
+      resource.ownerDepartment?.toString();
 
-const userDepartmentId = req.user.department?.toString();
+    const userDepartmentId = req.user.department?.toString();
 
-if (
-  req.user.role === "officer" &&
-  resourceDepartmentId !== userDepartmentId
-) {
-  return res.status(403).json({
-    message: "You do not have access to this department's resource"
-  });
-}
+    const isDepartmentScopedUser =
+      req.user.role === "officer" ||
+      (req.user.role === "department_head" && req.user.department);
+
+    if (
+      isDepartmentScopedUser &&
+      resourceDepartmentId !== userDepartmentId
+    ) {
+      return res.status(403).json({
+        message: "You do not have access to this department's resource"
+      });
+    }
 
     return res.json({ resource });
   } catch (error) {
@@ -158,14 +177,14 @@ const updateResource = async (req, res) => {
     }
 
     if (
-  req.user.role === "department_head" &&
-  req.user.department &&
-  resource.ownerDepartment.toString() !== req.user.department.toString()
-) {
-  return res.status(403).json({
-    message: "You can only update resources belonging to your department"
-  });
-}
+      req.user.role === "department_head" &&
+      req.user.department &&
+      resource.ownerDepartment.toString() !== req.user.department.toString()
+    ) {
+      return res.status(403).json({
+        message: "You can only update resources belonging to your department"
+      });
+    }
 
     const allowedFields = [
       "name",
@@ -174,6 +193,8 @@ const updateResource = async (req, res) => {
       "availableQuantity",
       "unit",
       "location",
+      "latitude",
+      "longitude",
       "tags",
       "status"
     ];
@@ -249,7 +270,23 @@ const deactivateResource = async (req, res) => {
     if (!resource || !resource.isActive) {
       return res.status(404).json({ message: "Resource not found" });
     }
+    // Department Heads can deactivate only their own department's resources
+    if (
+      req.user.role === "department_head" &&
+      req.user.department &&
+      resource.ownerDepartment.toString() !== req.user.department.toString()
+    ) {
+      return res.status(403).json({
+        message: "You can only deactivate resources belonging to your department"
+      });
+    }
 
+    // Officers cannot deactivate resources
+    if (req.user.role === "officer") {
+      return res.status(403).json({
+        message: "Officers cannot deactivate resources"
+      });
+    }
     resource.isActive = false;
     await resource.save();
 

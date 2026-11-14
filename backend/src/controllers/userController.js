@@ -83,6 +83,48 @@ const getUsers = async (req, res) => {
   }
 };
 
+
+const getDepartmentOfficers = async (req, res) => {
+  try {
+    const { departmentId } = req.params;
+
+    // Assigned Department Heads can access only their own department.
+    if (
+      req.user.role === "department_head" &&
+      req.user.department &&
+      req.user.department.toString() !== departmentId
+    ) {
+      return res.status(403).json({
+        message: "You cannot view officers of another department"
+      });
+    }
+
+    const officers = await User.find({
+      role: "officer",
+      department: departmentId
+    })
+      .select("name email role department")
+      .populate("department", "name code")
+      .sort({ name: 1 });
+
+    return res.json({
+      count: officers.length,
+      officers
+    });
+  } catch (error) {
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        message: "Invalid department ID"
+      });
+    }
+
+    return res.status(500).json({
+      message: "Failed to fetch department officers"
+    });
+  }
+};
+
+
 // Create a new department officer
 const createOfficer = async (req, res) => {
   try {
@@ -267,6 +309,7 @@ const createDepartmentHead = async (req, res) => {
 module.exports = {
   assignDepartment,
   getUsers,
+  getDepartmentOfficers,
   createOfficer,
   createDepartmentHead
 };

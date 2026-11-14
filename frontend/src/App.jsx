@@ -20,6 +20,7 @@ import { AuditPage } from "./pages/audit/AuditPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { ProjectsPage } from "./pages/projects/ProjectsPage";
 import { ConflictsPage } from "./pages/conflicts/ConflictsPage";
+import { MapPage } from "./pages/map/MapPage";
 
 export default function App() {
   return (
@@ -76,6 +77,7 @@ export default function App() {
                 />
                 <Route path="/projects" element={<ProjectsPage />} />
                 <Route path="/conflicts" element={<ConflictsPage />} />
+                <Route path="/map" element={<MapPage />} />
               </Route>
 
               {/* 404 Fallback */}

@@ -126,6 +126,7 @@ const getAllProjects = async (req, res) => {
 
     const filter = {};
 
+    // Officers can only view their own department's projects
     if (req.user.role === "officer") {
       if (!req.user.department) {
         return res.status(403).json({
@@ -136,10 +137,16 @@ const getAllProjects = async (req, res) => {
       filter.department = req.user.department;
     }
 
-    if (
-      department &&
-      req.user.role !== "officer"
+    // Assigned Department Heads can only view their own department's projects
+    else if (
+      req.user.role === "department_head" &&
+      req.user.department
     ) {
+      filter.department = req.user.department;
+    }
+
+    // City Admin and Central Department Head can filter across departments
+    else if (department) {
       filter.department = department;
     }
     if (status) filter.status = status;
@@ -189,18 +196,26 @@ const getProjectById = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // Officers can access only projects from their own department
-    if (req.user.role === "officer") {
+    // Officers and assigned Department Heads can access
+    // only projects from their own department.
+    const projectDepartmentId =
+      project.department?._id?.toString() ||
+      project.department?.toString();
+
+    const userDepartmentId = req.user.department?.toString();
+
+    const isDepartmentScopedUser =
+      req.user.role === "officer" ||
+      (req.user.role === "department_head" && req.user.department);
+
+    if (isDepartmentScopedUser) {
       if (!req.user.department) {
         return res.status(403).json({
           message: "You are not assigned to any department"
         });
       }
 
-      if (
-        project.department._id.toString() !==
-        req.user.department.toString()
-      ) {
+      if (projectDepartmentId !== userDepartmentId) {
         return res.status(403).json({
           message: "You do not have permission to access this project's details"
         });
@@ -241,8 +256,13 @@ const updateProject = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // Officers can update only projects belonging to their department
-    if (req.user.role === "officer") {
+    // Officers and assigned Department Heads can update
+    // only projects belonging to their own department.
+    const isDepartmentScopedUser =
+      req.user.role === "officer" ||
+      (req.user.role === "department_head" && req.user.department);
+
+    if (isDepartmentScopedUser) {
       if (!req.user.department) {
         return res.status(403).json({
           message: "You are not assigned to any department"
@@ -250,7 +270,8 @@ const updateProject = async (req, res) => {
       }
 
       if (
-        project.department.toString() !== req.user.department.toString()
+        project.department.toString() !==
+        req.user.department.toString()
       ) {
         return res.status(403).json({
           message: "You can only update projects belonging to your department"
@@ -334,8 +355,13 @@ const deleteProject = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // Officers can cancel only projects belonging to their department
-    if (req.user.role === "officer") {
+    // Officers and assigned Department Heads can cancel
+    // only projects belonging to their own department.
+    const isDepartmentScopedUser =
+      req.user.role === "officer" ||
+      (req.user.role === "department_head" && req.user.department);
+
+    if (isDepartmentScopedUser) {
       if (!req.user.department) {
         return res.status(403).json({
           message: "You are not assigned to any department"
@@ -343,7 +369,8 @@ const deleteProject = async (req, res) => {
       }
 
       if (
-        project.department.toString() !== req.user.department.toString()
+        project.department.toString() !==
+        req.user.department.toString()
       ) {
         return res.status(403).json({
           message: "You can only cancel projects belonging to your department"
@@ -403,7 +430,18 @@ const getTimelineSchedule = async (req, res) => {
       }
 
       filter.department = req.user.department;
-    } else if (department) {
+    }
+
+    // Assigned Department Heads can see only their own department's timeline
+    else if (
+      req.user.role === "department_head" &&
+      req.user.department
+    ) {
+      filter.department = req.user.department;
+    }
+
+    // City Admin and Central Department Head can filter across departments
+    else if (department) {
       filter.department = department;
     }
     if (category) filter.category = category;
@@ -465,7 +503,18 @@ const getCalendarSchedule = async (req, res) => {
       }
 
       filter.department = req.user.department;
-    } else if (req.query.department) {
+    }
+
+    // Assigned Department Heads can see only their own department's calendar
+    else if (
+      req.user.role === "department_head" &&
+      req.user.department
+    ) {
+      filter.department = req.user.department;
+    }
+
+    // City Admin and Central Department Head can filter across departments
+    else if (req.query.department) {
       filter.department = req.query.department;
     }
 
