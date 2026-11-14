@@ -3,7 +3,6 @@ import { useSearchParams } from "react-router-dom";
 import {
   Search,
   CheckCircle2,
-  Clock,
   ShieldCheck,
   Building2,
   Calendar,
@@ -12,13 +11,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { GrievanceAPI } from "../api/client";
-
-const STATUS_STEPS = [
-  { key: "submitted", label: "Registered" },
-  { key: "assigned_to_dept", label: "Assigned" },
-  { key: "in_progress", label: "In Progress" },
-  { key: "resolved", label: "Resolved" }
-];
+import { useLanguage } from "../context/LanguageContext";
 
 export function TrackStatusPage() {
   const [searchParams] = useSearchParams();
@@ -26,6 +19,14 @@ export function TrackStatusPage() {
   const [loading, setLoading] = useState(false);
   const [grievance, setGrievance] = useState(null);
   const [error, setError] = useState("");
+  const { t, isHindi } = useLanguage();
+
+  const STATUS_STEPS = [
+    { key: "submitted", label: t("track.statusSteps.submitted") },
+    { key: "assigned_to_dept", label: t("track.statusSteps.assigned_to_dept") },
+    { key: "in_progress", label: t("track.statusSteps.in_progress") },
+    { key: "resolved", label: t("track.statusSteps.resolved") }
+  ];
 
   const fetchTicket = async (ticket) => {
     if (!ticket.trim()) return;
@@ -36,7 +37,7 @@ export function TrackStatusPage() {
       const res = await GrievanceAPI.track(ticket.trim());
       setGrievance(res.grievance);
     } catch (err) {
-      setError(err.message || "No complaint found with this ticket number");
+      setError(err.message || (isHindi ? "इस टिकट संख्या से कोई शिकायत नहीं मिली" : "No complaint found with this ticket number"));
     } finally {
       setLoading(false);
     }
@@ -61,14 +62,21 @@ export function TrackStatusPage() {
     return 0;
   };
 
+  const getStatusDisplay = (status) => {
+    if (status === "resolved") return isHindi ? "समाधान पूर्ण" : "Resolved";
+    if (status === "in_progress") return isHindi ? "कार्य प्रगति पर" : "In Progress";
+    if (status === "assigned_to_dept" || status === "under_review") return isHindi ? "आवंटित" : "Assigned";
+    return isHindi ? "पंजीकृत" : "Registered";
+  };
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
       <div className="text-center mb-8">
         <h1 className="text-2xl font-black text-[var(--text-primary)]">
-          Live Grievance Tracking
+          {t("track.pageTitle")}
         </h1>
         <p className="text-xs text-[var(--text-muted)] mt-1">
-          Enter your Ticket ID to see department inspection status, road repair dates, and closure photos.
+          {t("track.pageSubtitle")}
         </p>
 
         {/* Search Bar */}
@@ -77,7 +85,7 @@ export function TrackStatusPage() {
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             <input
               type="text"
-              placeholder="e.g. GRV-2026-1011"
+              placeholder={t("track.searchPlaceholder")}
               value={ticketQuery}
               onChange={(e) => setTicketQuery(e.target.value)}
               className="w-full pl-9 pr-3.5 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs text-[var(--text-primary)] font-mono uppercase focus:outline-none focus:ring-2 focus:ring-emerald-600 shadow-xs"
@@ -88,7 +96,7 @@ export function TrackStatusPage() {
             disabled={loading}
             className="px-5 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white font-semibold text-xs cursor-pointer shadow-sm shrink-0"
           >
-            {loading ? "Searching..." : "Track"}
+            {loading ? t("track.searching") : t("track.searchBtn")}
           </button>
         </form>
       </div>
@@ -107,7 +115,7 @@ export function TrackStatusPage() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                  Tracking Code
+                  {t("track.ticketLabel")}
                 </span>
                 <div className="text-xl font-black font-mono text-emerald-800 dark:text-emerald-400">
                   {grievance.ticketId}
@@ -122,7 +130,7 @@ export function TrackStatusPage() {
                     : "bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-200"
                 }`}
               >
-                {grievance.status.replace(/_/g, " ")}
+                {getStatusDisplay(grievance.status)}
               </span>
             </div>
 
@@ -174,7 +182,7 @@ export function TrackStatusPage() {
             <div className="flex items-start gap-2.5">
               <Building2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               <div>
-                <span className="font-semibold text-[var(--text-muted)]">Responsible Dept:</span>
+                <span className="font-semibold text-[var(--text-muted)]">{t("track.deptAssigned")}:</span>
                 <p className="font-bold text-[var(--text-primary)]">{grievance.assignedDepartment}</p>
               </div>
             </div>
@@ -182,7 +190,7 @@ export function TrackStatusPage() {
             <div className="flex items-start gap-2.5">
               <MapPin className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               <div>
-                <span className="font-semibold text-[var(--text-muted)]">Location & Ward:</span>
+                <span className="font-semibold text-[var(--text-muted)]">{t("track.zone")}:</span>
                 <p className="font-bold text-[var(--text-primary)]">
                   {grievance.zone} {grievance.landmark ? `(${grievance.landmark})` : ""}
                 </p>
@@ -192,7 +200,7 @@ export function TrackStatusPage() {
             <div className="flex items-start gap-2.5">
               <Calendar className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               <div>
-                <span className="font-semibold text-[var(--text-muted)]">Date Submitted:</span>
+                <span className="font-semibold text-[var(--text-muted)]">{t("track.lodgedOn")}:</span>
                 <p className="font-bold text-[var(--text-primary)]">
                   {new Date(grievance.createdAt).toLocaleString()}
                 </p>
@@ -202,7 +210,7 @@ export function TrackStatusPage() {
             <div className="flex items-start gap-2.5">
               <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               <div>
-                <span className="font-semibold text-[var(--text-muted)]">Complainant:</span>
+                <span className="font-semibold text-[var(--text-muted)]">{t("report.complainantInfo")}:</span>
                 <p className="font-bold text-[var(--text-primary)]">{grievance.citizenName}</p>
               </div>
             </div>
@@ -212,14 +220,14 @@ export function TrackStatusPage() {
           {grievance.resolutionNotes && (
             <div className="p-6 bg-teal-50/50 dark:bg-teal-950/20 border-t border-[var(--border-subtle)]">
               <h4 className="text-xs font-bold text-teal-900 dark:text-teal-200 uppercase tracking-wider mb-1">
-                Field Inspection & Resolution Report
+                {t("track.remarks")}
               </h4>
               <p className="text-xs text-[var(--text-secondary)]">
                 {grievance.resolutionNotes}
               </p>
               {grievance.resolvedAt && (
                 <span className="text-[10px] text-[var(--text-muted)] block mt-1">
-                  Closed on: {new Date(grievance.resolvedAt).toLocaleDateString()}
+                  {isHindi ? "समाधान तिथि" : "Closed on"}: {new Date(grievance.resolvedAt).toLocaleDateString()}
                 </span>
               )}
             </div>
@@ -230,7 +238,7 @@ export function TrackStatusPage() {
             <div className="p-6 border-t border-[var(--border-subtle)]">
               <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-3 flex items-center gap-1.5">
                 <ImageIcon className="w-4 h-4 text-emerald-600" />
-                Submitted Photo Evidence ({grievance.images.length})
+                {t("track.evidence")} ({grievance.images.length})
               </h4>
               <div className="flex flex-wrap gap-3">
                 {grievance.images.map((img, i) => (
@@ -256,4 +264,3 @@ export function TrackStatusPage() {
     </div>
   );
 }
-

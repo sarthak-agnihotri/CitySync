@@ -21,13 +21,16 @@ const generateTicketId = async () => {
   return ticket;
 };
 
-// Submit a grievance (public with or without citizen login)
+// Submit a grievance (Requires registered citizen account)
 const submitGrievance = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({
+        message: "Registration required. Please sign in or create a citizen account before submitting a complaint."
+      });
+    }
+
     const {
-      citizenName,
-      citizenPhone,
-      citizenEmail,
       category,
       title,
       description,
@@ -41,9 +44,9 @@ const submitGrievance = async (req, res) => {
       return res.status(400).json({ message: "Category, title, description, and zone are required." });
     }
 
-    const name = req.user ? req.user.name : citizenName || "Concerned Citizen";
-    const phone = req.user ? req.user.phone : citizenPhone || "";
-    const email = req.user ? req.user.email : citizenEmail || "";
+    const name = req.user.name;
+    const phone = req.user.phone || "";
+    const email = req.user.email;
 
     const images = [];
     if (req.files && req.files.length > 0) {
@@ -60,7 +63,7 @@ const submitGrievance = async (req, res) => {
 
     const grievance = await Grievance.create({
       ticketId,
-      citizen: req.user ? req.user._id : null,
+      citizen: req.user._id,
       citizenName: name,
       citizenPhone: phone,
       citizenEmail: email,

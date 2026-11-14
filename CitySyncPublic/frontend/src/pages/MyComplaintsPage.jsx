@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FileText, AlertCircle, Calendar, MapPin, ArrowRight, CheckCircle2, Clock } from "lucide-react";
+import { FileText, Calendar, MapPin, ArrowRight } from "lucide-react";
 import { GrievanceAPI } from "../api/client";
 import { useCitizenAuth } from "../context/CitizenAuthContext";
+import { useLanguage } from "../context/LanguageContext";
 
 export function MyComplaintsPage() {
   const { user } = useCitizenAuth();
+  const { t, isHindi } = useLanguage();
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -18,41 +20,48 @@ export function MyComplaintsPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const getStatusLabel = (status) => {
+    if (status === "resolved") return isHindi ? "समाधान पूर्ण" : "Resolved";
+    if (status === "in_progress") return isHindi ? "कार्य प्रगति पर" : "In Progress";
+    if (status === "assigned_to_dept" || status === "under_review") return isHindi ? "आवंटित" : "Assigned";
+    return isHindi ? "पंजीकृत" : "Registered";
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-black text-[var(--text-primary)]">
-            My Registered Grievances
+            {t("myComplaints.title")}
           </h1>
           <p className="text-xs text-[var(--text-muted)] mt-1">
-            Tracking tickets submitted from {user?.email}
+            {t("myComplaints.sub")} {user?.email}
           </p>
         </div>
         <Link
           to="/report"
           className="px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs shadow-xs text-center"
         >
-          Report Another Issue
+          {t("myComplaints.reportAnother")}
         </Link>
       </div>
 
       {loading ? (
         <div className="text-center py-16 text-xs text-[var(--text-muted)]">
-          Loading your complaint history...
+          {t("myComplaints.loading")}
         </div>
       ) : complaints.length === 0 ? (
         <div className="p-12 text-center rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
           <FileText className="w-12 h-12 text-[var(--text-muted)] mx-auto mb-3" />
-          <h3 className="text-sm font-bold text-[var(--text-primary)]">No grievances submitted yet</h3>
+          <h3 className="text-sm font-bold text-[var(--text-primary)]">{t("myComplaints.emptyTitle")}</h3>
           <p className="text-xs text-[var(--text-secondary)] mt-1 max-w-sm mx-auto">
-            You haven't filed any municipal complaints from this account. Spot an issue in your ward?
+            {t("myComplaints.emptySub")}
           </p>
           <Link
             to="/report"
             className="inline-block mt-4 px-4 py-2 rounded-lg bg-emerald-700 text-white font-bold text-xs"
           >
-            File Your First Complaint
+            {t("myComplaints.emptyBtn")}
           </Link>
         </div>
       ) : (
@@ -76,7 +85,7 @@ export function MyComplaintsPage() {
                         : "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200"
                     }`}
                   >
-                    {item.status.replace(/_/g, " ")}
+                    {getStatusLabel(item.status)}
                   </span>
                   <span className="text-[11px] text-[var(--text-muted)]">
                     • {item.assignedDepartment}
@@ -100,7 +109,7 @@ export function MyComplaintsPage() {
                 to={`/track?ticket=${encodeURIComponent(item.ticketId)}`}
                 className="px-4 py-2 rounded-lg border border-[var(--border-subtle)] hover:bg-[var(--bg-surface-secondary)] text-xs font-semibold text-[var(--text-primary)] flex items-center justify-center gap-1 shrink-0"
               >
-                <span>View Timeline</span>
+                <span>{t("myComplaints.viewStatus")}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -110,4 +119,3 @@ export function MyComplaintsPage() {
     </div>
   );
 }
-

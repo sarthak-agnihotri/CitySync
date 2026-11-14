@@ -12,6 +12,8 @@ export const translations = {
     "nav.agencies": "Agencies",
     "nav.participatingAgencies": "Participating Agencies",
     "nav.faq": "FAQ",
+    "nav.citizenGrievance": "Citizen Grievances",
+    "nav.reportIssue": "Report Broken Road / Issue",
     "nav.goToPortal": "Go to Portal",
     "nav.openPortal": "Open Officer Portal",
     "nav.signIn": "Sign In",
@@ -22,6 +24,7 @@ export const translations = {
 
     // LandingPage Hero
     "hero.badge": "Smart Cities Governance Layer — Statutory Coordination Cell",
+    "hero.citizenCTA": "Report Broken Road / Pothole (Citizen Portal)",
     "hero.titleLine1": "One Platform. One City.",
     "hero.titleLine2": "No More Digging in the Dark.",
     "hero.subtitle":
@@ -220,7 +223,53 @@ export const translations = {
     "pageTitle.notifications": "Alerts & Notifications",
     "pageTitle.departments": "Department Management",
     "pageTitle.users": "User Directory & Role Assignment",
-    "pageTitle.audit": "Citywide Audit Trail"
+    "pageTitle.audit": "Citywide Audit Trail",
+
+    // NotFoundPage
+    "notFound.title": "The requested municipal page or asset does not exist.",
+    "notFound.return": "Return to Dashboard",
+
+    // Dashboard Page
+    "dashboard.opsHub": "MUNICIPAL OPERATIONS HUB",
+    "dashboard.welcome": "Welcome",
+    "dashboard.officer": "Officer",
+    "dashboard.loggedInAs": "Logged in with",
+    "dashboard.representing": "credentials representing",
+    "dashboard.registerProject": "Register Project",
+    "dashboard.submitRequisition": "Submit Requisition",
+    "dashboard.equipmentDirectory": "Equipment Directory",
+    "dashboard.statProjects": "City Projects",
+    "dashboard.statProjectsSub": "Registered civil works",
+    "dashboard.statConflicts": "Active Clashes",
+    "dashboard.statConflictsSub": "Spatial & timeline overlaps",
+    "dashboard.statResources": "Machinery Pool",
+    "dashboard.statResourcesSub": "Registered city assets",
+    "dashboard.statAvailable": "Available Units",
+    "dashboard.statAvailableSub": "Ready for deployment",
+    "dashboard.statPending": "Pending Approvals",
+    "dashboard.statPendingSub": "Awaiting authorization",
+    "dashboard.statAlerts": "Unread Alerts",
+    "dashboard.statAlertsSub": "Corridor notices & actions",
+    "dashboard.statDepts": "Line Departments",
+    "dashboard.statDeptsSub": "Coordinating municipal agencies",
+    "dashboard.statUsers": "Authorized Personnel",
+    "dashboard.statUsersSub": "Registered municipal officers",
+    "dashboard.recentRequests": "Recent Requisitions",
+    "dashboard.activeConflicts": "Active Clashes & Moratorium Violations",
+    "dashboard.lowStock": "Low Stock Machinery (<25% Available)",
+    "dashboard.viewAll": "View all",
+    "dashboard.noRequests": "No requisitions submitted yet",
+    "dashboard.noConflicts": "No active corridor conflicts detected",
+    "dashboard.noLowStock": "All equipment pools maintain healthy stock levels",
+    "dashboard.colResource": "Equipment / Resource",
+    "dashboard.colDepartment": "Department",
+    "dashboard.colQuantity": "Qty",
+    "dashboard.colDates": "Required Dates",
+    "dashboard.colStatus": "Status",
+    "dashboard.colSeverity": "Severity",
+    "dashboard.colOverlapping": "Overlapping Projects",
+    "dashboard.colRoadCorridor": "Road Corridor",
+    "dashboard.colAvailable": "Available"
   },
 
   hi: {
@@ -236,6 +285,8 @@ export const translations = {
     "nav.agencies": "एजेंसियां",
     "nav.participatingAgencies": "सहभागी एजेंसियां",
     "nav.faq": "सामान्य प्रश्न",
+    "nav.citizenGrievance": "नागरिक शिकायतें",
+    "nav.reportIssue": "टूटी सड़क / समस्या दर्ज करें",
     "nav.goToPortal": "पोर्टल पर जाएं",
     "nav.openPortal": "अधिकारी पोर्टल खोलें",
     "nav.signIn": "साइन इन",
@@ -246,6 +297,7 @@ export const translations = {
 
     // LandingPage Hero
     "hero.badge": "स्मार्ट सिटी शासन स्तर — वैधानिक समन्वय प्रकोष्ठ",
+    "hero.citizenCTA": "टूटी सड़क / गड्ढे की शिकायत करें (नागरिक पोर्टल)",
     "hero.titleLine1": "एक मंच। एक शहर।",
     "hero.titleLine2": "अब बिना समन्वय खुदाई नहीं।",
     "hero.subtitle":
@@ -444,7 +496,53 @@ export const translations = {
     "pageTitle.notifications": "अलर्ट एवं सूचनाएं",
     "pageTitle.departments": "विभाग प्रबंधन",
     "pageTitle.users": "उपयोगकर्ता निर्देशिका एवं भूमिका आवंटन",
-    "pageTitle.audit": "शहरव्यापी ऑडिट ट्रेल"
+    "pageTitle.audit": "शहरव्यापी ऑडिट ट्रेल",
+
+    // NotFoundPage
+    "notFound.title": "अनुरोधित नगरपालिका पृष्ठ या संसाधन उपलब्ध नहीं है।",
+    "notFound.return": "डैशबोर्ड पर वापस जाएं",
+
+    // Dashboard Page
+    "dashboard.opsHub": "नगरपालिका संचालन केंद्र",
+    "dashboard.welcome": "स्वागत है",
+    "dashboard.officer": "अधिकारी",
+    "dashboard.loggedInAs": "लॉग इन:",
+    "dashboard.representing": "क्रेडेंशियल्स, विभाग:",
+    "dashboard.registerProject": "परियोजना पंजीकृत करें",
+    "dashboard.submitRequisition": "मांग पत्र जमा करें",
+    "dashboard.equipmentDirectory": "उपकरण निर्देशिका",
+    "dashboard.statProjects": "शहर परियोजनाएं",
+    "dashboard.statProjectsSub": "पंजीकृत निर्माण कार्य",
+    "dashboard.statConflicts": "सक्रिय टकराव",
+    "dashboard.statConflictsSub": "स्थानिक एवं समय ओवरलैप",
+    "dashboard.statResources": "मशीनरी पूल",
+    "dashboard.statResourcesSub": "पंजीकृत नगर संपत्तियां",
+    "dashboard.statAvailable": "उपलब्ध इकाइयां",
+    "dashboard.statAvailableSub": "तैनाती हेतु तैयार",
+    "dashboard.statPending": "लंबित स्वीकृतियां",
+    "dashboard.statPendingSub": "प्राधिकरण की प्रतीक्षा",
+    "dashboard.statAlerts": "अपठित अलर्ट",
+    "dashboard.statAlertsSub": "कॉरिडोर नोटिस व कार्रवाइयां",
+    "dashboard.statDepts": "संबद्ध विभाग",
+    "dashboard.statDeptsSub": "समन्वयकारी नगरपालिका एजेंसियां",
+    "dashboard.statUsers": "अधिकृत कर्मी",
+    "dashboard.statUsersSub": "पंजीकृत नगरपालिका अधिकारी",
+    "dashboard.recentRequests": "हाल के मांग पत्र",
+    "dashboard.activeConflicts": "सक्रिय टकराव एवं अधिस्थगन उल्लंघन",
+    "dashboard.lowStock": "कम स्टॉक मशीनरी (<25% उपलब्ध)",
+    "dashboard.viewAll": "सभी देखें",
+    "dashboard.noRequests": "अभी तक कोई मांग पत्र जमा नहीं हुआ",
+    "dashboard.noConflicts": "कोई सक्रिय कॉरिडोर टकराव नहीं मिला",
+    "dashboard.noLowStock": "सभी उपकरण पूल में पर्याप्त स्टॉक उपलब्ध है",
+    "dashboard.colResource": "उपकरण / संसाधन",
+    "dashboard.colDepartment": "विभाग",
+    "dashboard.colQuantity": "मात्रा",
+    "dashboard.colDates": "आवश्यक तिथियां",
+    "dashboard.colStatus": "स्थिति",
+    "dashboard.colSeverity": "गंभीरता",
+    "dashboard.colOverlapping": "टकराव वाली परियोजनाएं",
+    "dashboard.colRoadCorridor": "सड़क कॉरिडोर",
+    "dashboard.colAvailable": "उपलब्ध"
   }
 };
 

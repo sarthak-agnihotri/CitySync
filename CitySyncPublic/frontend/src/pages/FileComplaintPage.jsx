@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Camera,
   MapPin,
-  Upload,
-  AlertCircle,
   CheckCircle2,
   X,
   Navigation,
@@ -12,17 +10,18 @@ import {
 } from "lucide-react";
 import { useCitizenAuth } from "../context/CitizenAuthContext";
 import { useToast } from "../context/ToastContext";
+import { useLanguage } from "../context/LanguageContext";
 import { GrievanceAPI } from "../api/client";
 
-const CATEGORIES = [
-  { id: "pothole", label: "Pothole / Road Damage", dept: "Public Works Dept" },
-  { id: "broken_road", label: "Broken / Unpaved Road", dept: "Public Works Dept" },
-  { id: "water_leakage", label: "Water Pipe Rupture / Leak", dept: "Water Supply Board" },
-  { id: "sewage_overflow", label: "Sewage Overflow / Blockage", dept: "Water & Sewerage Board" },
-  { id: "street_light", label: "Faulty Streetlight / Dark Spot", dept: "Electricity DISCOM" },
-  { id: "garbage_dumping", label: "Illegal Garbage Dumping", dept: "Solid Waste Division" },
-  { id: "traffic_signal", label: "Damaged Traffic Sign / Signal", dept: "Traffic Division" },
-  { id: "other", label: "Other Civic Problem", dept: "General Municipal Support" }
+const CATEGORY_DATA = [
+  { id: "pothole", labelEn: "Pothole / Road Damage", labelHi: "गड्ढा / टूटी सड़क", deptEn: "Public Works Dept", deptHi: "लोक निर्माण विभाग (PWD)" },
+  { id: "broken_road", labelEn: "Broken / Unpaved Road", labelHi: "टूटी / कच्ची सड़क", deptEn: "Public Works Dept", deptHi: "लोक निर्माण विभाग (PWD)" },
+  { id: "water_leakage", labelEn: "Water Pipe Rupture / Leak", labelHi: "पानी की पाइपलाइन रिसाव / टूटन", deptEn: "Water Supply Board", deptHi: "जल आपूर्ति बोर्ड" },
+  { id: "sewage_overflow", labelEn: "Sewage Overflow / Blockage", labelHi: "सीवर ओवरफ्लो / जाम", deptEn: "Water & Sewerage Board", deptHi: "जल एवं सीवरेज बोर्ड" },
+  { id: "street_light", labelEn: "Faulty Streetlight / Dark Spot", labelHi: "खराब स्ट्रीट लाइट / अंधेरा", deptEn: "Electricity DISCOM", deptHi: "विद्युत वितरण निगम" },
+  { id: "garbage_dumping", labelEn: "Illegal Garbage Dumping", labelHi: "कचरे का अवैध ढेर", deptEn: "Solid Waste Division", deptHi: "ठोस अपशिष्ट प्रबंधन" },
+  { id: "traffic_signal", labelEn: "Damaged Traffic Sign / Signal", labelHi: "क्षतिग्रस्त ट्रैफिक सिग्नल / साइन", deptEn: "Traffic Division", deptHi: "यातायात प्रभाग" },
+  { id: "other", labelEn: "Other Civic Problem", labelHi: "अन्य नागरिक समस्या", deptEn: "General Municipal Support", deptHi: "सामान्य नगरपालिका सहायता" }
 ];
 
 const ZONES = [
@@ -36,6 +35,7 @@ const ZONES = [
 export function FileComplaintPage() {
   const { user } = useCitizenAuth();
   const { addToast } = useToast();
+  const { t, isHindi } = useLanguage();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -60,13 +60,13 @@ export function FileComplaintPage() {
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + images.length > 3) {
-      addToast("You can upload a maximum of 3 photos", "error");
+      addToast(isHindi ? "आप अधिकतम 3 फोटो अपलोड कर सकते हैं" : "You can upload a maximum of 3 photos", "error");
       return;
     }
 
     const validFiles = files.filter((file) => {
       if (file.size > 5 * 1024 * 1024) {
-        addToast(`${file.name} is larger than 5MB`, "error");
+        addToast(`${file.name} ${isHindi ? "5MB से बड़ा है" : "is larger than 5MB"}`, "error");
         return false;
       }
       return true;
@@ -75,7 +75,6 @@ export function FileComplaintPage() {
     const newImages = [...images, ...validFiles];
     setImages(newImages);
 
-    // Create previews
     const newPreviews = validFiles.map((file) => URL.createObjectURL(file));
     setImagePreviews((prev) => [...prev, ...newPreviews]);
   };
@@ -87,7 +86,7 @@ export function FileComplaintPage() {
 
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
-      addToast("Geolocation is not supported by your browser", "error");
+      addToast(isHindi ? "आपके ब्राउज़र में जीपीएस समर्थित नहीं है" : "Geolocation is not supported by your browser", "error");
       return;
     }
     setLocating(true);
@@ -99,41 +98,46 @@ export function FileComplaintPage() {
           longitude: pos.coords.longitude.toFixed(6)
         }));
         setLocating(false);
-        addToast("Location pinned from GPS coordinates", "success");
+        addToast(isHindi ? "जीपीएस स्थान सफलतापूर्वक प्राप्त किया गया" : "GPS coordinates acquired accurately", "success");
       },
       (err) => {
         setLocating(false);
-        addToast("Unable to fetch location: " + err.message, "error");
+        addToast(err.message || (isHindi ? "स्थान प्राप्त करने में असमर्थ" : "Unable to retrieve device location"), "error");
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { timeout: 10000 }
     );
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title.trim() || !formData.description.trim()) {
-      addToast("Please provide both title and detailed description", "error");
+      addToast(isHindi ? "कृपया शीर्षक और समस्या विवरण भरें" : "Please fill in the title and description", "error");
       return;
     }
 
     setSubmitting(true);
     try {
-      const data = new FormData();
-      Object.keys(formData).forEach((key) => {
-        if (formData[key] !== null && formData[key] !== undefined) {
-          data.append(key, formData[key]);
-        }
+      const formPayload = new FormData();
+      formPayload.append("citizenName", user?.name || formData.citizenName);
+      formPayload.append("citizenPhone", user?.phone || formData.citizenPhone);
+      formPayload.append("citizenEmail", user?.email || formData.citizenEmail);
+      formPayload.append("category", formData.category);
+      formPayload.append("title", formData.title);
+      formPayload.append("description", formData.description);
+      formPayload.append("zone", formData.zone);
+      formPayload.append("landmark", formData.landmark);
+      if (formData.latitude) formPayload.append("latitude", formData.latitude);
+      if (formData.longitude) formPayload.append("longitude", formData.longitude);
+
+      images.forEach((img) => {
+        formPayload.append("images", img);
       });
 
-      images.forEach((file) => {
-        data.append("images", file);
-      });
-
-      const res = await GrievanceAPI.submit(data);
-      setSubmittedTicket(res.ticketId);
-      addToast("Grievance registered successfully!", "success");
+      const res = await GrievanceAPI.submit(formPayload);
+      setSubmittedTicket(res.grievance.ticketId);
+      addToast(isHindi ? "शिकायत सफलतापूर्वक दर्ज की गई!" : "Complaint registered successfully!", "success");
     } catch (err) {
-      addToast(err.message || "Failed to submit grievance", "error");
+      addToast(err.message || (isHindi ? "शिकायत दर्ज करने में विफल" : "Failed to lodge grievance"), "error");
     } finally {
       setSubmitting(false);
     }
@@ -141,25 +145,27 @@ export function FileComplaintPage() {
 
   if (submittedTicket) {
     return (
-      <div className="max-w-xl mx-auto px-4 py-16 text-center">
-        <div className="p-8 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] shadow-xl flex flex-col items-center">
+      <div className="max-w-2xl mx-auto px-4 py-16">
+        <div className="p-8 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-center flex flex-col items-center shadow-lg">
           <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center mb-4">
-            <CheckCircle2 className="w-8 h-8" />
+            <CheckCircle2 className="w-10 h-10" />
           </div>
-          <h2 className="text-2xl font-black text-[var(--text-primary)]">Grievance Registered</h2>
+          <h2 className="text-xl font-bold text-[var(--text-primary)]">
+            {t("report.successTitle")}
+          </h2>
           <p className="text-xs text-[var(--text-secondary)] mt-2 max-w-sm">
-            Your complaint has been logged and assigned to the relevant department engineers for inspection.
+            {t("report.successDesc")}
           </p>
 
           <div className="my-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 w-full">
             <span className="text-xs uppercase font-bold text-emerald-800 dark:text-emerald-300">
-              Your Grievance Tracking ID
+              {t("report.trackingIdLabel")}
             </span>
             <div className="text-2xl font-black font-mono text-emerald-900 dark:text-emerald-200 mt-1 select-all">
               {submittedTicket}
             </div>
             <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-1">
-              Save this code to check resolution progress anytime
+              {t("report.trackingIdSub")}
             </p>
           </div>
 
@@ -168,7 +174,7 @@ export function FileComplaintPage() {
               onClick={() => navigate(`/track?ticket=${encodeURIComponent(submittedTicket)}`)}
               className="flex-1 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs cursor-pointer shadow-sm"
             >
-              Track Live Status
+              {t("report.trackBtn")}
             </button>
             <button
               onClick={() => {
@@ -190,7 +196,7 @@ export function FileComplaintPage() {
               }}
               className="flex-1 py-2.5 rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] font-semibold text-xs cursor-pointer"
             >
-              File Another Report
+              {t("report.anotherBtn")}
             </button>
           </div>
         </div>
@@ -202,10 +208,10 @@ export function FileComplaintPage() {
     <div className="max-w-3xl mx-auto px-4 py-10">
       <div className="mb-6">
         <h1 className="text-2xl font-black text-[var(--text-primary)]">
-          Report Civic Issue / Damaged Road
+          {t("report.pageTitle")}
         </h1>
         <p className="text-xs text-[var(--text-muted)] mt-1">
-          Provide accurate details and photos to help field officers locate and repair the issue promptly.
+          {t("report.pageSubtitle")}
         </p>
       </div>
 
@@ -216,10 +222,10 @@ export function FileComplaintPage() {
         {/* Category Selection */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
-            Issue Category *
+            {t("report.categoryLabel")}
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            {CATEGORIES.map((cat) => (
+            {CATEGORY_DATA.map((cat) => (
               <label
                 key={cat.id}
                 className={`flex items-start gap-3 p-3 rounded-xl border text-xs cursor-pointer transition-all ${
@@ -237,8 +243,12 @@ export function FileComplaintPage() {
                   className="mt-0.5 accent-emerald-700"
                 />
                 <div>
-                  <div className="font-bold text-[var(--text-primary)]">{cat.label}</div>
-                  <div className="text-[10px] text-[var(--text-muted)] mt-0.5">Assigned to: {cat.dept}</div>
+                  <div className="font-bold text-[var(--text-primary)]">
+                    {isHindi ? cat.labelHi : cat.labelEn}
+                  </div>
+                  <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
+                    {isHindi ? "संबंधित विभाग" : "Assigned to"}: {isHindi ? cat.deptHi : cat.deptEn}
+                  </div>
                 </div>
               </label>
             ))}
@@ -249,12 +259,12 @@ export function FileComplaintPage() {
         <div className="space-y-4">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-              Short Title *
+              {t("report.titleLabel")}
             </label>
             <input
               type="text"
               required
-              placeholder="e.g. Hazardous pothole opposite bus stop"
+              placeholder={t("report.titlePlaceholder")}
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               className="w-full px-3.5 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-transparent text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600"
@@ -263,12 +273,12 @@ export function FileComplaintPage() {
 
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-              Detailed Problem Statement *
+              {t("report.descLabel")}
             </label>
             <textarea
               required
               rows={4}
-              placeholder="Describe the severity, duration of the issue, and specific road hazard caused..."
+              placeholder={t("report.descPlaceholder")}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="w-full px-3.5 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-transparent text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600 resize-none"
@@ -279,7 +289,7 @@ export function FileComplaintPage() {
         {/* Photo Evidence Upload */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-            Photo Evidence (Max 3 Images, up to 5MB each)
+            {t("report.photosLabel")}
           </label>
           <div className="border-2 border-dashed border-[var(--border-subtle)] rounded-xl p-5 text-center bg-[var(--bg-surface-secondary)]/50">
             <input
@@ -293,10 +303,10 @@ export function FileComplaintPage() {
             <label htmlFor="photo-upload" className="cursor-pointer flex flex-col items-center">
               <Camera className="w-8 h-8 text-emerald-700 dark:text-emerald-400 mb-2" />
               <span className="text-xs font-bold text-[var(--text-primary)]">
-                Click to snap or upload photos from device
+                {t("report.uploadClick")}
               </span>
               <span className="text-[11px] text-[var(--text-muted)] mt-1">
-                JPEG, PNG, or WebP formats supported
+                {t("report.uploadFormats")}
               </span>
             </label>
           </div>
@@ -324,7 +334,7 @@ export function FileComplaintPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-              Administrative Zone *
+              {t("report.zoneLabel")}
             </label>
             <select
               value={formData.zone}
@@ -341,14 +351,14 @@ export function FileComplaintPage() {
 
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-              Nearest Landmark / Address
+              {t("report.landmarkLabel")}
             </label>
             <input
               type="text"
-              placeholder="e.g. Near Mother Dairy, Gate 2"
+              placeholder={t("report.landmarkPlaceholder")}
               value={formData.landmark}
               onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
-              className="w-full px-3.5 py-2 rounded-lg border border-[var(--border-subtle)] bg-transparent text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-transparent text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600"
             />
           </div>
         </div>
@@ -360,11 +370,11 @@ export function FileComplaintPage() {
             <div>
               <span className="text-xs font-bold text-[var(--text-primary)]">
                 {formData.latitude && formData.longitude
-                  ? `GPS Pinned: ${formData.latitude}, ${formData.longitude}`
-                  : "Pin Precise GPS Location (Recommended)"}
+                  ? `${t("report.gpsPinned")}: ${formData.latitude}, ${formData.longitude}`
+                  : t("report.pinGps")}
               </span>
               <p className="text-[10px] text-[var(--text-muted)]">
-                Helps road repair vans navigate directly to the site.
+                {t("report.gpsDesc")}
               </p>
             </div>
           </div>
@@ -374,51 +384,44 @@ export function FileComplaintPage() {
             disabled={locating}
             className="px-3 py-1.5 rounded-lg border border-emerald-600 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-xs font-semibold cursor-pointer shrink-0"
           >
-            {locating ? "Acquiring GPS..." : "Auto-Pin Location"}
+            {locating ? t("report.gpsAcquiring") : t("report.gpsBtn")}
           </button>
         </div>
 
-        {/* Citizen Contact (Optional if already logged in) */}
-        {!user && (
-          <div className="p-4 rounded-xl border border-[var(--border-subtle)] space-y-3">
-            <div className="text-xs font-bold text-[var(--text-primary)]">
-              Contact Details for Updates (Optional)
+        {/* Citizen Contact (Pre-filled from registered account) */}
+        <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)]/50 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-[var(--text-primary)]">
+              {t("report.complainantInfo")}
+            </span>
+            <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+              {t("report.verified")}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-[var(--text-secondary)] pt-1">
+            <div>
+              <span className="text-[10px] text-[var(--text-muted)] block">{t("report.name")}:</span>
+              <strong className="text-[var(--text-primary)]">{user?.name}</strong>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <input
-                type="text"
-                placeholder="Your Name"
-                value={formData.citizenName}
-                onChange={(e) => setFormData({ ...formData, citizenName: e.target.value })}
-                className="px-3 py-2 rounded-lg border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] bg-transparent"
-              />
-              <input
-                type="tel"
-                placeholder="Mobile (for SMS update)"
-                value={formData.citizenPhone}
-                onChange={(e) => setFormData({ ...formData, citizenPhone: e.target.value })}
-                className="px-3 py-2 rounded-lg border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] bg-transparent"
-              />
-              <input
-                type="email"
-                placeholder="Email Address"
-                value={formData.citizenEmail}
-                onChange={(e) => setFormData({ ...formData, citizenEmail: e.target.value })}
-                className="px-3 py-2 rounded-lg border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] bg-transparent"
-              />
+            <div>
+              <span className="text-[10px] text-[var(--text-muted)] block">{t("report.email")}:</span>
+              <strong className="text-[var(--text-primary)]">{user?.email}</strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-[var(--text-muted)] block">{t("report.mobile")}:</span>
+              <strong className="text-[var(--text-primary)]">{user?.phone || t("report.notProvided")}</strong>
             </div>
           </div>
-        )}
+        </div>
 
         <button
           type="submit"
           disabled={submitting}
           className="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white font-bold text-sm transition-colors cursor-pointer shadow-md"
         >
-          {submitting ? "Registering Grievance with Municipality..." : "Submit Grievance to CitySync"}
+          {submitting ? t("report.submitting") : t("report.submitBtn")}
         </button>
       </form>
     </div>
   );
 }
-

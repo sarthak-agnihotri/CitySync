@@ -22,6 +22,9 @@ import { LandingFooter } from "../components/layout/LandingFooter";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { ResourcesAPI, DepartmentsAPI, RequestsAPI } from "../api";
+import { Camera, ExternalLink } from "lucide-react";
+
+const CITIZEN_PORTAL_URL = "http://127.0.0.1:5174";
 
 export function LandingPage() {
   const { isAuthenticated, user } = useAuth();
@@ -144,6 +147,19 @@ export function LandingPage() {
                   className="btn btn-ghost text-sm py-2.5 px-4 text-[var(--text-secondary)]"
                 >
                   {t("hero.exploreServices")}
+                </a>
+
+                {/* Citizen Direct Complaint CTA */}
+                <a
+                  href={CITIZEN_PORTAL_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary text-sm py-2.5 px-4 text-emerald-800 dark:text-emerald-300 border-emerald-600/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 shadow-xs flex items-center gap-2 font-bold"
+                  title="Direct link to Citizen Complaint Portal"
+                >
+                  <Camera className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span>{t("hero.citizenCTA")}</span>
+                  <ExternalLink className="w-3.5 h-3.5 opacity-70" />
                 </a>
               </div>
 
