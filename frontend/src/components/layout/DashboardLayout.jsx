@@ -8,6 +8,7 @@ import { useLanguage } from "../../context/LanguageContext";
 const PAGE_TITLE_KEYS = {
   "/dashboard": "pageTitle.dashboard",
   "/projects": "pageTitle.projects",
+  "/map": "pageTitle.map",
   "/conflicts": "pageTitle.conflicts",
   "/resources": "pageTitle.resources",
   "/requests": "pageTitle.requests",

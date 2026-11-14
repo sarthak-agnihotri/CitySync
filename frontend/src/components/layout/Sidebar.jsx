@@ -118,7 +118,7 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
             onClick={handleNavClick}
           >
             <Map className="w-4 h-4 shrink-0" aria-hidden="true" />
-            <span>Smart City Map</span>
+            <span>{t("sidebar.map")}</span>
           </NavLink>
           <NavLink
             to="/conflicts"

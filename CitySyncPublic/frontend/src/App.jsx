@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
 import { ToastProvider } from "./context/ToastContext";
@@ -15,11 +15,14 @@ import { CitizenLoginPage, CitizenRegisterPage } from "./pages/CitizenAuthPages"
 
 function ProtectedCitizenRoute({ children }) {
   const { isAuthenticated, loading } = useCitizenAuth();
+  const location = useLocation();
+
   if (loading) {
     return <div className="text-center py-20 text-xs text-[var(--text-muted)]">Verifying session...</div>;
   }
   if (!isAuthenticated) {
-    return <Navigate to="/register?redirect=/report" replace />;
+    const redirectTarget = location.pathname + location.search;
+    return <Navigate to={`/register?redirect=${encodeURIComponent(redirectTarget || "/report")}`} replace />;
   }
   return children;
 }
