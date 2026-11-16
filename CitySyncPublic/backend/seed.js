@@ -6,7 +6,7 @@ const Grievance = require("./src/models/Grievance");
 
 const seedPublicData = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/Citysync");
+    await mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/citysync");
     console.log("Connected to MongoDB for CitySyncPublic seeding...");
 
     await CitizenUser.deleteMany({});
