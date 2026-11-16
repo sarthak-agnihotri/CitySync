@@ -150,7 +150,48 @@ export const publicTranslations = {
     "citizenAuth.signInHere": "Sign in",
     "citizenAuth.signingIn": "Signing in...",
     "citizenAuth.creating": "Creating Account...",
-    "citizenAuth.signInBtn": "Sign In to Citizen Account"
+    "citizenAuth.signInBtn": "Sign In to Citizen Account",
+
+    // Map & GIS
+    "nav.map": "Civic Map",
+    "nav.profile": "Profile & Settings",
+    "map.badge": "Interactive GIS Transparency",
+    "map.bannerTitle": "Explore the Live Civic Redressal Map",
+    "map.bannerDesc": "Locate potholes, streetlights, and drainage issues pinned across your municipal zone. Track repair progress geographically and upvote issues affecting your neighborhood.",
+    "map.bannerBtn": "Open Civic Map",
+    "map.title": "City Transparency & Grievance Map",
+    "map.subtitle": "Explore geo-tagged citizen complaints across administrative wards in real time.",
+    "map.allCategories": "All Categories",
+    "map.allStatuses": "All Statuses",
+    "map.allZones": "All Zones",
+    "map.filter": "Filter Map",
+    "map.searchPlaceholder": "Search by title, location or ticket...",
+    "map.reportedOn": "Reported on",
+    "map.openInTracker": "Open in Tracker",
+    "map.meToo": "I Am Also Facing This",
+
+    // SLA & Redressal Loop
+    "track.slaRemaining": "SLA Resolution Target",
+    "track.slaOverdue": "SLA Overdue",
+    "track.beforeAfter": "Before & After Resolution Evidence",
+    "track.citizenPhoto": "Citizen Reported Issue",
+    "track.deptPhoto": "Municipal Work Completion",
+    "track.rateTitle": "Rate Municipal Resolution",
+    "track.rateDesc": "How satisfied are you with the quality of repair work?",
+    "track.submitRating": "Submit Feedback",
+    "track.reopenTitle": "Still Broken? Request Re-open",
+    "track.reopenBtn": "Request Re-open",
+    "track.upvote": "I Am Also Facing This (+1)",
+
+    // Citizen Profile
+    "profile.title": "Citizen Profile & Settings",
+    "profile.subtitle": "Manage your contact details and account security",
+    "profile.personalInfo": "Personal Information",
+    "profile.saveProfile": "Save Profile Changes",
+    "profile.security": "Security & Password",
+    "profile.currentPassword": "Current Password",
+    "profile.newPassword": "New Password",
+    "profile.updatePassword": "Change Password"
   },
 
   hi: {
@@ -304,6 +345,47 @@ export const publicTranslations = {
     "citizenAuth.signInHere": "साइन इन करें",
     "citizenAuth.signingIn": "साइन इन हो रहा है...",
     "citizenAuth.creating": "खाता बनाया जा रहा है...",
-    "citizenAuth.signInBtn": "नागरिक खाते में साइन इन करें"
+    "citizenAuth.signInBtn": "नागरिक खाते में साइन इन करें",
+
+    // Map & GIS
+    "nav.map": "नागरिक मानचित्र",
+    "nav.profile": "प्रोफ़ाइल एवं सेटिंग्स",
+    "map.badge": "इंटरएक्टिव जीआईएस पारदर्शिता",
+    "map.bannerTitle": "लाइव नागरिक निवारण मानचित्र देखें",
+    "map.bannerDesc": "अपने नगरपालिका क्षेत्र में गड्ढों, स्ट्रीटलाइट्स और जल निकासी समस्याओं को मानचित्र पर देखें। भौगोलिक रूप से प्रगति ट्रैक करें और अपने क्षेत्र के मुद्दों को अपवोट करें।",
+    "map.bannerBtn": "नागरिक मानचित्र खोलें",
+    "map.title": "शहर पारदर्शिता एवं शिकायत मानचित्र",
+    "map.subtitle": "प्रशासनिक वार्डों में जियो-टैग्ड नागरिक शिकायतों को रीयल-टाइम में देखें।",
+    "map.allCategories": "सभी श्रेणियां",
+    "map.allStatuses": "सभी स्थितियां",
+    "map.allZones": "सभी क्षेत्र",
+    "map.filter": "मानचित्र फ़िल्टर करें",
+    "map.searchPlaceholder": "शीर्षक, स्थान या टिकट से खोजें...",
+    "map.reportedOn": "दर्ज तिथि",
+    "map.openInTracker": "ट्रैकर में खोलें",
+    "map.meToo": "मुझे भी यह समस्या आ रही है",
+
+    // SLA & Redressal Loop
+    "track.slaRemaining": "SLA समाधान लक्ष्य",
+    "track.slaOverdue": "SLA अवधि समाप्त",
+    "track.beforeAfter": "समाधान से पहले और बाद का प्रमाण",
+    "track.citizenPhoto": "नागरिक द्वारा दर्ज समस्या",
+    "track.deptPhoto": "नगरपालिका कार्य पूर्णता",
+    "track.rateTitle": "नगरपालिका समाधान का मूल्यांकन करें",
+    "track.rateDesc": "क्या आप मरम्मत कार्य की गुणवत्ता से संतुष्ट हैं?",
+    "track.submitRating": "प्रतिक्रिया जमा करें",
+    "track.reopenTitle": "क्या समस्या अभी भी बनी हुई है? पुनः खोलें",
+    "track.reopenBtn": "पुनः खोलने का अनुरोध करें",
+    "track.upvote": "मुझे भी यह समस्या आ रही है (+1)",
+
+    // Citizen Profile
+    "profile.title": "नागरिक प्रोफ़ाइल एवं सेटिंग्स",
+    "profile.subtitle": "अपने संपर्क विवरण और खाता सुरक्षा प्रबंधित करें",
+    "profile.personalInfo": "व्यक्तिगत जानकारी",
+    "profile.saveProfile": "प्रोफ़ाइल परिवर्तन सहेजें",
+    "profile.security": "सुरक्षा एवं पासवर्ड",
+    "profile.currentPassword": "वर्तमान पासवर्ड",
+    "profile.newPassword": "नया पासवर्ड",
+    "profile.updatePassword": "पासवर्ड बदलें"
   }
 };

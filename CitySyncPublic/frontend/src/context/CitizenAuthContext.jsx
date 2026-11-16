@@ -56,6 +56,11 @@ export function CitizenAuthProvider({ children }) {
     setTokenState(null);
   };
 
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+    setStoredUser(updatedUser);
+  };
+
   return (
     <CitizenAuthContext.Provider
       value={{
@@ -65,7 +70,8 @@ export function CitizenAuthProvider({ children }) {
         loading,
         login,
         register,
-        logout
+        logout,
+        updateUser
       }}
     >
       {children}

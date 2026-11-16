@@ -76,7 +76,7 @@ const grievanceSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ["submitted", "under_review", "assigned_to_dept", "in_progress", "resolved", "rejected"],
+      enum: ["submitted", "under_review", "assigned_to_dept", "in_progress", "resolved", "reopened", "rejected"],
       default: "submitted"
     },
     assignedDepartment: {
@@ -97,6 +97,45 @@ const grievanceSchema = new mongoose.Schema(
       default: ""
     },
     resolvedAt: {
+      type: Date,
+      default: null
+    },
+    reopenReason: {
+      type: String,
+      default: ""
+    },
+    reopenedAt: {
+      type: Date,
+      default: null
+    },
+    satisfactionRating: {
+      type: Number,
+      min: 1,
+      max: 5,
+      default: null
+    },
+    satisfactionFeedback: {
+      type: String,
+      default: ""
+    },
+    ratedAt: {
+      type: Date,
+      default: null
+    },
+    upvotes: {
+      type: Number,
+      default: 0
+    },
+    upvoters: [
+      {
+        type: String
+      }
+    ],
+    slaHours: {
+      type: Number,
+      default: 48
+    },
+    slaDeadline: {
       type: Date,
       default: null
     }

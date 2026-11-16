@@ -6,20 +6,38 @@ const {
   submitGrievance,
   trackGrievance,
   getMyGrievances,
-  getPublicStats
+  getPublicStats,
+  rateGrievance,
+  reopenGrievance,
+  upvoteGrievance,
+  getMapGrievances,
+  getNotifications,
+  markNotificationRead,
+  markAllNotificationsRead
 } = require("../controllers/grievanceController");
 
-// Public live summary
+// Public endpoints
 router.get("/stats", getPublicStats);
-
-// Track by Ticket ID (Public)
+router.get("/map", getMapGrievances);
 router.get("/track/:ticketId", trackGrievance);
+router.post("/:ticketId/upvote", (req, res, next) => {
+  // Optional auth: try to extract user if bearer token is present
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return citizenAuthMiddleware(req, res, next);
+  }
+  next();
+}, upvoteGrievance);
 
-// Submit Grievance (Mandatory Citizen Authentication Required)
+// Authenticated citizen endpoints
 router.post("/submit", citizenAuthMiddleware, upload.array("images", 3), submitGrievance);
-
-// Citizen authenticated routes
 router.get("/my-complaints", citizenAuthMiddleware, getMyGrievances);
+router.post("/:ticketId/rate", citizenAuthMiddleware, rateGrievance);
+router.post("/:ticketId/reopen", citizenAuthMiddleware, reopenGrievance);
+
+// In-portal notification endpoints
+router.get("/notifications", citizenAuthMiddleware, getNotifications);
+router.patch("/notifications/:id/read", citizenAuthMiddleware, markNotificationRead);
+router.post("/notifications/read-all", citizenAuthMiddleware, markAllNotificationsRead);
 
 module.exports = router;
-

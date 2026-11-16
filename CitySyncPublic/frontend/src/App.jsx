@@ -12,6 +12,8 @@ import { FileComplaintPage } from "./pages/FileComplaintPage";
 import { TrackStatusPage } from "./pages/TrackStatusPage";
 import { MyComplaintsPage } from "./pages/MyComplaintsPage";
 import { CitizenLoginPage, CitizenRegisterPage } from "./pages/CitizenAuthPages";
+import { CivicMapPage } from "./pages/CivicMapPage";
+import { CitizenProfilePage } from "./pages/CitizenProfilePage";
 
 function ProtectedCitizenRoute({ children }) {
   const { isAuthenticated, loading } = useCitizenAuth();
@@ -44,6 +46,7 @@ export default function App() {
                 <main className="flex-1">
                   <Routes>
                     <Route path="/" element={<LandingPage />} />
+                    <Route path="/map" element={<CivicMapPage />} />
                     <Route
                       path="/report"
                       element={
@@ -60,6 +63,14 @@ export default function App() {
                       element={
                         <ProtectedCitizenRoute>
                           <MyComplaintsPage />
+                        </ProtectedCitizenRoute>
+                      }
+                    />
+                    <Route
+                      path="/profile"
+                      element={
+                        <ProtectedCitizenRoute>
+                          <CitizenProfilePage />
                         </ProtectedCitizenRoute>
                       }
                     />

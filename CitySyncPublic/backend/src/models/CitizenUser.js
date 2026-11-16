@@ -32,6 +32,14 @@ const citizenUserSchema = new mongoose.Schema(
       type: String,
       default: "citizen",
       enum: ["citizen"]
+    },
+    resetToken: {
+      type: String,
+      default: null
+    },
+    resetTokenExpiry: {
+      type: Date,
+      default: null
     }
   },
   {

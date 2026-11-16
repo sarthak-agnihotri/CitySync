@@ -12,6 +12,7 @@ import { useCitizenAuth } from "../context/CitizenAuthContext";
 import { useToast } from "../context/ToastContext";
 import { useLanguage } from "../context/LanguageContext";
 import { GrievanceAPI } from "../api/client";
+import { LocationPickerMap } from "../components/common/LocationPickerMap";
 
 const CATEGORY_DATA = [
   { id: "pothole", labelEn: "Pothole / Road Damage", labelHi: "गड्ढा / टूटी सड़क", deptEn: "Public Works Dept", deptHi: "लोक निर्माण विभाग (PWD)" },
@@ -363,29 +364,49 @@ export function FileComplaintPage() {
           </div>
         </div>
 
-        {/* GPS Coordinates Button */}
-        <div className="p-3.5 rounded-xl bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <MapPin className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
-            <div>
-              <span className="text-xs font-bold text-[var(--text-primary)]">
-                {formData.latitude && formData.longitude
-                  ? `${t("report.gpsPinned")}: ${formData.latitude}, ${formData.longitude}`
-                  : t("report.pinGps")}
-              </span>
-              <p className="text-[10px] text-[var(--text-muted)]">
-                {t("report.gpsDesc")}
-              </p>
+        {/* GPS Coordinates Button & Map Pin Drop */}
+        <div className="space-y-3">
+          <div className="p-3.5 rounded-xl bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <MapPin className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
+              <div>
+                <span className="text-xs font-bold text-[var(--text-primary)]">
+                  {formData.latitude && formData.longitude
+                    ? `${t("report.gpsPinned")}: ${formData.latitude}, ${formData.longitude}`
+                    : t("report.pinGps")}
+                </span>
+                <p className="text-[10px] text-[var(--text-muted)]">
+                  {t("report.gpsDesc")}
+                </p>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={handleDetectLocation}
+              disabled={locating}
+              className="px-3 py-1.5 rounded-lg border border-emerald-600 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-xs font-semibold cursor-pointer shrink-0"
+            >
+              {locating ? t("report.gpsAcquiring") : t("report.gpsBtn")}
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={handleDetectLocation}
-            disabled={locating}
-            className="px-3 py-1.5 rounded-lg border border-emerald-600 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-xs font-semibold cursor-pointer shrink-0"
-          >
-            {locating ? t("report.gpsAcquiring") : t("report.gpsBtn")}
-          </button>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
+              {isHindi ? "मानचित्र पर सटीक स्थान चुनें (पिन को खींचें या क्लिक करें)" : "Pinpoint Location on Map (Click or Drag Pin)"}
+            </label>
+            <LocationPickerMap
+              latitude={formData.latitude}
+              longitude={formData.longitude}
+              zone={formData.zone}
+              onSelectLocation={(lat, lng) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  latitude: lat,
+                  longitude: lng
+                }));
+              }}
+            />
+          </div>
         </div>
 
         {/* Citizen Contact (Pre-filled from registered account) */}

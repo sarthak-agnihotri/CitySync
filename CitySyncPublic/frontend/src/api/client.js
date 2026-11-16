@@ -61,17 +61,63 @@ export const CitizenAuthAPI = {
       method: "POST",
       body: JSON.stringify(payload)
     }),
-  getMe: () => apiFetch("/auth/me")
+  getMe: () => apiFetch("/auth/me"),
+  updateProfile: (payload) =>
+    apiFetch("/auth/profile", {
+      method: "PUT",
+      body: JSON.stringify(payload)
+    }),
+  changePassword: (payload) =>
+    apiFetch("/auth/change-password", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    }),
+  forgotPassword: (email) =>
+    apiFetch("/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email })
+    }),
+  resetPassword: (payload) =>
+    apiFetch("/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    })
 };
 
 export const GrievanceAPI = {
   getStats: () => apiFetch("/grievances/stats"),
+  getMap: () => apiFetch("/grievances/map"),
   track: (ticketId) => apiFetch(`/grievances/track/${encodeURIComponent(ticketId)}`),
   submit: (formData) =>
     apiFetch("/grievances/submit", {
       method: "POST",
       body: formData
     }),
-  getMyGrievances: () => apiFetch("/grievances/my-complaints")
+  getMyGrievances: () => apiFetch("/grievances/my-complaints"),
+  rate: (ticketId, payload) =>
+    apiFetch(`/grievances/${encodeURIComponent(ticketId)}/rate`, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    }),
+  reopen: (ticketId, payload) =>
+    apiFetch(`/grievances/${encodeURIComponent(ticketId)}/reopen`, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    }),
+  upvote: (ticketId) =>
+    apiFetch(`/grievances/${encodeURIComponent(ticketId)}/upvote`, {
+      method: "POST"
+    })
 };
 
+export const NotificationAPI = {
+  list: () => apiFetch("/grievances/notifications"),
+  markAsRead: (id) =>
+    apiFetch(`/grievances/notifications/${encodeURIComponent(id)}/read`, {
+      method: "PATCH"
+    }),
+  markAllAsRead: () =>
+    apiFetch("/grievances/notifications/read-all", {
+      method: "POST"
+    })
+};

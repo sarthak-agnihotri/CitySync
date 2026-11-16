@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FileText, Calendar, MapPin, ArrowRight } from "lucide-react";
+import {
+  FileText,
+  Calendar,
+  MapPin,
+  ArrowRight,
+  Clock,
+  ThumbsUp,
+  Star,
+  RotateCcw
+} from "lucide-react";
 import { GrievanceAPI } from "../api/client";
 import { useCitizenAuth } from "../context/CitizenAuthContext";
 import { useLanguage } from "../context/LanguageContext";
@@ -22,9 +31,40 @@ export function MyComplaintsPage() {
 
   const getStatusLabel = (status) => {
     if (status === "resolved") return isHindi ? "समाधान पूर्ण" : "Resolved";
+    if (status === "reopened") return isHindi ? "पुनः खोला गया" : "Reopened";
     if (status === "in_progress") return isHindi ? "कार्य प्रगति पर" : "In Progress";
     if (status === "assigned_to_dept" || status === "under_review") return isHindi ? "आवंटित" : "Assigned";
     return isHindi ? "पंजीकृत" : "Registered";
+  };
+
+  const getSlaBadge = (item) => {
+    if (item.status === "resolved") {
+      return (
+        <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+          <Clock className="w-3 h-3" />
+          {isHindi ? "समय पर पूर्ण" : "Resolved within SLA"}
+        </span>
+      );
+    }
+    const createdAtTime = new Date(item.createdAt).getTime();
+    const slaHours = item.slaHours || 48;
+    const deadlineTime = createdAtTime + slaHours * 60 * 60 * 1000;
+    const diffHours = Math.round((deadlineTime - Date.now()) / (1000 * 60 * 60));
+
+    if (diffHours < 0) {
+      return (
+        <span className="text-[10px] font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-1">
+          <Clock className="w-3 h-3" />
+          {isHindi ? `विलंबित (${Math.abs(diffHours)} घंटे)` : `Overdue (${Math.abs(diffHours)}h)`}
+        </span>
+      );
+    }
+    return (
+      <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+        <Clock className="w-3 h-3" />
+        {isHindi ? `शेष: ${diffHours} घंटे` : `${diffHours}h left`}
+      </span>
+    );
   };
 
   return (
@@ -72,7 +112,7 @@ export function MyComplaintsPage() {
               className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-emerald-500/40 transition-colors"
             >
               <div className="space-y-1.5 flex-1">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="font-mono font-bold text-xs text-emerald-800 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
                     {item.ticketId}
                   </span>
@@ -80,6 +120,8 @@ export function MyComplaintsPage() {
                     className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded ${
                       item.status === "resolved"
                         ? "bg-teal-100 text-teal-800 dark:bg-teal-950/40 dark:text-teal-300"
+                        : item.status === "reopened"
+                        ? "bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300"
                         : item.status === "in_progress"
                         ? "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
                         : "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200"
@@ -90,10 +132,17 @@ export function MyComplaintsPage() {
                   <span className="text-[11px] text-[var(--text-muted)]">
                     • {item.assignedDepartment}
                   </span>
+
+                  {/* SLA Tracker */}
+                  <span className="ml-auto md:ml-2">
+                    {getSlaBadge(item)}
+                  </span>
                 </div>
+
                 <h3 className="text-sm font-bold text-[var(--text-primary)]">{item.title}</h3>
                 <p className="text-xs text-[var(--text-secondary)] line-clamp-2">{item.description}</p>
-                <div className="flex items-center gap-4 text-[11px] text-[var(--text-muted)] pt-1">
+
+                <div className="flex flex-wrap items-center gap-4 text-[11px] text-[var(--text-muted)] pt-1">
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3 h-3 text-emerald-600" />
                     {item.zone}
@@ -102,6 +151,16 @@ export function MyComplaintsPage() {
                     <Calendar className="w-3 h-3" />
                     {new Date(item.createdAt).toLocaleDateString()}
                   </span>
+                  <span className="flex items-center gap-1 font-semibold text-slate-600 dark:text-slate-400">
+                    <ThumbsUp className="w-3 h-3 text-emerald-600" />
+                    {item.upvotes || 0} {isHindi ? "समर्थन" : "Upvotes"}
+                  </span>
+                  {item.satisfactionRating && (
+                    <span className="flex items-center gap-0.5 text-amber-500 font-bold">
+                      <Star className="w-3 h-3 fill-amber-400" />
+                      {item.satisfactionRating}/5
+                    </span>
+                  )}
                 </div>
               </div>
 
