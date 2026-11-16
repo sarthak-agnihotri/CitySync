@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Landmark, Mail, Lock, ShieldCheck } from "lucide-react";
+import { Landmark, Mail, Lock, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import { useCitizenAuth } from "../context/CitizenAuthContext";
 import { useToast } from "../context/ToastContext";
 import { useLanguage } from "../context/LanguageContext";
@@ -10,6 +10,7 @@ export function CitizenLoginPage() {
   const redirectPath = searchParams.get("redirect") || "/my-complaints";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useCitizenAuth();
   const { addToast } = useToast();
@@ -49,7 +50,7 @@ export function CitizenLoginPage() {
               {t("citizenAuth.email")}
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
               <input
                 type="email"
                 required
@@ -66,15 +67,24 @@ export function CitizenLoginPage() {
               {t("citizenAuth.password")}
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
-                placeholder="••••••••"
+                placeholder={t("citizenAuth.passwordPlaceholder")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-transparent text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                className="w-full pl-9 pr-10 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-transparent text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-2.5 text-slate-400 hover:text-[var(--text-primary)] transition-colors cursor-pointer p-0.5"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
@@ -113,6 +123,9 @@ export function CitizenRegisterPage() {
     phone: "",
     address: ""
   });
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { register } = useCitizenAuth();
   const { addToast } = useToast();
@@ -121,6 +134,14 @@ export function CitizenRegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.password !== confirmPassword) {
+      addToast(t("citizenAuth.passwordMismatch") || "Passwords do not match", "error");
+      return;
+    }
+    if (formData.password.length < 6) {
+      addToast("Password must be at least 6 characters long", "error");
+      return;
+    }
     setLoading(true);
     try {
       await register(formData);
@@ -214,14 +235,50 @@ export function CitizenRegisterPage() {
             <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
               {t("citizenAuth.password")}
             </label>
-            <input
-              type="password"
-              required
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border border-[var(--border-subtle)] bg-transparent text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                placeholder={t("citizenAuth.passwordPlaceholder")}
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="w-full pl-3 pr-10 py-2 rounded-lg border border-[var(--border-subtle)] bg-transparent text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-2 text-slate-400 hover:text-[var(--text-primary)] transition-colors cursor-pointer p-0.5"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
+              {t("citizenAuth.confirmPassword")}
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                required
+                placeholder={t("citizenAuth.confirmPasswordPlaceholder")}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full pl-3 pr-10 py-2 rounded-lg border border-[var(--border-subtle)] bg-transparent text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                className="absolute right-3 top-2 text-slate-400 hover:text-[var(--text-primary)] transition-colors cursor-pointer p-0.5"
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                tabIndex={-1}
+              >
+                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <button
