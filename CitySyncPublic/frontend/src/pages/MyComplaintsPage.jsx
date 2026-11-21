@@ -68,52 +68,52 @@ export function MyComplaintsPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-10">
         <div>
-          <h1 className="text-2xl font-black text-[var(--text-primary)]">
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[var(--text-primary)]">
             {t("myComplaints.title")}
           </h1>
-          <p className="text-xs text-[var(--text-muted)] mt-1">
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             {t("myComplaints.sub")} {user?.email}
           </p>
         </div>
         <Link
           to="/report"
-          className="px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs shadow-xs text-center"
+          className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700 text-white font-bold text-sm shadow-lg shadow-emerald-900/15 text-center transition-all hover:-translate-y-0.5"
         >
           {t("myComplaints.reportAnother")}
         </Link>
       </div>
 
       {loading ? (
-        <div className="text-center py-16 text-xs text-[var(--text-muted)]">
+        <div className="text-center py-24 rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-sm text-sm font-medium text-[var(--text-muted)]">
           {t("myComplaints.loading")}
         </div>
       ) : complaints.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-          <FileText className="w-12 h-12 text-[var(--text-muted)] mx-auto mb-3" />
-          <h3 className="text-sm font-bold text-[var(--text-primary)]">{t("myComplaints.emptyTitle")}</h3>
-          <p className="text-xs text-[var(--text-secondary)] mt-1 max-w-sm mx-auto">
+        <div className="p-10 sm:p-16 text-center rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-sm">
+          <div className="w-20 h-20 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center mx-auto mb-5"><FileText className="w-9 h-9 text-emerald-700 dark:text-emerald-400" /></div>
+          <h3 className="text-base sm:text-lg font-extrabold tracking-tight text-[var(--text-primary)]">{t("myComplaints.emptyTitle")}</h3>
+          <p className="text-sm leading-relaxed text-[var(--text-secondary)] mt-2 max-w-md mx-auto">
             {t("myComplaints.emptySub")}
           </p>
           <Link
             to="/report"
-            className="inline-block mt-4 px-4 py-2 rounded-lg bg-emerald-700 text-white font-bold text-xs"
+            className="inline-flex items-center justify-center mt-6 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700 text-white font-bold text-sm shadow-lg shadow-emerald-900/15 transition-all hover:-translate-y-0.5"
           >
             {t("myComplaints.emptyBtn")}
           </Link>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {complaints.map((item) => (
             <div
               key={item._id}
-              className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-emerald-500/40 transition-colors"
+              className="p-6 sm:p-7 rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-950/5 transition-all duration-300"
             >
-              <div className="space-y-1.5 flex-1">
+              <div className="space-y-3 flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-mono font-bold text-xs text-emerald-800 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                  <span className="font-mono font-bold text-xs sm:text-sm tracking-wide text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800">
                     {item.ticketId}
                   </span>
                   <span
@@ -139,10 +139,10 @@ export function MyComplaintsPage() {
                   </span>
                 </div>
 
-                <h3 className="text-sm font-bold text-[var(--text-primary)]">{item.title}</h3>
-                <p className="text-xs text-[var(--text-secondary)] line-clamp-2">{item.description}</p>
+                <h3 className="text-base sm:text-lg font-extrabold tracking-tight text-[var(--text-primary)]">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-[var(--text-secondary)] line-clamp-2">{item.description}</p>
 
-                <div className="flex flex-wrap items-center gap-4 text-[11px] text-[var(--text-muted)] pt-1">
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-3 text-xs text-[var(--text-muted)] pt-3 border-t border-[var(--border-subtle)]">
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3 h-3 text-emerald-600" />
                     {item.zone}
@@ -166,10 +166,10 @@ export function MyComplaintsPage() {
 
               <Link
                 to={`/track?ticket=${encodeURIComponent(item.ticketId)}`}
-                className="px-4 py-2 rounded-lg border border-[var(--border-subtle)] hover:bg-[var(--bg-surface-secondary)] text-xs font-semibold text-[var(--text-primary)] flex items-center justify-center gap-1 shrink-0"
+                className="px-5 py-3 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/20 hover:bg-emerald-100 dark:hover:bg-emerald-950/50 text-sm font-bold text-emerald-800 dark:text-emerald-300 flex items-center justify-center gap-2 shrink-0 transition-all duration-200 hover:-translate-y-0.5"
               >
                 <span>{t("myComplaints.viewStatus")}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           ))}
@@ -178,3 +178,7 @@ export function MyComplaintsPage() {
     </div>
   );
 }
+
+
+
+

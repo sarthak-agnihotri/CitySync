@@ -174,17 +174,17 @@ export function TrackStatusPage() {
   const slaInfo = getSlaStatus();
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-black text-[var(--text-primary)]">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      <div className="text-center mb-10 sm:mb-12">
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[var(--text-primary)]">
           {t("track.pageTitle")}
         </h1>
-        <p className="text-xs text-[var(--text-muted)] mt-1">
+        <p className="text-sm text-[var(--text-secondary)] mt-2">
           {t("track.pageSubtitle")}
         </p>
 
         {/* Search Bar */}
-        <form onSubmit={handleSearch} className="mt-6 flex max-w-md mx-auto gap-2">
+        <form onSubmit={handleSearch} className="mt-8 flex flex-col sm:flex-row max-w-2xl mx-auto gap-3 p-2 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-lg shadow-slate-950/5">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             <input
@@ -192,13 +192,13 @@ export function TrackStatusPage() {
               placeholder={t("track.searchPlaceholder")}
               value={ticketQuery}
               onChange={(e) => setTicketQuery(e.target.value)}
-              className="w-full pl-9 pr-3.5 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs text-[var(--text-primary)] font-mono uppercase focus:outline-none focus:ring-2 focus:ring-emerald-600 shadow-xs"
+              className="w-full pl-10 pr-4 py-3.5 rounded-xl border border-transparent bg-[var(--bg-surface-secondary)] text-sm text-[var(--text-primary)] font-mono uppercase focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-all"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="px-5 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white font-semibold text-xs cursor-pointer shadow-sm shrink-0"
+            className="px-7 py-3.5 rounded-xl bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700 disabled:opacity-60 text-white font-bold text-sm cursor-pointer shadow-md shadow-emerald-900/15 shrink-0 transition-all"
           >
             {loading ? t("track.searching") : t("track.searchBtn")}
           </button>
@@ -213,15 +213,15 @@ export function TrackStatusPage() {
       )}
 
       {grievance && (
-        <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-md overflow-hidden space-y-0">
+        <div className="rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-xl shadow-slate-950/5 overflow-hidden space-y-0">
           {/* Header Card */}
-          <div className="p-6 border-b border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)]/30">
+          <div className="p-6 sm:p-8 border-b border-[var(--border-subtle)] bg-gradient-to-br from-emerald-50/70 to-teal-50/30 dark:from-emerald-950/20 dark:to-teal-950/10">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
                   {t("track.ticketLabel")}
                 </span>
-                <div className="text-xl font-black font-mono text-emerald-800 dark:text-emerald-400">
+                <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-emerald-800 dark:text-emerald-300 mt-1">
                   {grievance.ticketId}
                 </div>
               </div>
@@ -255,10 +255,10 @@ export function TrackStatusPage() {
               </div>
             </div>
 
-            <h2 className="text-base font-bold text-[var(--text-primary)] mt-3">
+            <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[var(--text-primary)] mt-6">
               {grievance.title}
             </h2>
-            <p className="text-xs text-[var(--text-secondary)] mt-1">
+            <p className="text-sm leading-relaxed text-[var(--text-secondary)] mt-2">
               {grievance.description}
             </p>
 
@@ -280,8 +280,8 @@ export function TrackStatusPage() {
           </div>
 
           {/* Stepper Timeline */}
-          <div className="p-6 border-b border-[var(--border-subtle)]">
-            <div className="flex items-center justify-between relative">
+          <div className="p-6 sm:p-8 border-b border-[var(--border-subtle)]">
+            <div className="flex items-center justify-between relative gap-1">
               <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 bg-[var(--border-subtle)] z-0" />
               {STATUS_STEPS.map((step, idx) => {
                 const currentIdx = getStepIndex(grievance.status);
@@ -289,9 +289,9 @@ export function TrackStatusPage() {
                 const isCurrent = idx === currentIdx;
 
                 return (
-                  <div key={step.key} className="flex flex-col items-center relative z-10 bg-[var(--bg-surface)] px-2">
+                  <div key={step.key} className="flex flex-col items-center relative z-10 bg-[var(--bg-surface)] px-1 sm:px-3 min-w-0">
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 transition-all ${
+                      className={`w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-sm border-2 shadow-sm transition-all duration-300 ${
                         isPassed
                           ? "bg-emerald-700 text-white border-emerald-700"
                           : "bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-subtle)]"
@@ -300,7 +300,7 @@ export function TrackStatusPage() {
                       {isPassed ? <CheckCircle2 className="w-4 h-4" /> : idx + 1}
                     </div>
                     <span
-                      className={`text-[11px] mt-1.5 font-bold ${
+                      className={`text-[10px] sm:text-xs text-center mt-2 font-bold leading-tight ${
                         isCurrent
                           ? "text-emerald-700 dark:text-emerald-400"
                           : "text-[var(--text-muted)]"
@@ -315,40 +315,40 @@ export function TrackStatusPage() {
           </div>
 
           {/* Metadata Grid */}
-          <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs border-b border-[var(--border-subtle)]">
-            <div className="flex items-start gap-2.5">
-              <Building2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+          <div className="p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6 text-sm border-b border-[var(--border-subtle)]">
+            <div className="flex items-start gap-3 p-4 rounded-2xl bg-[var(--bg-surface-secondary)]/60 border border-[var(--border-subtle)]">
+              <Building2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
               <div>
                 <span className="font-semibold text-[var(--text-muted)]">{t("track.deptAssigned")}:</span>
-                <p className="font-bold text-[var(--text-primary)]">{grievance.assignedDepartment}</p>
+                <p className="font-bold text-sm text-[var(--text-primary)] mt-1">{grievance.assignedDepartment}</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-2.5">
-              <MapPin className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-4 rounded-2xl bg-[var(--bg-surface-secondary)]/60 border border-[var(--border-subtle)]">
+              <MapPin className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
               <div>
                 <span className="font-semibold text-[var(--text-muted)]">{t("track.zone")}:</span>
-                <p className="font-bold text-[var(--text-primary)]">
+                <p className="font-bold text-sm text-[var(--text-primary)] mt-1">
                   {grievance.zone} {grievance.landmark ? `(${grievance.landmark})` : ""}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-2.5">
-              <Calendar className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-4 rounded-2xl bg-[var(--bg-surface-secondary)]/60 border border-[var(--border-subtle)]">
+              <Calendar className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
               <div>
                 <span className="font-semibold text-[var(--text-muted)]">{t("track.lodgedOn")}:</span>
-                <p className="font-bold text-[var(--text-primary)]">
+                <p className="font-bold text-sm text-[var(--text-primary)] mt-1">
                   {new Date(grievance.createdAt).toLocaleString()}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-2.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-4 rounded-2xl bg-[var(--bg-surface-secondary)]/60 border border-[var(--border-subtle)]">
+              <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
               <div>
                 <span className="font-semibold text-[var(--text-muted)]">{t("report.complainantInfo")}:</span>
-                <p className="font-bold text-[var(--text-primary)]">{grievance.citizenName}</p>
+                <p className="font-bold text-sm text-[var(--text-primary)] mt-1">{grievance.citizenName}</p>
               </div>
             </div>
           </div>
@@ -367,15 +367,15 @@ export function TrackStatusPage() {
           )}
 
           {/* "Before & After" Resolution Photos Comparison */}
-          <div className="p-6 border-b border-[var(--border-subtle)] space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] flex items-center gap-1.5">
+          <div className="p-6 sm:p-8 border-b border-[var(--border-subtle)] space-y-5">
+            <h4 className="text-sm font-extrabold uppercase tracking-wider text-[var(--text-secondary)] flex items-center gap-2">
               <ImageIcon className="w-4 h-4 text-emerald-600" />
               {isHindi ? "फोटो साक्ष्य एवं मरम्मत सत्यापन" : "Photo Evidence & Repair Verification"}
             </h4>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Before Repair */}
-              <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)]/40 space-y-2">
+              <div className="p-4 sm:p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)]/50 space-y-3 shadow-sm">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
                   {isHindi ? "1. नागरिक द्वारा दर्ज फोटो (मरम्मत से पहले)" : "1. Reported Hazard (Before Repair)"}
                 </span>
@@ -405,7 +405,7 @@ export function TrackStatusPage() {
               </div>
 
               {/* After Repair (Department Evidence) */}
-              <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)]/40 space-y-2">
+              <div className="p-4 sm:p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)]/50 space-y-3 shadow-sm">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
                   {isHindi ? "2. विभागीय मरम्मत साक्ष्य (मरम्मत के बाद)" : "2. Department Field Evidence (After Repair)"}
                 </span>
@@ -415,7 +415,7 @@ export function TrackStatusPage() {
                       href={grievance.resolutionImage.startsWith("http") ? grievance.resolutionImage : `http://127.0.0.1:5001${grievance.resolutionImage}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="block w-24 h-24 rounded-lg overflow-hidden border border-emerald-400 shadow-xs"
+                      className="block w-32 h-32 sm:w-40 sm:h-40 rounded-xl overflow-hidden border border-emerald-400/70 shadow-md transition-transform hover:scale-[1.02]"
                     >
                       <img
                         src={grievance.resolutionImage.startsWith("http") ? grievance.resolutionImage : `http://127.0.0.1:5001${grievance.resolutionImage}`}
@@ -440,15 +440,15 @@ export function TrackStatusPage() {
 
           {/* Field Inspection Remarks */}
           {grievance.resolutionNotes && (
-            <div className="p-6 bg-teal-50/50 dark:bg-teal-950/20 border-b border-[var(--border-subtle)]">
-              <h4 className="text-xs font-bold text-teal-900 dark:text-teal-200 uppercase tracking-wider mb-1">
+            <div className="p-6 sm:p-8 bg-gradient-to-br from-teal-50/70 to-emerald-50/40 dark:from-teal-950/30 dark:to-emerald-950/20 border-b border-[var(--border-subtle)]">
+              <h4 className="text-sm font-extrabold text-teal-900 dark:text-teal-200 uppercase tracking-wider mb-3">
                 {t("track.remarks")}
               </h4>
-              <p className="text-xs text-[var(--text-secondary)]">
+              <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
                 {grievance.resolutionNotes}
               </p>
               {grievance.resolvedAt && (
-                <span className="text-[10px] text-[var(--text-muted)] block mt-1">
+                <span className="text-xs font-semibold text-[var(--text-muted)] block mt-3">
                   {isHindi ? "समाधान तिथि" : "Closed on"}: {new Date(grievance.resolvedAt).toLocaleDateString()}
                 </span>
               )}
@@ -457,12 +457,12 @@ export function TrackStatusPage() {
 
           {/* Citizen Feedback & Re-open Loop (For Resolved Complaints) */}
           {grievance.status === "resolved" && (
-            <div className="p-6 bg-[var(--bg-surface-secondary)]/30 space-y-4">
+            <div className="p-6 sm:p-8 bg-[var(--bg-surface-secondary)]/40 space-y-6">
               <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)]">
+                <h4 className="text-sm font-extrabold uppercase tracking-wider text-[var(--text-primary)]">
                   {isHindi ? "नागरिक संतुष्टि एवं गुणवत्ता ऑडिट" : "Citizen Redressal Verification & Rating"}
                 </h4>
-                <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                <p className="text-sm leading-relaxed text-[var(--text-secondary)] mt-2">
                   {isHindi
                     ? "क्या आपकी समस्या का समाधान ठीक से हुआ? अपनी रेटिंग दर्ज करें या समस्या रहने पर पुनः खोलें।"
                     : "Was the repair completed to your satisfaction? Submit your rating or request a reopen if issues persist."}
@@ -470,7 +470,7 @@ export function TrackStatusPage() {
               </div>
 
               {grievance.satisfactionRating ? (
-                <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs space-y-1">
+                <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-sm space-y-3 shadow-sm">
                   <div className="flex items-center gap-1.5 text-amber-500 font-bold">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
@@ -515,14 +515,14 @@ export function TrackStatusPage() {
                     placeholder={isHindi ? "वैकल्पिक टिप्पणी लिखें (उदा. कार्य समय पर पूरा हुआ)..." : "Optional remarks (e.g. well paved road, quick service)..."}
                     value={feedback}
                     onChange={(e) => setFeedback(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                    className="w-full px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-all"
                   />
 
                   <div className="flex flex-wrap items-center gap-3">
                     <button
                       type="submit"
                       disabled={submittingRating}
-                      className="btn btn-primary text-xs py-1.5 px-4 cursor-pointer"
+                      className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700 disabled:opacity-60 text-white font-bold text-sm cursor-pointer shadow-md shadow-emerald-900/15 transition-all"
                     >
                       {submittingRating
                         ? (isHindi ? "जमा हो रहा है..." : "Submitting...")
@@ -532,7 +532,7 @@ export function TrackStatusPage() {
                     <button
                       type="button"
                       onClick={() => setShowReopenBox((prev) => !prev)}
-                      className="btn btn-secondary text-xs py-1.5 px-3 text-rose-700 dark:text-rose-400 hover:bg-rose-50 cursor-pointer"
+                      className="px-5 py-3 rounded-xl border border-rose-200 dark:border-rose-800 text-sm font-bold text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer transition-all"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>{isHindi ? "कार्य असंतोषजनक? पुनः खोलें" : "Work Incomplete? Request Re-open"}</span>
@@ -545,7 +545,7 @@ export function TrackStatusPage() {
               {showReopenBox && (
                 <form
                   onSubmit={handleReopenSubmit}
-                  className="mt-3 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 space-y-3"
+                  className="mt-4 p-5 sm:p-6 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 space-y-4 shadow-sm"
                 >
                   <div className="text-xs font-bold text-rose-900 dark:text-rose-200">
                     {isHindi ? "शिकायत पुनः खोलने का कारण दर्ज करें" : "Reason for Reopening Complaint"}
@@ -556,13 +556,13 @@ export function TrackStatusPage() {
                     placeholder={isHindi ? "बताएं कि समस्या का समाधान क्यों नहीं हुआ (उदा. सड़क का गड्ढा अभी भी गहरा है)..." : "Explain why the issue was not properly resolved..."}
                     value={reopenReason}
                     onChange={(e) => setReopenReason(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-rose-300 dark:border-rose-800 bg-[var(--bg-surface)] text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-rose-600 resize-none"
+                    className="w-full px-4 py-3 rounded-xl border border-rose-300 dark:border-rose-800 bg-[var(--bg-surface)] text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-rose-600 resize-none transition-all"
                   />
                   <div className="flex items-center gap-2">
                     <button
                       type="submit"
                       disabled={submittingReopen}
-                      className="px-3 py-1.5 rounded-lg bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs cursor-pointer shadow-xs"
+                      className="px-5 py-3 rounded-xl bg-rose-700 hover:bg-rose-800 text-white font-bold text-sm cursor-pointer shadow-md transition-all"
                     >
                       {submittingReopen
                         ? (isHindi ? "पुनः खुल रहा है..." : "Reopening...")
@@ -571,7 +571,7 @@ export function TrackStatusPage() {
                     <button
                       type="button"
                       onClick={() => setShowReopenBox(false)}
-                      className="px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] text-xs text-[var(--text-muted)] cursor-pointer"
+                      className="px-5 py-3 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] cursor-pointer transition-all"
                     >
                       {isHindi ? "रद्द करें" : "Cancel"}
                     </button>
@@ -585,3 +585,11 @@ export function TrackStatusPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
