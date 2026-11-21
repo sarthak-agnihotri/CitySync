@@ -12,6 +12,7 @@ const resourceRoutes = require("./routes/resourceRoutes");
 const requestRoutes = require("./routes/requestRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const auditRoutes = require("./routes/auditRoutes");
+const grievanceRoutes = require("./routes/grievanceRoutes");
 
 // Member 3 — Project Management & Scheduling
 const projectRoutes = require("./routes/projectRoutes");
@@ -72,6 +73,7 @@ app.use("/api/resources", resourceRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/audit", auditRoutes);
+app.use("/api/grievances", grievanceRoutes);
 
 // Member 3 — Project Registry & Conflict Engine
 app.use("/api/projects", projectRoutes);
@@ -82,3 +84,4 @@ app.use("/api/milestones", milestoneRoutes);
 app.use("/api/tasks", taskRoutes);
 
 module.exports = app;
+

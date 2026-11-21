@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Boxes,
   ClipboardList,
+  FileWarning,
   Bell,
   Building2,
   Users,
@@ -163,6 +164,19 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
           </NavLink>
 
           <NavLink
+            to="/grievances"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${isActive
+                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60"
+                : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
+              }`
+            }
+            onClick={handleNavClick}
+          >
+            <FileWarning className="w-4 h-4 shrink-0" aria-hidden="true" />
+            <span>Grievances</span>
+          </NavLink>
+          <NavLink
             to="/notifications"
             className={({ isActive }) =>
               `flex items-center justify-between px-3 py-2 rounded-md text-xs font-semibold transition-colors ${isActive
@@ -280,3 +294,4 @@ export function Sidebar({ unreadCount = 0, isOpen, onClose }) {
     </>
   );
 }
+

@@ -10,3 +10,6 @@ export { ProjectsAPI } from "./projects";
 export { ConflictsAPI } from "./conflicts";
 export { MilestonesAPI } from "./milestones";
 export { TasksAPI } from "./tasks";
+
+
+export { GrievancesAPI } from './grievances';

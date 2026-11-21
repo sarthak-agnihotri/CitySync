@@ -13,6 +13,7 @@ import { RegisterPage } from "./pages/auth/RegisterPage";
 import { DashboardPage } from "./pages/dashboard/DashboardPage";
 import { ResourcesPage } from "./pages/resources/ResourcesPage";
 import { RequestsPage } from "./pages/requests/RequestsPage";
+import { GrievancesPage } from "./pages/grievances/GrievancesPage";
 import { NotificationsPage } from "./pages/notifications/NotificationsPage";
 import { DepartmentsPage } from "./pages/departments/DepartmentsPage";
 import { UsersPage } from "./pages/users/UsersPage";
@@ -48,6 +49,7 @@ export default function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/resources" element={<ResourcesPage />} />
                 <Route path="/requests" element={<RequestsPage />} />
+                <Route path="/grievances" element={<GrievancesPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
 
                 {/* City Admin Only Routes */}
@@ -91,3 +93,4 @@ export default function App() {
     </BrowserRouter>
   );
 }
+

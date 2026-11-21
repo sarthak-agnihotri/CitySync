@@ -12,6 +12,7 @@ const PAGE_TITLE_KEYS = {
   "/conflicts": "pageTitle.conflicts",
   "/resources": "pageTitle.resources",
   "/requests": "pageTitle.requests",
+  "/grievances": "pageTitle.grievances",
   "/notifications": "pageTitle.notifications",
   "/departments": "pageTitle.departments",
   "/users": "pageTitle.users",
@@ -51,7 +52,9 @@ export function DashboardLayout() {
   };
 
   const titleKey = PAGE_TITLE_KEYS[location.pathname];
-  const currentTitle = titleKey ? t(titleKey) : "CitySync Portal";
+  const currentTitle = location.pathname === "/grievances"
+    ? "Citizen Grievances"
+    : titleKey ? t(titleKey) : "CitySync Portal";
 
   return (
     <div className="min-h-screen flex bg-[var(--bg-page)] text-[var(--text-primary)] transition-colors">
@@ -75,3 +78,4 @@ export function DashboardLayout() {
     </div>
   );
 }
+
