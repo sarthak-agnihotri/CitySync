@@ -299,17 +299,7 @@ export function CitizenNavbar() {
               </div>
             )}
 
-            {/* Link to Municipal Staff Portal */}
-            <a
-              href="http://127.0.0.1:5173"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md border border-[var(--border-subtle)] text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-secondary)] transition-colors"
-              title={t("nav.staffPortal")}
-            >
-              <span>{t("nav.staffPortal")}</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
+            
           </div>
 
           {/* Mobile Menu Button */}

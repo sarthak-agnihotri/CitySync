@@ -3,14 +3,14 @@ const CitizenNotification = require("../models/CitizenNotification");
 
 // Category to default assigned department routing
 const DEPT_MAP = {
-  broken_road: "Public Works Department",
-  pothole: "Public Works Department",
-  water_leakage: "Water Supply & Sewerage Board",
-  sewage_overflow: "Water Supply & Sewerage Board",
-  street_light: "Electricity DISCOM",
-  garbage_dumping: "Solid Waste Management",
-  traffic_signal: "Traffic Police Division",
-  other: "Public Works Department"
+  broken_road: { code: "ROAD" },
+  pothole: { code: "ROAD" },
+  traffic_signal: { code: "ROAD" },
+  water_leakage: { code: "WATER" },
+  sewage_overflow: { code: "WATER" },
+  street_light: { code: "ELECTRICITY" },
+  garbage_dumping: { code: "WASTE" },
+  other: null
 };
 
 // SLA durations in hours by issue severity
@@ -81,7 +81,24 @@ const submitGrievance = async (req, res) => {
     }
 
     const ticketId = await generateTicketId();
-    const assignedDepartment = DEPT_MAP[category] || "Public Works Department";
+    const departmentConfig = DEPT_MAP[category];
+
+    const department = departmentConfig
+      ? await Grievance.db.collection("departments").findOne({
+          code: departmentConfig.code,
+          isActive: true
+        })
+      : null;
+
+    if (departmentConfig && !department) {
+      return res.status(500).json({
+        message: "The department for this complaint category is not configured."
+      });
+    }
+
+    const assignedDepartment = department
+      ? department.name
+      : "City Admin Review";
     const sla = SLA_HOURS[category] || 48;
     const slaDeadline = new Date(Date.now() + sla * 60 * 60 * 1000);
 
@@ -111,6 +128,7 @@ const submitGrievance = async (req, res) => {
       },
       images,
       assignedDepartment,
+      assignedDepartmentId: department ? department._id : null,
       status: "submitted",
       priority: category === "pothole" || category === "water_leakage" ? "high" : "medium",
       slaHours: sla,
@@ -126,6 +144,37 @@ const submitGrievance = async (req, res) => {
       type: "submitted"
     }).catch(() => {});
 
+    // Notify the Government Dashboard about the new grievance
+    try {
+      const recipientFilter = department
+        ? { role: "department_head", department: department._id }
+        : { role: "city_admin" };
+
+      const recipients = await Grievance.db
+        .collection("users")
+        .find(recipientFilter, { projection: { _id: 1 } })
+        .toArray();
+
+      if (recipients.length > 0) {
+        const now = new Date();
+
+        await Grievance.db.collection("notifications").insertMany(
+          recipients.map((user) => ({
+            recipient: user._id,
+            recipientDepartment: department ? department._id : null,
+            type: "grievance_submitted",
+            title: "New Citizen Grievance",
+            message: `New grievance ${grievance.ticketId}: ${grievance.title} (${grievance.category}) in ${grievance.zone}.`,
+            relatedGrievance: grievance._id,
+            isRead: false,
+            createdAt: now,
+            updatedAt: now
+          }))
+        );
+      }
+    } catch (notificationError) {
+      console.error("Government notification error:", notificationError.message);
+    }
     res.status(201).json({
       message: "Grievance submitted successfully",
       ticketId: grievance.ticketId,
@@ -415,3 +464,5 @@ module.exports = {
   markNotificationRead,
   markAllNotificationsRead
 };
+
+

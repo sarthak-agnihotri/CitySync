@@ -83,6 +83,25 @@ const grievanceSchema = new mongoose.Schema(
       type: String,
       default: "Public Works Department"
     },
+    assignedDepartmentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department",
+      default: null
+    },
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null
+    },
+    assignedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null
+    },
+    assignedAt: {
+      type: Date,
+      default: null
+    },
     priority: {
       type: String,
       enum: ["low", "medium", "high", "critical"],
@@ -146,4 +165,5 @@ const grievanceSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("Grievance", grievanceSchema);
+
 
