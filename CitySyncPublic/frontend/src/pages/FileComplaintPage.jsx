@@ -162,7 +162,7 @@ export function FileComplaintPage() {
             <span className="text-xs uppercase font-bold text-emerald-800 dark:text-emerald-300">
               {t("report.trackingIdLabel")}
             </span>
-            <div className="text-2xl font-black font-mono text-emerald-900 dark:text-emerald-200 mt-1 select-all">
+            <div className="text-2xl font-black font-mono text-emerald-900 dark:text-emerald-300 dark:text-emerald-200 mt-1 select-all">
               {submittedTicket}
             </div>
             <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-1">
@@ -206,141 +206,273 @@ export function FileComplaintPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      <div className="mb-6">
-        <h1 className="text-2xl font-black text-[var(--text-primary)]">
-          {t("report.pageTitle")}
-        </h1>
-        <p className="text-xs text-[var(--text-muted)] mt-1">
-          {t("report.pageSubtitle")}
-        </p>
+    <div className="max-w-5xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mb-8 overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950 via-emerald-800 to-teal-700 p-7 sm:p-10 shadow-xl">
+        <div className="max-w-2xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-semibold text-emerald-50 mb-4">
+            <MapPin size={14} />
+            CITYSYNC · CITIZEN SERVICES
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+            {t("report.pageTitle")}
+          </h1>
+
+          <p className="mt-3 text-sm sm:text-base leading-relaxed text-emerald-50/90">
+            {t("report.pageSubtitle")}
+          </p>
+        </div>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] shadow-sm space-y-6"
+        className="rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 sm:p-8 shadow-xl shadow-slate-200/40 space-y-8"
       >
-        {/* Category Selection */}
+
+        {/* Modern Category Selection */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
-            {t("report.categoryLabel")}
-          </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            {CATEGORY_DATA.map((cat) => (
-              <label
-                key={cat.id}
-                className={`flex items-start gap-3 p-3 rounded-xl border text-xs cursor-pointer transition-all ${
-                  formData.category === cat.id
-                    ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-600 text-emerald-950 dark:text-emerald-200 font-semibold"
-                    : "border-[var(--border-subtle)] hover:bg-[var(--bg-surface-secondary)] text-[var(--text-secondary)]"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="category"
-                  value={cat.id}
-                  checked={formData.category === cat.id}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="mt-0.5 accent-emerald-700"
-                />
-                <div>
-                  <div className="font-bold text-[var(--text-primary)]">
-                    {isHindi ? cat.labelHi : cat.labelEn}
+          <div className="mb-4">
+            <h2 className="text-base font-bold text-[var(--text-primary)]">
+              {t("report.categoryLabel")}
+            </h2>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">
+              Select the civic issue you want to report
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {CATEGORY_DATA.map((cat, index) => {
+              const categoryIcons = [
+                "🛣️",
+                "🚧",
+                "💧",
+                "🚰",
+                "💡",
+                "🗑️",
+                "🚦",
+                "🏙️"
+              ];
+
+              const selected = formData.category === cat.id;
+
+              return (
+                <label
+                  key={cat.id}
+                  className={`relative flex items-start gap-3 rounded-2xl border-2 p-4 cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${selected
+                    ? "border-emerald-600 bg-emerald-50 shadow-md shadow-emerald-100 dark:bg-emerald-950/30 dark:shadow-none"
+                    : "border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-emerald-500"
+                    }`}
+                >
+                  <input
+                    type="radio"
+                    name="category"
+                    value={cat.id}
+                    checked={selected}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        category: e.target.value
+                      }))
+                    }
+                    className="sr-only"
+                  />
+
+                  <div
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-2xl ${selected
+                      ? "bg-emerald-100 dark:bg-emerald-900/50"
+                      : "bg-[var(--bg-surface-secondary)]"
+                      }`}
+                  >
+                    {categoryIcons[index]}
                   </div>
-                  <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
-                    {isHindi ? "संबंधित विभाग" : "Assigned to"}: {isHindi ? cat.deptHi : cat.deptEn}
+
+                  <div className="min-w-0 flex-1">
+                    <h3 className={`text-sm font-bold ${selected ? "text-emerald-900 dark:text-emerald-300" : "text-[var(--text-primary)]"
+                      }`}>
+                      {isHindi ? cat.labelHi : cat.labelEn}
+                    </h3>
+
+                    <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
+                      {isHindi ? "संबंधित विभाग" : "Assigned to"}:{" "}
+                      {isHindi ? cat.deptHi : cat.deptEn}
+                    </p>
                   </div>
-                </div>
-              </label>
-            ))}
+
+                  {selected && (
+                    <CheckCircle2
+                      size={19}
+                      className="absolute right-3 top-3 shrink-0 text-emerald-600"
+                    />
+                  )}
+                </label>
+              );
+            })}
           </div>
         </div>
 
-        {/* Title & Description */}
-        <div className="space-y-4">
+
+
+        {/* Modern Complaint Details */}
+        <div className="space-y-5">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-              {t("report.titleLabel")}
+            <div className="mb-3">
+              <h2 className="text-base font-bold text-[var(--text-primary)]">
+                {isHindi ? "शिकायत का विवरण" : "Complaint Details"}
+              </h2>
+              <p className="mt-1 text-xs text-[var(--text-muted)]">
+                {isHindi
+                  ? "अपनी समस्या के बारे में विस्तार से बताएं"
+                  : "Provide details to help the concerned department understand the issue"}
+              </p>
+            </div>
+
+            <label className="mb-2 block text-sm font-semibold text-[var(--text-primary)]">
+              {t("report.titleLabel")} <span className="text-rose-500">*</span>
             </label>
+
             <input
               type="text"
               required
               placeholder={t("report.titlePlaceholder")}
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-transparent text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+              className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] px-4 py-3.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none transition-all focus:border-emerald-500 focus:bg-[var(--bg-surface)] focus:ring-4 focus:ring-emerald-500/10"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-              {t("report.descLabel")}
+            <label className="mb-2 block text-sm font-semibold text-[var(--text-primary)]">
+              {t("report.descLabel")} <span className="text-rose-500">*</span>
             </label>
+
             <textarea
               required
-              rows={4}
+              rows={5}
               placeholder={t("report.descPlaceholder")}
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-transparent text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600 resize-none"
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              className="w-full resize-y rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] px-4 py-3.5 text-sm leading-relaxed text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none transition-all focus:border-emerald-500 focus:bg-[var(--bg-surface)] focus:ring-4 focus:ring-emerald-500/10"
             />
+
+            <p className="mt-2 text-right text-xs text-[var(--text-muted)]">
+              {formData.description.length} characters
+            </p>
           </div>
         </div>
 
-        {/* Photo Evidence Upload */}
-        <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-            {t("report.photosLabel")}
-          </label>
-          <div className="border-2 border-dashed border-[var(--border-subtle)] rounded-xl p-5 text-center bg-[var(--bg-surface-secondary)]/50">
-            <input
-              type="file"
-              id="photo-upload"
-              accept="image/*"
-              multiple
-              onChange={handleImageChange}
-              className="hidden"
+
+        
+{/* Modern Photo Evidence Upload */}
+<div>
+  <div className="mb-3">
+    <h2 className="text-base font-bold text-[var(--text-primary)]">
+      {t("report.photosLabel")}
+    </h2>
+    <p className="mt-1 text-xs text-[var(--text-muted)]">
+      Upload photographs to help authorities understand the issue
+    </p>
+  </div>
+
+  <div className="rounded-2xl border-2 border-dashed border-emerald-200 bg-emerald-50/40 dark:border-emerald-800 dark:bg-emerald-950/20 p-6 text-center transition-all hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40">
+    <input
+      type="file"
+      id="photo-upload"
+      accept="image/jpeg,image/png,image/webp"
+      multiple
+      onChange={handleImageChange}
+      className="hidden"
+    />
+
+    <label
+      htmlFor="photo-upload"
+      className="flex cursor-pointer flex-col items-center"
+    >
+      <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-emerald-700 shadow-sm dark:bg-[var(--bg-surface)] dark:text-emerald-300">
+        <Camera size={27} />
+      </div>
+
+      <span className="text-sm font-bold text-[var(--text-primary)]">
+        Click to upload complaint photos
+      </span>
+
+      <span className="mt-1 text-xs text-[var(--text-muted)]">
+        JPEG, PNG or WEBP · Maximum 5MB per photo
+      </span>
+
+      <span className="mt-3 rounded-lg bg-emerald-700 px-4 py-2 text-xs font-semibold text-white">
+        Browse Photos
+      </span>
+    </label>
+  </div>
+
+  {imagePreviews.length > 0 && (
+    <div className="mt-4">
+      <div className="mb-3 flex items-center justify-between">
+        <span className="text-sm font-bold text-[var(--text-primary)]">
+          Uploaded Photos
+        </span>
+        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+          {imagePreviews.length}/3 Photos
+        </span>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+        {imagePreviews.map((src, i) => (
+          <div
+            key={i}
+            className="group relative aspect-square overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] shadow-sm"
+          >
+            <img
+              src={src}
+              alt={`Complaint evidence ${i + 1}`}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
-            <label htmlFor="photo-upload" className="cursor-pointer flex flex-col items-center">
-              <Camera className="w-8 h-8 text-emerald-700 dark:text-emerald-400 mb-2" />
-              <span className="text-xs font-bold text-[var(--text-primary)]">
-                {t("report.uploadClick")}
-              </span>
-              <span className="text-[11px] text-[var(--text-muted)] mt-1">
-                {t("report.uploadFormats")}
-              </span>
-            </label>
+
+            <button
+              type="button"
+              onClick={() => removeImage(i)}
+              aria-label={`Remove photo ${i + 1}`}
+              className="absolute right-2 top-2 rounded-full bg-slate-900/80 p-1.5 text-white transition-colors hover:bg-rose-600"
+            >
+              <X size={15} />
+            </button>
           </div>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
 
-          {/* Previews */}
-          {imagePreviews.length > 0 && (
-            <div className="flex flex-wrap gap-3 mt-3">
-              {imagePreviews.map((src, i) => (
-                <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border border-[var(--border-subtle)] shadow-xs">
-                  <img src={src} alt="Upload preview" className="w-full h-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(i)}
-                    className="absolute top-1 right-1 p-0.5 rounded-full bg-black/70 text-white hover:bg-rose-600 cursor-pointer"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
 
+        
         {/* Location & Ward Pinning */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-              {t("report.zoneLabel")}
-            </label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {/* Administrative Zone */}
+          <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 shadow-sm transition-all hover:border-emerald-200">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+                <MapPin size={21} />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                  {t("report.zoneLabel")}
+                </h3>
+                <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                  Select the area where the issue is located
+                </p>
+              </div>
+            </div>
+
             <select
               value={formData.zone}
-              onChange={(e) => setFormData({ ...formData, zone: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              onChange={(e) =>
+                setFormData({ ...formData, zone: e.target.value })
+              }
+              className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none transition focus:border-emerald-500 focus:bg-[var(--bg-surface)] focus:ring-4 focus:ring-emerald-500/10"
             >
               {ZONES.map((z) => (
                 <option key={z} value={z}>
@@ -350,50 +482,95 @@ export function FileComplaintPage() {
             </select>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-              {t("report.landmarkLabel")}
-            </label>
+          {/* Nearby Landmark */}
+          <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 shadow-sm transition-all hover:border-emerald-200">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-300">
+                <Navigation size={21} />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                  {t("report.landmarkLabel")}
+                </h3>
+                <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                  Add a nearby landmark for easy identification
+                </p>
+              </div>
+            </div>
+
             <input
               type="text"
               placeholder={t("report.landmarkPlaceholder")}
               value={formData.landmark}
-              onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-transparent text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              onChange={(e) =>
+                setFormData({ ...formData, landmark: e.target.value })
+              }
+              className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-emerald-500 focus:bg-[var(--bg-surface)] focus:ring-4 focus:ring-emerald-500/10"
             />
           </div>
         </div>
 
+
+        
         {/* GPS Coordinates Button & Map Pin Drop */}
-        <div className="space-y-3">
-          <div className="p-3.5 rounded-xl bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <MapPin className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
-              <div>
-                <span className="text-xs font-bold text-[var(--text-primary)]">
-                  {formData.latitude && formData.longitude
-                    ? `${t("report.gpsPinned")}: ${formData.latitude}, ${formData.longitude}`
-                    : t("report.pinGps")}
-                </span>
-                <p className="text-[10px] text-[var(--text-muted)]">
-                  {t("report.gpsDesc")}
-                </p>
+        <div className="space-y-5">
+          {/* GPS Status Card */}
+          <div className="overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 shadow-sm dark:border-emerald-800 dark:from-emerald-950/40 dark:to-teal-950/40">
+            <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-emerald-700 shadow-sm dark:bg-[var(--bg-surface)] dark:text-emerald-300">
+                  <MapPin size={23} />
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                    {formData.latitude && formData.longitude
+                      ? t("report.gpsPinned")
+                      : t("report.pinGps")}
+                  </h3>
+
+                  <p className="mt-1 text-xs leading-relaxed text-[var(--text-secondary)]">
+                    {formData.latitude && formData.longitude
+                      ? `${formData.latitude}, ${formData.longitude}`
+                      : t("report.gpsDesc")}
+                  </p>
+
+                  {formData.latitude && formData.longitude && (
+                    <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
+                      <CheckCircle2 size={12} />
+                      Location selected
+                    </span>
+                  )}
+                </div>
               </div>
+
+              <button
+                type="button"
+                onClick={handleDetectLocation}
+                disabled={locating}
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 text-xs font-bold text-white shadow-md transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <Navigation size={15} />
+                {locating ? t("report.gpsAcquiring") : t("report.gpsBtn")}
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={handleDetectLocation}
-              disabled={locating}
-              className="px-3 py-1.5 rounded-lg border border-emerald-600 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-xs font-semibold cursor-pointer shrink-0"
-            >
-              {locating ? t("report.gpsAcquiring") : t("report.gpsBtn")}
-            </button>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
-              {isHindi ? "मानचित्र पर सटीक स्थान चुनें (पिन को खींचें या क्लिक करें)" : "Pinpoint Location on Map (Click or Drag Pin)"}
-            </label>
+          {/* Interactive Map */}
+          <div className="space-y-3">
+            <div>
+              <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                {isHindi
+                  ? "मानचित्र पर सटीक स्थान चुनें"
+                  : "Pinpoint Location on Map"}
+              </h3>
+              <p className="mt-1 text-xs text-[var(--text-muted)]">
+                {isHindi
+                  ? "पिन को खींचें या मानचित्र पर क्लिक करें"
+                  : "Click anywhere on the map or drag the pin to mark the exact issue location."}
+              </p>
+            </div>
+
             <LocationPickerMap
               latitude={formData.latitude}
               longitude={formData.longitude}
@@ -409,40 +586,83 @@ export function FileComplaintPage() {
           </div>
         </div>
 
+
+        
         {/* Citizen Contact (Pre-filled from registered account) */}
-        <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)]/50 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[var(--text-primary)]">
-              {t("report.complainantInfo")}
-            </span>
-            <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+        <div className="overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-sm">
+          <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] px-5 py-4">
+            <div>
+              <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                {t("report.complainantInfo")}
+              </h3>
+              <p className="mt-1 text-xs text-[var(--text-muted)]">
+                Your registered account information
+              </p>
+            </div>
+
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 dark:border-emerald-800 dark:bg-emerald-950/40 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
+              <CheckCircle2 size={13} />
               {t("report.verified")}
             </span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-[var(--text-secondary)] pt-1">
-            <div>
-              <span className="text-[10px] text-[var(--text-muted)] block">{t("report.name")}:</span>
-              <strong className="text-[var(--text-primary)]">{user?.name}</strong>
+
+          <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-3">
+            <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] p-4">
+              <span className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                {t("report.name")}
+              </span>
+              <p className="break-words text-sm font-semibold text-[var(--text-primary)]">
+                {user?.name || "—"}
+              </p>
             </div>
-            <div>
-              <span className="text-[10px] text-[var(--text-muted)] block">{t("report.email")}:</span>
-              <strong className="text-[var(--text-primary)]">{user?.email}</strong>
+
+            <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] p-4">
+              <span className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                {t("report.email")}
+              </span>
+              <p className="break-words text-sm font-semibold text-[var(--text-primary)]">
+                {user?.email || "—"}
+              </p>
             </div>
-            <div>
-              <span className="text-[10px] text-[var(--text-muted)] block">{t("report.mobile")}:</span>
-              <strong className="text-[var(--text-primary)]">{user?.phone || t("report.notProvided")}</strong>
+
+            <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] p-4">
+              <span className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                {t("report.mobile")}
+              </span>
+              <p className="break-words text-sm font-semibold text-[var(--text-primary)]">
+                {user?.phone || t("report.notProvided")}
+              </p>
             </div>
           </div>
         </div>
 
+
+        
         <button
           type="submit"
           disabled={submitting}
-          className="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white font-bold text-sm transition-colors cursor-pointer shadow-md"
+          className="group flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-700 px-6 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-900/15 transition-all duration-300 hover:-translate-y-0.5 hover:from-emerald-800 hover:to-teal-800 hover:shadow-xl disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {submitting ? t("report.submitting") : t("report.submitBtn")}
+          {submitting ? (
+            <>
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              {t("report.submitting")}
+            </>
+          ) : (
+            <>
+              <FileText size={19} />
+              {t("report.submitBtn")}
+              <span className="text-lg transition-transform group-hover:translate-x-1">
+                →
+              </span>
+            </>
+          )}
         </button>
+
       </form>
     </div>
   );
 }
+
+
+

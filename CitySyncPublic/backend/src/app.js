@@ -50,5 +50,36 @@ app.get("/api/health", (req, res) => {
 app.use("/api/citizen/auth", citizenAuthRoutes);
 app.use("/api/citizen/grievances", grievanceRoutes);
 
+// Central error handler for upload and API errors
+app.use((err, req, res, next) => {
+  console.error("API Error:", err.message);
+
+  if (err instanceof require("multer").MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        success: false,
+        message: "Each image must be 5 MB or smaller."
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      message: err.message
+    });
+  }
+
+  if (err.statusCode === 400) {
+    return res.status(400).json({
+      success: false,
+      message: err.message
+    });
+  }
+
+  return res.status(500).json({
+    success: false,
+    message: "Something went wrong on the server."
+  });
+});
+
 module.exports = app;
 
