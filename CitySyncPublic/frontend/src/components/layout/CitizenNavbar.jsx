@@ -1,31 +1,45 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   Landmark,
   Menu,
   X,
-  ArrowRight,
-  User,
   LogOut,
-  ExternalLink,
   AlertTriangle,
   Search,
   FileText,
   MapPin,
   Bell,
-  CheckCircle2,
-  Settings
+  Settings,
+  CheckCheck,
+  ChevronDown,
 } from "lucide-react";
 import { useCitizenAuth } from "../../context/CitizenAuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { ThemeToggle } from "../common/ThemeToggle";
 import { NotificationAPI } from "../../api/client";
 
+const desktopLinkClass = ({ isActive }) =>
+  `relative flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
+    isActive
+      ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300"
+      : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-emerald-700 dark:hover:text-emerald-400"
+  }`;
+
+const mobileLinkClass = ({ isActive }) =>
+  `flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all ${
+    isActive
+      ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300"
+      : "text-[var(--text-primary)] hover:bg-[var(--bg-surface-secondary)]"
+  }`;
+
 export function CitizenNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+
   const notifRef = useRef(null);
 
   const { user, isAuthenticated, logout } = useCitizenAuth();
@@ -33,227 +47,250 @@ export function CitizenNavbar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    setMobileMenuOpen(false);
     logout();
     navigate("/");
   };
 
   const fetchNotifications = async () => {
     if (!isAuthenticated) return;
+
     try {
       const res = await NotificationAPI.list();
       setNotifications(res.notifications || []);
       setUnreadCount(res.unreadCount || 0);
-    } catch {}
+    } catch (error) {
+      console.error("Unable to fetch notifications:", error);
+    }
   };
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
+
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000); // 30s poll
+
+    const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
   }, [isAuthenticated]);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (notifRef.current && !notifRef.current.contains(e.target)) {
+    const handleClickOutside = (event) => {
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
         setShowNotifDropdown(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const handleMarkAllRead = async () => {
     try {
       await NotificationAPI.markAllAsRead();
       setUnreadCount(0);
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    } catch {}
+      setNotifications((prev) =>
+        prev.map((notification) => ({ ...notification, read: true }))
+      );
+    } catch (error) {
+      console.error("Unable to mark notifications as read:", error);
+    }
   };
 
-  const handleNotificationClick = async (notif) => {
+  const handleNotificationClick = async (notification) => {
     try {
-      if (!notif.read) {
-        await NotificationAPI.markAsRead(notif._id);
-        setUnreadCount((c) => Math.max(0, c - 1));
+      if (!notification.read) {
+        await NotificationAPI.markAsRead(notification._id);
+
+        setUnreadCount((count) => Math.max(0, count - 1));
+
         setNotifications((prev) =>
-          prev.map((n) => (n._id === notif._id ? { ...n, read: true } : n))
+          prev.map((item) =>
+            item._id === notification._id
+              ? { ...item, read: true }
+              : item
+          )
         );
       }
+
       setShowNotifDropdown(false);
-      if (notif.ticketId) {
-        navigate(`/track?ticket=${encodeURIComponent(notif.ticketId)}`);
+      setMobileMenuOpen(false);
+
+      if (notification.ticketId) {
+        navigate(
+          `/track?ticket=${encodeURIComponent(notification.ticketId)}`
+        );
       }
-    } catch {}
+    } catch (error) {
+      console.error("Unable to open notification:", error);
+    }
   };
 
+  const closeMobileMenu = () => setMobileMenuOpen(false);
+
   return (
-    <header className="sticky top-0 z-50 bg-[var(--bg-surface)] border-b border-[var(--border-subtle)] transition-colors shadow-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Brand Identity */}
+    <header className="sticky top-0 z-50 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/95 shadow-sm backdrop-blur-xl">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+        <div className="flex min-h-[76px] items-center justify-between gap-3">
+
+          {/* BRAND */}
           <Link
             to="/"
-            className="flex items-center gap-3 text-decoration-none focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md"
-            aria-label="CitySync Public Home"
+            onClick={closeMobileMenu}
+            aria-label="CitySync Citizen Portal Home"
+            className="group flex min-w-0 items-center gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
-            <div className="w-10 h-10 rounded-md bg-emerald-800 text-white flex items-center justify-center font-bold shadow-xs">
-              <Landmark className="w-5 h-5 text-emerald-100" aria-hidden="true" />
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-800 text-white shadow-lg shadow-emerald-900/20 transition-transform duration-200 group-hover:scale-105">
+              <Landmark className="h-6 w-6" strokeWidth={2.2} />
             </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-bold tracking-tight text-[var(--text-primary)]">
-                  CitySync <span className="text-emerald-700 dark:text-emerald-400">Public</span>
+
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-lg font-black tracking-tight text-[var(--text-primary)] sm:text-xl">
+                  CitySync
                 </span>
-                <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                  Citizen Cell
+                <span className="text-lg font-black tracking-tight text-emerald-700 dark:text-emerald-400 sm:text-xl">
+                  Public
                 </span>
               </div>
-              <span className="text-[11px] font-medium text-[var(--text-muted)] -mt-1 tracking-wide">
+
+              <p className="mt-0.5 text-[10px] font-semibold tracking-[0.13em] text-[var(--text-muted)] sm:text-[11px]">
                 {t("nav.portalSub")}
-              </span>
+              </p>
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-5" aria-label="Main Navigation">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `text-xs font-semibold transition-colors ${
-                  isActive
-                    ? "text-emerald-700 dark:text-emerald-400"
-                    : "text-[var(--text-secondary)] hover:text-emerald-700 dark:hover:text-emerald-400"
-                }`
-              }
-            >
+          {/* DESKTOP NAVIGATION */}
+          <nav
+            className="hidden items-center gap-1 lg:flex"
+            aria-label="Main Navigation"
+          >
+            <NavLink to="/" end className={desktopLinkClass}>
               {t("nav.home")}
             </NavLink>
-            <NavLink
-              to="/map"
-              className={({ isActive }) =>
-                `flex items-center gap-1.5 text-xs font-semibold transition-colors ${
-                  isActive
-                    ? "text-emerald-700 dark:text-emerald-400"
-                    : "text-[var(--text-secondary)] hover:text-emerald-700 dark:hover:text-emerald-400"
-                }`
-              }
-            >
-              <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-              <span>{t("nav.map")}</span>
+
+            <NavLink to="/map" className={desktopLinkClass}>
+              <MapPin className="h-4 w-4" />
+              {t("nav.map")}
             </NavLink>
-            <NavLink
-              to="/report"
-              className={({ isActive }) =>
-                `flex items-center gap-1.5 text-xs font-semibold transition-colors ${
-                  isActive
-                    ? "text-emerald-700 dark:text-emerald-400"
-                    : "text-[var(--text-secondary)] hover:text-emerald-700 dark:hover:text-emerald-400"
-                }`
-              }
-            >
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
-              <span>{t("nav.report")}</span>
+
+            <NavLink to="/report" className={desktopLinkClass}>
+              <AlertTriangle className="h-4 w-4" />
+              {t("nav.report")}
             </NavLink>
-            <NavLink
-              to="/track"
-              className={({ isActive }) =>
-                `flex items-center gap-1.5 text-xs font-semibold transition-colors ${
-                  isActive
-                    ? "text-emerald-700 dark:text-emerald-400"
-                    : "text-[var(--text-secondary)] hover:text-emerald-700 dark:hover:text-emerald-400"
-                }`
-              }
-            >
-              <Search className="w-3.5 h-3.5 text-sky-500" />
-              <span>{t("nav.track")}</span>
+
+            <NavLink to="/track" className={desktopLinkClass}>
+              <Search className="h-4 w-4" />
+              {t("nav.track")}
             </NavLink>
 
             {isAuthenticated && (
-              <NavLink
-                to="/my-complaints"
-                className={({ isActive }) =>
-                  `flex items-center gap-1.5 text-xs font-semibold transition-colors ${
-                    isActive
-                      ? "text-emerald-700 dark:text-emerald-400"
-                      : "text-[var(--text-secondary)] hover:text-emerald-700 dark:hover:text-emerald-400"
-                  }`
-                }
-              >
-                <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                <span>{t("nav.myHistory")}</span>
+              <NavLink to="/my-complaints" className={desktopLinkClass}>
+                <FileText className="h-4 w-4" />
+                {t("nav.myHistory")}
               </NavLink>
             )}
           </nav>
 
-          {/* Right Actions */}
-          <div className="hidden sm:flex items-center gap-3">
-            {/* Theme Toggle matching main portal */}
-            <ThemeToggle />
+          {/* RIGHT SIDE ACTIONS */}
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
 
-            {/* In-Portal Notification Bell */}
+            {/* THEME */}
+            <div className="hidden sm:block">
+              <ThemeToggle />
+            </div>
+
+            <div className="sm:hidden">
+              <ThemeToggle compact={true} />
+            </div>
+
+            {/* NOTIFICATIONS */}
             {isAuthenticated && (
               <div className="relative" ref={notifRef}>
                 <button
                   type="button"
                   onClick={() => setShowNotifDropdown((prev) => !prev)}
-                  className="relative p-2 rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-                  title="Notifications"
+                  aria-label="Notifications"
+                  aria-expanded={showNotifDropdown}
+                  className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] transition-all hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-950/40 dark:hover:text-emerald-300"
                 >
-                  <Bell className="w-4 h-4" />
+                  <Bell className="h-5 w-5" />
+
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center animate-pulse">
-                      {unreadCount}
+                    <span className="absolute -right-1 -top-1 flex h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 border-[var(--bg-surface)] bg-rose-600 px-1 text-[10px] font-bold text-white">
+                      {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
                   )}
                 </button>
 
-                {/* Notifications Dropdown */}
                 {showNotifDropdown && (
-                  <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] shadow-xl z-50 overflow-hidden">
-                    <div className="p-3 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-surface-secondary)]/40">
-                      <span className="text-xs font-bold text-[var(--text-primary)]">
-                        {isHindi ? "नागरिक सूचनाएं" : "Citizen Alerts"}
-                      </span>
+                  <div className="absolute right-0 top-[calc(100%+12px)] z-[60] w-[min(340px,calc(100vw-24px))] overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-2xl">
+                    <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)]/60 px-4 py-4">
+                      <div>
+                        <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                          {isHindi ? "नागरिक सूचनाएं" : "Citizen Alerts"}
+                        </h3>
+                        <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                          {unreadCount} {isHindi ? "अपठित" : "unread notifications"}
+                        </p>
+                      </div>
+
                       {unreadCount > 0 && (
                         <button
                           type="button"
                           onClick={handleMarkAllRead}
-                          className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer"
+                          className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 dark:text-emerald-400"
                         >
-                          {isHindi ? "सभी पढ़े हुए मार्क करें" : "Mark all as read"}
+                          <CheckCheck className="h-4 w-4" />
+                          {isHindi ? "सभी पढ़ें" : "Mark all read"}
                         </button>
                       )}
                     </div>
 
-                    <div className="max-h-72 overflow-y-auto divide-y divide-[var(--border-subtle)]">
+                    <div className="max-h-[340px] overflow-y-auto divide-y divide-[var(--border-subtle)]">
                       {notifications.length === 0 ? (
-                        <div className="p-6 text-center text-xs text-[var(--text-muted)]">
-                          {isHindi ? "कोई नई सूचना नहीं है" : "No notifications yet"}
+                        <div className="px-5 py-10 text-center">
+                          <Bell className="mx-auto mb-3 h-8 w-8 text-[var(--text-muted)]" />
+                          <p className="text-sm font-semibold text-[var(--text-secondary)]">
+                            {isHindi ? "कोई नई सूचना नहीं है" : "No notifications yet"}
+                          </p>
                         </div>
                       ) : (
-                        notifications.map((n) => (
-                          <div
-                            key={n._id}
-                            onClick={() => handleNotificationClick(n)}
-                            className={`p-3 text-xs hover:bg-[var(--bg-surface-secondary)] transition-colors cursor-pointer ${
-                              !n.read ? "bg-emerald-50/40 dark:bg-emerald-950/20" : ""
+                        notifications.map((notification) => (
+                          <button
+                            type="button"
+                            key={notification._id}
+                            onClick={() => handleNotificationClick(notification)}
+                            className={`w-full px-4 py-3 text-left transition-colors hover:bg-[var(--bg-surface-secondary)] ${
+                              !notification.read
+                                ? "bg-emerald-50/60 dark:bg-emerald-950/20"
+                                : ""
                             }`}
                           >
-                            <div className="flex items-center justify-between gap-2 mb-1">
-                              <span className="font-bold text-[var(--text-primary)] line-clamp-1">
-                                {n.title}
-                              </span>
-                              {!n.read && (
-                                <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" />
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <p className="line-clamp-1 text-sm font-bold text-[var(--text-primary)]">
+                                  {notification.title}
+                                </p>
+                                <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[var(--text-secondary)]">
+                                  {notification.message}
+                                </p>
+                                <p className="mt-2 text-[10px] text-[var(--text-muted)]">
+                                  {new Date(notification.createdAt).toLocaleDateString()}
+                                </p>
+                              </div>
+
+                              {!notification.read && (
+                                <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-600" />
                               )}
                             </div>
-                            <p className="text-[11px] text-[var(--text-secondary)] line-clamp-2">
-                              {n.message}
-                            </p>
-                            <span className="text-[10px] text-[var(--text-muted)] block mt-1">
-                              {new Date(n.createdAt).toLocaleDateString()}
-                            </span>
-                          </div>
+                          </button>
                         ))
                       )}
                     </div>
@@ -262,148 +299,166 @@ export function CitizenNavbar() {
               </div>
             )}
 
-            {isAuthenticated ? (
-              <div className="flex items-center gap-2 pl-2 border-l border-[var(--border-subtle)]">
-                <Link
-                  to="/profile"
-                  className="flex items-center gap-2 text-xs font-semibold text-[var(--text-primary)] hover:opacity-80 transition-opacity"
-                  title="Citizen Profile"
-                >
-                  <div className="w-7 h-7 rounded-full bg-emerald-800 text-white flex items-center justify-center text-xs font-bold">
-                    {user?.name ? user.name.charAt(0).toUpperCase() : "C"}
-                  </div>
-                  <span className="max-w-[110px] truncate">{user?.name}</span>
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="btn btn-secondary text-xs py-1.5 px-2.5 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30"
-                  title={t("nav.signOut")}
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link
-                  to="/login"
-                  className="btn btn-secondary text-xs py-1.5 px-3"
-                >
-                  {t("nav.signIn")}
-                </Link>
-                <Link
-                  to="/register"
-                  className="btn btn-primary text-xs py-1.5 px-3 shadow-xs"
-                >
-                  {t("nav.register")}
-                </Link>
-              </div>
-            )}
+            {/* DESKTOP ACCOUNT ACTIONS */}
+            <div className="hidden items-center gap-2 border-l border-[var(--border-subtle)] pl-3 sm:flex">
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/profile"
+                    className="flex max-w-[150px] items-center gap-2 rounded-xl px-2 py-2 transition-colors hover:bg-[var(--bg-surface-secondary)]"
+                    title="Citizen Profile"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-600 to-teal-800 text-sm font-bold text-white">
+                      {user?.name ? user.name.charAt(0).toUpperCase() : "C"}
+                    </span>
 
-            
-          </div>
+                    <span className="max-w-[90px] truncate text-sm font-semibold text-[var(--text-primary)]">
+                      {user?.name}
+                    </span>
+                    <ChevronDown className="h-4 w-4 text-[var(--text-muted)]" />
+                  </Link>
 
-          {/* Mobile Menu Button */}
-          <div className="flex items-center gap-2 md:hidden">
-            <ThemeToggle compact={true} />
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    title={t("nav.signOut")}
+                    aria-label={t("nav.signOut")}
+                    className="flex h-10 w-10 items-center justify-center rounded-xl border border-rose-200 text-rose-600 transition-colors hover:bg-rose-50 dark:border-rose-900 dark:text-rose-400 dark:hover:bg-rose-950/40"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="rounded-xl px-4 py-2.5 text-sm font-bold text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-surface-secondary)] hover:text-[var(--text-primary)]"
+                  >
+                    {t("nav.signIn")}
+                  </Link>
+
+                  <Link
+                    to="/register"
+                    className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-900/15 transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                  >
+                    {t("nav.register")}
+                  </Link>
+                </>
+              )}
+            </div>
+
+            {/* MOBILE MENU BUTTON */}
             <button
+              type="button"
               onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="p-2 rounded-md text-[var(--text-secondary)] hover:bg-[var(--bg-surface-secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer"
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileMenuOpen}
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-primary)] transition-colors hover:border-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 lg:hidden"
             >
               {mobileMenuOpen ? (
-                <X className="w-5 h-5" aria-hidden="true" />
+                <X className="h-5 w-5" />
               ) : (
-                <Menu className="w-5 h-5" aria-hidden="true" />
+                <Menu className="h-5 w-5" />
               )}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* MOBILE NAVIGATION */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 pt-3 pb-5 space-y-3">
-          <nav className="flex flex-col space-y-2">
-            <Link
-              to="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-md text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-surface-secondary)]"
-            >
-              {t("nav.home")}
-            </Link>
-            <Link
-              to="/map"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-md text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-surface-secondary)] flex items-center gap-2"
-            >
-              <MapPin className="w-4 h-4 text-emerald-600" />
-              <span>{t("nav.map")}</span>
-            </Link>
-            <Link
-              to="/report"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-md text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-surface-secondary)]"
-            >
-              {t("nav.report")}
-            </Link>
-            <Link
-              to="/track"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-md text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-surface-secondary)]"
-            >
-              {t("nav.track")}
-            </Link>
-            {isAuthenticated && (
-              <>
-                <Link
-                  to="/my-complaints"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-md text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-surface-secondary)]"
-                >
-                  {t("nav.myHistory")}
-                </Link>
-                <Link
-                  to="/profile"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-md text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-surface-secondary)] flex items-center gap-2"
-                >
-                  <Settings className="w-4 h-4 text-emerald-600" />
-                  <span>{t("nav.profile")}</span>
-                </Link>
-              </>
-            )}
-          </nav>
+        <div className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-xl lg:hidden">
+          <div className="mx-auto max-w-[1440px] space-y-4 px-4 py-5 sm:px-6">
 
-          <div className="pt-3 border-t border-[var(--border-subtle)] flex flex-col gap-2">
-            {isAuthenticated ? (
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  handleLogout();
-                }}
-                className="btn btn-secondary w-full text-xs justify-center"
+            {/* MOBILE USER INFO */}
+            {isAuthenticated && (
+              <Link
+                to="/profile"
+                onClick={closeMobileMenu}
+                className="flex items-center gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] p-4"
               >
-                {t("nav.signOut")}
-              </button>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="btn btn-secondary w-full text-xs justify-center"
-                >
-                  {t("nav.signIn")}
-                </Link>
-                <Link
-                  to="/register"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="btn btn-primary w-full text-xs justify-center"
-                >
-                  {t("nav.register")}
-                </Link>
-              </>
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald-600 to-teal-800 text-base font-bold text-white">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : "C"}
+                </span>
+
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-bold text-[var(--text-primary)]">
+                    {user?.name}
+                  </p>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    {isHindi ? "नागरिक प्रोफ़ाइल" : "Citizen Profile"}
+                  </p>
+                </div>
+
+                <Settings className="h-5 w-5 text-emerald-600" />
+              </Link>
             )}
+
+            {/* MOBILE LINKS */}
+            <nav className="space-y-1.5" aria-label="Mobile Navigation">
+              <NavLink to="/" end onClick={closeMobileMenu} className={mobileLinkClass}>
+                <Landmark className="h-5 w-5" />
+                {t("nav.home")}
+              </NavLink>
+
+              <NavLink to="/map" onClick={closeMobileMenu} className={mobileLinkClass}>
+                <MapPin className="h-5 w-5" />
+                {t("nav.map")}
+              </NavLink>
+
+              <NavLink to="/report" onClick={closeMobileMenu} className={mobileLinkClass}>
+                <AlertTriangle className="h-5 w-5" />
+                {t("nav.report")}
+              </NavLink>
+
+              <NavLink to="/track" onClick={closeMobileMenu} className={mobileLinkClass}>
+                <Search className="h-5 w-5" />
+                {t("nav.track")}
+              </NavLink>
+
+              {isAuthenticated && (
+                <NavLink
+                  to="/my-complaints"
+                  onClick={closeMobileMenu}
+                  className={mobileLinkClass}
+                >
+                  <FileText className="h-5 w-5" />
+                  {t("nav.myHistory")}
+                </NavLink>
+              )}
+            </nav>
+
+            {/* MOBILE ACCOUNT ACTIONS */}
+            <div className="space-y-2 border-t border-[var(--border-subtle)] pt-4">
+              {isAuthenticated ? (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700 transition-colors hover:bg-rose-100 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-400"
+                >
+                  <LogOut className="h-4 w-4" />
+                  {t("nav.signOut")}
+                </button>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <Link
+                    to="/login"
+                    onClick={closeMobileMenu}
+                    className="flex items-center justify-center rounded-xl border border-[var(--border-subtle)] px-4 py-3 text-sm font-bold text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-surface-secondary)]"
+                  >
+                    {t("nav.signIn")}
+                  </Link>
+
+                  <Link
+                    to="/register"
+                    onClick={closeMobileMenu}
+                    className="flex items-center justify-center rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 px-4 py-3 text-sm font-bold text-white shadow-md"
+                  >
+                    {t("nav.register")}
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -411,22 +466,43 @@ export function CitizenNavbar() {
   );
 }
 
+
 export function CitizenFooter() {
   const { t } = useLanguage();
+
   return (
-    <footer className="mt-auto border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] py-8 text-xs text-[var(--text-muted)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Landmark className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
-          <span className="font-semibold text-[var(--text-secondary)]">{t("footer.org")}</span>
-          <span>• {t("footer.mechanism")}</span>
+    <footer className="mt-auto border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center justify-between gap-5 py-8 sm:py-10 md:flex-row">
+          <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-800 text-white shadow-lg shadow-emerald-900/15">
+              <Landmark className="h-5 w-5" />
+            </div>
+
+            <div>
+              <p className="text-sm font-extrabold tracking-tight text-[var(--text-primary)]">
+                CitySync Public
+              </p>
+              <p className="mt-1 text-xs text-[var(--text-muted)]">
+                {t("footer.org")}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium text-[var(--text-secondary)]">
+            <span>{t("footer.mechanism")}</span>
+            <span className="hidden h-1 w-1 rounded-full bg-emerald-500 sm:block" />
+            <span>{t("footer.control")}</span>
+            <span className="hidden h-1 w-1 rounded-full bg-emerald-500 sm:block" />
+            <span>{t("footer.emergency")}</span>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          <span>{t("footer.control")}</span>
-          <span>•</span>
-          <span>{t("footer.emergency")}</span>
+
+        <div className="border-t border-[var(--border-subtle)] py-4 text-center text-xs text-[var(--text-muted)]">
+          CitySync Citizen Portal
         </div>
       </div>
     </footer>
   );
 }
+
