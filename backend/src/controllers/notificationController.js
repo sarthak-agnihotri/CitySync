@@ -14,6 +14,7 @@ const getMyNotifications = async (req, res) => {
       .populate("relatedResource", "name category")
       .populate("relatedProject", "title status")
       .populate("relatedTask", "title status dueDate priority")
+      .populate("relatedGrievance", "ticketId title category status zone")
       .sort({ createdAt: -1 })
       .limit(100);
 
@@ -95,3 +96,4 @@ module.exports = {
   markAllAsRead,
   deleteNotification
 };
+

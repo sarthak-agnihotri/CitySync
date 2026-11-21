@@ -14,7 +14,8 @@ const createNotification = async ({
   relatedRequest = null,
   relatedResource = null,
   relatedProject = null,
-  relatedTask = null
+  relatedTask = null,
+  relatedGrievance = null
 }) => {
   try {
     await Notification.create({
@@ -26,7 +27,8 @@ const createNotification = async ({
       relatedRequest,
       relatedResource,
       relatedProject,
-      relatedTask
+      relatedTask,
+      relatedGrievance
     });
   } catch (err) {
     console.error("Failed to create notification:", err.message);
@@ -81,3 +83,4 @@ const logAudit = async ({
 };
 
 module.exports = { createNotification, createBulkNotifications, logAudit };
+
