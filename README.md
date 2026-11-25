@@ -1,227 +1,315 @@
-# CitySync — Digital Platform for Inter-Departmental Cooperation
+# CitySync — Unified Digital Platform for Inter-Departmental Cooperation & Citizen Grievance Redressal
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Platform-CitySync-blue?style=for-the-badge&logo=civicrm&logoColor=white" alt="CitySync Platform" />
-  <img src="https://img.shields.io/badge/Node.js-18%2B-green?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js Version" />
-  <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 18" />
-  <img src="https://img.shields.io/badge/Vite-6.0-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
-  <img src="https://img.shields.io/badge/MongoDB-Atlas%20%7C%20Mongoose-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/Platform-CitySync%20Ecosystem-blue?style=for-the-badge&logo=civicrm&logoColor=white" alt="CitySync Platform" />
+  <img src="https://img.shields.io/badge/Architecture-Dual--Portal%20System-emerald?style=for-the-badge&logo=blueprint&logoColor=white" alt="Dual Portal System" />
+  <img src="https://img.shields.io/badge/Node.js-18%2B%20%7C%20Express%205-green?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js Express 5" />
+  <img src="https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 18" />
+  <img src="https://img.shields.io/badge/Vite-6.0-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite 6" />
+  <img src="https://img.shields.io/badge/TailwindCSS-v4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS v4" />
+  <img src="https://img.shields.io/badge/Database-MongoDB%20Atlas%20%2F%20Mongoose-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB Atlas" />
+  <img src="https://img.shields.io/badge/GIS-Leaflet%20%26%20OpenStreetMap-199900?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="GIS Integration" />
   <img src="https://img.shields.io/badge/Auth-JWT%20%26%20Bcrypt-orange?style=for-the-badge&logo=jsonwebtokens&logoColor=white" alt="JWT Auth" />
-  <img src="https://img.shields.io/badge/GIS-Leaflet%20%2F%20OSM-199900?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="GIS Integration" />
+  <img src="https://img.shields.io/badge/i18n-English%20%26%20हिन्दी-red?style=for-the-badge&logo=googletranslate&logoColor=white" alt="Bilingual i18n" />
 </p>
 
 > **"One Platform. One City. No More Digging in the Dark."**  
-> *A unified digital governance and spatial coordination platform designed to end the chronic "dig–repair–dig" cycle across municipal corporations, utility providers, and transit authorities.*
+> *A state-of-the-art civic intelligence ecosystem combining an Inter-Departmental Infrastructure Coordination Platform with an official Citizen Grievance & Civic Redressal Portal to end the chronic "dig–repair–dig" cycle across modern smart cities.*
 
 ---
 
 ## 📑 Table of Contents
 
-- [Urban Problem Statement](#-urban-problem-statement)
-- [The CitySync Solution](#-the-citysync-solution)
-- [Key Stakeholders & Implementing Agencies](#-key-stakeholders--implementing-agencies)
-- [Core Platform Capabilities](#-core-platform-capabilities)
-  - [1. GIS Spatial Registry](#1--common-gis-map--spatial-project-registry)
-  - [2. Algorithmic Conflict Engine](#2--spatial--temporal-conflict-detection-engine)
-  - [3. Master City Scheduling](#3--unified-project-scheduling--master-timeline-gantt-view)
-  - [4. Inter-Agency Resource Sharing](#4--cross-department-resource--equipment-sharing)
-  - [5. Machine Learning Delay Prediction](#5--machine-learning-delay--risk-prediction)
-  - [6. Role-Based Access Control (RBAC)](#6--multi-tier-role-based-access-control-rbac)
-  - [7. Audit Logging & Alerts](#7--real-time-notifications--immutable-audit-logging)
-- [System Architecture & Data Flow](#-system-architecture)
-- [Technology Stack](#-technology-stack)
-- [Repository File Structure](#-repository-file-structure)
-- [Quickstart & Installation Guide](#-installation--setup-guide)
-- [Pre-Seeded Demo Credentials](#-pre-seeded-demo-accounts)
-- [REST API Reference](#-rest-api-reference)
-- [Role & Permissions Matrix](#-role-based-permissions-matrix)
-- [The 5-Part "Dig-Later" Policy Framework](#-the-5-part-dig-later-policy-framework)
-- [Institutional Governance Model](#-institutional-governance-model)
-- [Team Roles & Module Distribution](#-module-distribution--team-contributions)
-- [Git Branching & Collaboration Workflow](#-git-collaboration-rules)
-- [Project Roadmap](#-roadmap--future-horizons)
-- [License & Academic Attribution](#-license--academic-attribution)
+1. [Urban Problem Statement & The Chronic Digging Crisis](#-urban-problem-statement)
+2. [The CitySync Solution: Dual-Portal Ecosystem](#-the-citysync-solution-dual-portal-ecosystem)
+3. [Key Stakeholders & Implementing Agencies](#-key-stakeholders--implementing-agencies)
+4. [Ecosystem Architecture & Data Flow](#-ecosystem-architecture--data-flow)
+5. [Core Platform 1: Inter-Departmental Coordination Portal](#-core-platform-1-inter-departmental-coordination-portal)
+   - [GIS Spatial Registry & Geotagged Projects](#1-gis-spatial-registry--geotagged-projects)
+   - [Algorithmic Conflict Detection Engine (Haversine & Temporal)](#2-algorithmic-conflict-detection-engine)
+   - [Master City Scheduling & Unified Gantt Timeline](#3-master-city-scheduling--unified-gantt-timeline)
+   - [Cross-Department Resource & Equipment Sharing](#4-cross-department-resource--equipment-sharing)
+   - [Project Milestones & Task Progress Tracking](#5-project-milestones--task-progress-tracking)
+   - [Machine Learning Delay & Risk Prediction](#6-machine-learning-delay--risk-prediction)
+   - [Multi-Tier Role-Based Access Control (RBAC)](#7-multi-tier-role-based-access-control-rbac)
+   - [Real-Time Collision Alerts & Immutable Audit Trail](#8-real-time-collision-alerts--immutable-audit-trail)
+6. [Core Platform 2: CitySyncPublic — Citizen Grievance Portal](#-core-platform-2-citysyncpublic--citizen-grievance-portal)
+   - [Geo-Tagged Photo Reporting & Pin-Drop Map Picker](#1-geo-tagged-photo-reporting--pin-drop-map-picker)
+   - [Public Civic Transparency Map (`/map`)](#2-public-civic-transparency-map-map)
+   - [Before & After Resolution Verification](#3-before--after-resolution-verification)
+   - [Satisfaction Ratings (1-5 Stars) & Re-Open Workflow](#4-satisfaction-ratings-1-5-stars--re-open-workflow)
+   - ["I Am Also Facing This" Community Upvoting (+1)](#5-i-am-also-facing-this-community-upvoting-1)
+   - [Dynamic SLA Clocks & Overdue Breach Indicators](#6-dynamic-sla-clocks--overdue-breach-indicators)
+   - [In-Portal Notification Center & Profile Management](#7-in-portal-notification-center--profile-management)
+   - [Self-Service Password Recovery with 6-Digit OTP](#8-self-service-password-recovery-with-6-digit-otp)
+7. [Bilingual Support & Institutional Zero-Blue Design](#-bilingual-support--institutional-zero-blue-design)
+8. [Technology Stack](#-technology-stack)
+9. [Repository Directory Structure](#-repository-directory-structure)
+10. [Quickstart & Installation Guide](#-quickstart--installation-guide)
+11. [Pre-Seeded Demo Accounts & Credentials](#-pre-seeded-demo-accounts--credentials)
+12. [Complete REST API Reference](#-complete-rest-api-reference)
+    - [Inter-Departmental Platform APIs (Port 5000)](#inter-departmental-platform-apis-port-5000)
+    - [CitySyncPublic Citizen APIs (Port 5001)](#citysyncpublic-citizen-apis-port-5001)
+13. [Role & Permissions Matrix](#-role--permissions-matrix)
+14. [The 5-Part "Dig-Later" Policy Framework](#-the-5-part-dig-later-policy-framework)
+15. [Statutory Governance & Institutional Model](#-statutory-governance--institutional-model)
+16. [Capstone Team Roles & Module Distribution](#-capstone-team-roles--module-distribution)
+17. [Git Collaboration & Branching Strategy](#-git-collaboration--branching-strategy)
+18. [License & Academic Attribution](#-license--academic-attribution)
 
 ---
 
 ## 🏙️ Urban Problem Statement
 
-Modern cities are governed by a patchwork of parastatal agencies and line departments — municipal corporations, water supply & sewerage boards, electricity distribution companies (DISCOMs), public works departments (PWD), transit authorities, and telecom/gas concessionaires. Each agency operates in departmental isolation: planning, budgeting, and executing civil infrastructure projects on separate timelines without visibility into neighboring initiatives.
+Modern municipal governance is characterized by extreme administrative fragmentation. Line departments and utility concessionaires—including the Public Works Department (PWD), Water Supply & Sewerage Board (WSSB), Electricity Distribution Companies (DISCOMs), City Gas Utilities, Metro Rail Corporations, and Telecom Operators—plan, budget, and execute capital civil works inside departmental silos without shared spatial visibility.
 
-This fragmentation creates severe information asymmetry and causes the ubiquitous **"dig–repair–dig" cycle**:
+This structural disconnect triggers the chronic **"dig–repair–dig" cycle** that plagues urban centers:
 
 ```
-[1. Municipal Corp] ────> Resurfaces arterial roadway with fresh bituminous asphalt
-         │
-         ▼ (2 months later)
-[2. Gas Utility]    ────> Cuts open fresh road to install underground city gas pipelines
-         │
-         ▼ (3 months later)
-[3. Water Board]    ────> Digs open the same corridor to replace a leaking water trunk line
-         │
-         ▼
-[Resulting Crisis]  ────> Road is structurally compromised, potholes proliferate, 
-                          public tax funds are wasted repeatedly, traffic gridlock ensues.
+[1. Municipal PWD]       ────> Lays fresh bituminous asphalt on an arterial road (₹1.5 Crore budget)
+           │
+           ▼ (60 days later)
+[2. City Gas Utility]    ────> Trench-cuts fresh road to lay underground natural gas pipes
+           │
+           ▼ (90 days later)
+[3. Water Board (WSSB)]  ────> Excavates the same road corridor to replace a ruptured trunk sewer main
+           │
+           ▼ (45 days later)
+[4. Electricity DISCOM]  ────> Micro-trenches across the pavement to install high-tension underground feeder cables
+           │
+           ▼
+[Crisis Outcome]         ────> Road structural integrity is destroyed, crater-sized potholes proliferate,
+                               taxpayer funds are squandered repeatedly, and traffic gridlock paralyzes the city.
 ```
 
-### Quantifiable Consequences of Uncoordinated Digging:
-* **Taxpayer Waste:** Municipalities spend millions repaving corridors that are excavated shortly thereafter.
-* **Economic Stagnation:** Repeated roadworks trigger severe traffic congestion, transit delays, and business disruption.
-* **Environmental & Public Health Hazards:** Continuous unpaved trenches cause airborne particulate pollution ($PM_{2.5}$ & $PM_{10}$) and water logging during monsoons.
-* **Accidental Utility Outages:** Excavators from one agency regularly sever subterranean cables or water mains belonging to another agency due to missing spatial visibility.
+### Quantifiable Damages of Uncoordinated Road Excavations:
+* **Taxpayer Waste:** Billions in municipal revenues are lost annually resurfacing asphalt roadways that are destroyed within weeks by neighboring utilities.
+* **Economic & Productivity Losses:** Repeated trenching generates severe vehicular congestion, supply-chain delays, public transit detours, and commercial disruption.
+* **Public Health Hazards & Air Pollution:** Continuous unpaved dirt trenches and debris elevate airborne particulate matter ($\text{PM}_{2.5}$ and $\text{PM}_{10}$), triggering respiratory illnesses.
+* **Severe Infrastructure Damage & Outages:** Heavy backhoes and excavators from one agency regularly slice optical fiber backbones, puncture pressurized water trunks, or sever power lines due to zero sub-surface visibility.
+* **Citizen Frustration & Low Trust:** Citizens have no transparent channel to track why roads are repeatedly destroyed or hold contractors accountable for delayed restoration.
 
 ---
 
-## 💡 The CitySync Solution
+## 💡 The CitySync Solution: Dual-Portal Ecosystem
 
-**CitySync** provides an authoritative, digital-first coordination layer above all municipal agencies. By combining **Geographic Information Systems (GIS)**, an **algorithmic conflict detection engine**, and **shared resource workflows**, CitySync eliminates departmental blind spots before heavy machinery ever breaks ground.
+**CitySync** delivers a unified, digital-first municipal coordination and public transparency ecosystem structured into two seamlessly integrated platforms:
 
 ```mermaid
-graph LR
-    A[Agency Submits Project] --> B[Spatial & Temporal Validation]
-    B --> C{Conflict Detected?}
-    C -- Yes --> D[Flag Collision & Trigger Mitigation Protocol]
-    C -- No --> E[Approve Permit & Enforce Common Phasing]
-    D --> F[Joint Excavation & Shared Utility Ducts]
-    E --> G[Update City Master Gantt & GIS Map]
-    F --> G
+flowchart TD
+    subgraph CitySync Ecosystem
+        subgraph Portal 1: Municipal Staff & Admin Portal [Port 5173 / Port 5000]
+            StaffUI["React 18 Municipal Coordination Dashboard"]
+            StaffAuth["RBAC: City Admin, Department Heads, Field Officers"]
+            ConflictEngine["Haversine Spatial & Temporal Conflict Engine"]
+            MasterGantt["Unified Multi-Agency Gantt Timeline & Sequencing"]
+            MachineryPool["Cross-Department Heavy Machinery Pool"]
+            MilestoneTracker["Project Milestones & Task Progress Engine"]
+            AuditTrail["Immutable Audit Logger & Real-time Alerts"]
+        end
+
+        subgraph Portal 2: CitySyncPublic — Citizen Grievance Portal [Port 5174 / Port 5001]
+            CitizenUI["Bilingual Citizen Portal (English & हिन्दी)"]
+            CitizenAuth["Citizen Registration, JWT & 6-Digit OTP Recovery"]
+            GISPublicMap["Interactive Civic Transparency Map (/map)"]
+            PinDropMap["Pin-Drop Map Picker (Leaflet & GPS Auto-Pin)"]
+            BeforeAfter["Before & After Photo Resolution Verification"]
+            RatingsReopen["5-Star Satisfaction Ratings & Re-Open Escalations"]
+            Upvoting["Community '+1 Facing This' Upvoting Engine"]
+            SLATracker["Dynamic SLA Clocks & Overdue Breach Alerts"]
+        end
+
+        subgraph Shared Civic Database [MongoDB Atlas]
+            ProjectsColl[("Projects & Spatial Geotags")]
+            ConflictsColl[("Detected Collisions")]
+            GrievancesColl[("Citizen Grievances")]
+            UsersColl[("Staff & Citizen Accounts")]
+            AuditColl[("System Audit Trail")]
+        end
+
+        StaffUI --> StaffAuth --> ConflictEngine & MasterGantt & MachineryPool & MilestoneTracker
+        ConflictEngine & MasterGantt & MachineryPool & MilestoneTracker --> ProjectsColl & ConflictsColl
+        
+        CitizenUI --> CitizenAuth --> PinDropMap & GISPublicMap & BeforeAfter & RatingsReopen & Upvoting
+        PinDropMap & BeforeAfter & RatingsReopen & Upvoting --> GrievancesColl
+        
+        GrievancesColl -.->|"Auto-routes repairs to line departments"| StaffUI
+        ProjectsColl -.->|"Feeds active roadwork data"| GISPublicMap
+    end
 ```
+
+1. **Municipal Inter-Departmental Portal (`/frontend` on Port 5173 + `/backend` on Port 5000):**  
+   An authoritative planning, conflict detection, permitting, and resource-sharing cockpit for municipal commissioners, department heads, and site engineers.
+2. **CitySyncPublic Citizen Portal (`/CitySyncPublic/frontend` on Port 5174 + `/CitySyncPublic/backend` on Port 5001):**  
+   A dedicated public redressal web portal empowering residents to pinpoint road hazards, upload photo evidence, monitor real-time SLA repair clocks, upvote urgent neighborhood issues, and verify repair quality.
 
 ---
 
 ## 🏛️ Key Stakeholders & Implementing Agencies
 
-| Agency | Domain & Primary Responsibilities | Typical Sub-Surface Impact |
+| Agency | Domain & Primary Responsibilities | Sub-Surface & Right-of-Way Impact |
 |---|---|---|
-| **Municipal Corporation (ULB)** | City roads, storm-water drainage networks, street lighting, waste infrastructure | Paving, open drains, culverts |
-| **Water Supply & Sewerage Board** | High-pressure potable trunk lines, wastewater collectors, sewer mains | Deep trenches ($1.5\text{m} - 3\text{m}$ depth) |
-| **Electricity DISCOM** | High-tension/low-tension cabling, underground conduits, distribution transformers | Mid-depth trenches ($0.8\text{m} - 1.2\text{m}$) |
-| **Public Works Department (PWD)** | Transit corridors, arterial expressways, flyovers, grade separators | Heavy pavement excavation, foundation piling |
-| **Metro Rail / Transport Authority**| Mass transit viaducts, subterranean stations, multi-modal interchanges | Deep tunneling, right-of-way diversions |
-| **City Gas & Telecom Utilities** | Piped natural gas (PNG) steel/MDPE lines, optical fiber conduit ducting | Horizontal drilling, micro-trenching |
-| **City Infrastructure Coordination Cell (ICC)** | Statutory arbitrating authority empowered to sequence civil projects | Permitting, moratorium enforcement, dispute resolution |
+| **Municipal Corporation (ULB)** | City roads, storm-water drainage networks, solid waste management, street lighting | Surface paving, open culverts, roadside gutters |
+| **Water Supply & Sewerage Board (WSSB)** | Pressurized potable water trunk lines, sewer collectors, treatment facilities | Deep open-trench excavations ($1.5\text{m} - 3.5\text{m}$ depth) |
+| **Electricity DISCOM** | High/low-tension feeder cables, substations, underground conduits, street transformers | Medium-depth trenches ($0.8\text{m} - 1.2\text{m}$ depth) |
+| **Public Works Department (PWD)** | Transit corridors, arterial expressways, bypasses, flyovers, grade separators | Heavy pavement excavation, structural foundation piling |
+| **Metro Rail / Transit Authority** | Mass rapid transit viaducts, underground tunnels, multi-modal transport hubs | Deep sub-surface tunneling, multi-year right-of-way diversions |
+| **City Gas & Telecom Concessionaires** | Piped natural gas (PNG) steel pipelines, optical fiber duct networks | Horizontal directional drilling (HDD), micro-trenching |
+| **Residents & Commuters** | Public reporting, local road defect monitoring, resolution verification | End users affected by road damage and traffic congestion |
 
 ---
 
-## 🚀 Core Platform Capabilities
-
-### 1. 🗺️ Common GIS Map & Spatial Project Registry
-* **Centralized Spatial Repository:** Replaces fragmented spreadsheets with a single interactive map powered by **Leaflet.js** and **OpenStreetMap**.
-* **Precise Geotagging:** Every infrastructure proposal requires geographical coordinates (latitude & longitude), affected street address, administrative ward/zone, and excavation radius buffer.
-* **Dynamic Multi-Layer Filters:** Filter city projects in real time by department, category (roadwork, water/sewage, power, telecom, transit), timeline status, and priority grade.
-
-### 2. ⚡ Spatial & Temporal Conflict Detection Engine
-CitySync features a dual-layer algorithmic conflict detection engine that executes automatically upon project creation and updates:
-
-#### Mathematical Formulation:
-1. **Temporal Overlap:**  
-   Two projects $A$ and $B$ collide temporally if and only if their active execution windows intersect:
-   $$\text{Temporal Collision} \iff (\text{Start}_A \le \text{End}_B) \land (\text{End}_A \ge \text{Start}_B)$$
-
-2. **Spatial Proximity (Haversine Formula):**  
-   The platform computes the great-circle surface distance $d$ between project locations $(lat_1, lon_1)$ and $(lat_2, lon_2)$:
-   $$a = \sin^2\left(\frac{\Delta \phi}{2}\right) + \cos(\phi_1) \cdot \cos(\phi_2) \cdot \sin^2\left(\frac{\Delta \lambda}{2}\right)$$
-   $$c = 2 \cdot \text{atan2}\left(\sqrt{a}, \sqrt{1-a}\right)$$
-   $$d = R \cdot c \quad (\text{where Earth radius } R = 6,371,000\text{ meters})$$
-
-3. **Conflict Severity Grading:**
-   * 🔴 **Critical:** $d \le 150\text{ meters}$ with overlapping dates OR either project is classified as "critical priority". Requires mandatory joint coordination review.
-   * 🟠 **High:** $150\text{m} < d \le 500\text{ meters}$ with overlapping dates. Road corridor capacity or detour clashes.
-   * 🟡 **Medium:** Overlapping dates within the same administrative ward/zone.
-   * 🟢 **Low:** Adjacent timeline overlaps outside immediate impact buffers.
-
-### 3. 📅 Unified Project Scheduling & Master Timeline (Gantt View)
-* **Citywide Unified Master Gantt:** Visualizes all department schedules on a single interactive timeline so administrators can identify congestion bottlenecks months ahead.
-* **Algorithmic Utility Sequencing:** Recommends the only logical engineering hierarchy for shared corridors:
-  $$\text{Deep Subsurface Utilities (Water / Sewer)} \longrightarrow \text{Shallow Utilities (Gas / Power / Telecom)} \longrightarrow \text{Sub-base Compaction} \longrightarrow \text{Final Bituminous Paving}$$
-* **No-Dig Moratorium Tracking:** Enforces a protected 2-to-3 year "No-Dig" freeze on freshly carpeted road surfaces, rejecting non-emergency excavation permits.
-
-### 4. 🚜 Cross-Department Resource & Equipment Sharing
-* **Shared Heavy Machinery Pool:** Real-time searchable inventory of expensive, specialized machinery (hydraulic excavators, asphalt pavers, micro-trenchers, suction tankers, mobile generators) across departments.
-* **Inter-Agency Requisitions:** Departments can request idle equipment from other agencies, reducing capital expenditure and machine downtime.
-* **Transfer Lifecycle Tracking:** Full approval workflow (`pending` $\rightarrow$ `approved` $\rightarrow$ `in-use` $\rightarrow$ `returned`) with automatic quantity incrementing and decrementing.
-
-### 5. 🤖 Machine Learning Delay & Risk Prediction
-* **Predictive Delay Modeling:** Evaluates project parameters including planned duration, estimated budget, assigned contractor tier, monsoon weather risk coefficients, and department historical efficiency to forecast project completion delays.
-* **Risk Categorization:** Flags high-risk projects early, prompting municipal commissioners to allocate contingency buffers or additional supervisory oversight.
-
-### 6. 🔐 Multi-Tier Role-Based Access Control (RBAC)
-* **City Administrator (Commissioner / ICC):** Full citywide visibility, permit issuance, conflict resolution override, user management, and audit log inspection.
-* **Department Head:** Project creation, budget modification, resource request approvals, and inter-department coordination.
-* **Field Officer / Site Engineer:** On-site progress updates, completion reporting, and emergency requisition requests.
-* **Stateless Security:** Built with signed JSON Web Tokens (JWT) containing cryptographic user payloads, paired with salted Bcrypt password hashing.
-
-### 7. 🔔 Real-Time Notifications & Immutable Audit Logging
-* **Automated Collision Warnings:** Instant system alerts generated and dispatched whenever a newly submitted project conflicts with an existing schedule.
-* **Immutable Audit Trail:** Chronological, tamper-evident log documenting every project creation, status update, conflict resolution, and resource transfer with timestamps and user identifiers.
-
----
-
-## 🏗️ System Architecture
-
-CitySync is built on an enterprise 3-tier decoupled architecture:
+## 🏗️ Ecosystem Architecture & Data Flow
 
 ```mermaid
-flowchart TB
-    subgraph Presentation Tier
-        UI["React 18 SPA (Vite)"]
-        GIS["Leaflet / OpenStreetMap GIS View"]
-        Gantt["Master Timeline / Gantt Component"]
-        Dashboard["Analytics & Project Tables"]
+sequenceDiagram
+    autonumber
+    actor Citizen as Citizen (CitySyncPublic)
+    participant PubFront as Public Frontend (:5174)
+    participant PubBack as Public Backend (:5001)
+    participant DB as MongoDB Atlas
+    participant StaffBack as Staff Backend (:5000)
+    actor DeptHead as Department Head (PWD/WSSB)
+    actor Admin as City Administrator (ICC)
+
+    Note over Citizen,PubBack: Citizen Grievance & Civic Redressal Flow
+    Citizen->>PubFront: Snaps photo of hazardous pothole & pins GPS location
+    PubFront->>PubBack: POST /api/citizen/grievances/submit (Multipart + GPS)
+    PubBack->>DB: Saves Grievance (assigns PWD, sets 48h SLA deadline)
+    PubBack->>Citizen: Returns tracking ticket (e.g., GRV-2026-1011)
+
+    Note over DeptHead,StaffBack: Department Project Proposal & Conflict Detection
+    DeptHead->>StaffBack: Submits pipeline expansion project (lat/lng, dates, budget)
+    StaffBack->>StaffBack: Runs Haversine distance & temporal window collision check
+    alt Conflict Detected (Distance <= 500m & Overlapping Dates)
+        StaffBack->>DB: Creates Conflict record (Severity: CRITICAL / HIGH)
+        StaffBack->>Admin: Dispatches automated collision alert notification
+        Admin->>StaffBack: Convenes joint coordination; mandates single shared trenching
+    else No Conflict Detected
+        StaffBack->>DB: Approves project & logs entry into Master City Gantt
     end
 
-    subgraph Application Tier [Express.js / Node.js Engine]
-        Gateway["Express API Gateway & CORS Handler"]
-        AuthMiddleware["JWT Authentication Middleware"]
-        RBACMiddleware["Role-Based Access Control (RBAC)"]
-        
-        subgraph Controllers & Services
-            AuthCtrl["Auth & User Controller"]
-            DeptCtrl["Department Controller"]
-            ProjCtrl["Project Management Controller"]
-            ConflictEngine["Algorithmic Conflict Detection Engine (Haversine)"]
-            ResourceCtrl["Resource Sharing & Request Engine"]
-            AuditNotifier["Notification & Audit Logger"]
-        end
-    end
-
-    subgraph Data Tier
-        MongoDB[("MongoDB Atlas Cloud Database")]
-        UserColl[("Users & Roles")]
-        DeptColl[("Departments")]
-        ProjColl[("Projects & Spatial Coordinates")]
-        ConflictColl[("Conflicts & Severities")]
-        ResourceColl[("Equipment & Requisitions")]
-        AuditColl[("Immutable Audit Logs")]
-    end
-
-    subgraph ML & Intelligence
-        MLService["Machine Learning Risk & Delay Prediction Engine"]
-    end
-
-    UI --> Gateway
-    GIS --> Gateway
-    Gantt --> Gateway
-    Dashboard --> Gateway
-
-    Gateway --> AuthMiddleware --> RBACMiddleware
-    RBACMiddleware --> AuthCtrl
-    RBACMiddleware --> DeptCtrl
-    RBACMiddleware --> ProjCtrl
-    RBACMiddleware --> ResourceCtrl
-
-    ProjCtrl --> ConflictEngine
-    ConflictEngine --> AuditNotifier
-    ResourceCtrl --> AuditNotifier
-    ProjCtrl -.-> MLService
-
-    AuthCtrl --> UserColl
-    DeptCtrl --> DeptColl
-    ProjCtrl --> ProjColl
-    ConflictEngine --> ConflictColl
-    ResourceCtrl --> ResourceColl
-    AuditNotifier --> AuditColl
+    Note over DeptHead,Citizen: Resolution & Verification Loop
+    DeptHead->>PubBack: Updates ticket with repair remarks & completion photo
+    PubBack->>Citizen: In-portal notification: "Grievance GRV-2026-1011 Resolved"
+    Citizen->>PubFront: Inspects Before & After evidence side-by-side
+    Citizen->>PubBack: Submits 5-star rating (or requests Re-open if repair failed)
 ```
+
+---
+
+## 🚀 Core Platform 1: Inter-Departmental Coordination Portal
+
+### 1. GIS Spatial Registry & Geotagged Projects
+* **Central Spatial Database:** Replaces scattered spreadsheets with an interactive GIS map powered by **Leaflet.js** and **OpenStreetMap**.
+* **Precise Geospatial Metadata:** Every civil project proposal mandates GPS coordinates (latitude & longitude), affected street address, administrative ward/zone, and buffer radius.
+* **Multi-Layer Dynamic Filtering:** Instant filtering across departments, project categories (roadwork, water/sewer, power, telecom, transit), timeline statuses (`planned`, `in_progress`, `completed`), and priority tiers.
+
+### 2. Algorithmic Conflict Detection Engine
+Whenever a new project is created or rescheduled, CitySync executes an automatic dual-layer collision detection engine:
+
+#### A. Temporal Overlap Condition:
+Two civil works projects $A$ and $B$ collide temporally if and only if their execution dates intersect:
+$$\text{Temporal Collision} \iff (\text{Start}_A \le \text{End}_B) \land (\text{End}_A \ge \text{Start}_B)$$
+
+#### B. Spatial Proximity (Great-Circle Haversine Formula):
+The engine calculates the precise spherical surface distance $d$ between project locations $(lat_1, lon_1)$ and $(lat_2, lon_2)$:
+$$a = \sin^2\left(\frac{\Delta \phi}{2}\right) + \cos(\phi_1) \cdot \cos(\phi_2) \cdot \sin^2\left(\frac{\Delta \lambda}{2}\right)$$
+$$c = 2 \cdot \text{atan2}\left(\sqrt{a}, \sqrt{1-a}\right)$$
+$$d = R \cdot c \quad (\text{where Earth's mean radius } R = 6,371,000\text{ meters})$$
+
+#### C. Conflict Severity Matrix:
+* 🔴 **Critical Severity:** $d \le 150\text{ meters}$ with overlapping dates OR either project is marked as "critical priority". Triggers an immediate hold on road-cutting permits.
+* 🟠 **High Severity:** $150\text{m} < d \le 500\text{ meters}$ with overlapping dates. Indicates arterial road capacity bottlenecks or competing detour routes.
+* 🟡 **Medium Severity:** Date overlaps within the same administrative municipal ward.
+* 🟢 **Low Severity:** Adjacent project timeline overlaps outside immediate impact buffers.
+
+### 3. Master City Scheduling & Unified Gantt Timeline
+* **Citywide Unified Gantt:** Visualizes all department schedules on a synchronous timeline, enabling administrators to identify corridor congestion months before mobilization.
+* **Standardized Utility Sequencing:** Programmatically enforces the only logical civil engineering hierarchy for shared corridors:
+  $$\text{Deep Sewer / Water Trunks} \longrightarrow \text{Shallow Gas / Power / Telecom Ducts} \longrightarrow \text{Sub-base Compaction} \longrightarrow \text{Final Bituminous Carpet}$$
+* **No-Dig Moratorium Tracking:** Enforces a protected 2-to-3 year "No-Dig" freeze on freshly carpeted road surfaces, rejecting non-emergency excavation permits.
+
+### 4. Cross-Department Resource & Equipment Sharing
+* **Shared Heavy Machinery Pool:** Real-time searchable inventory of expensive equipment (hydraulic excavators, asphalt pavers, vacuum suction tankers, horizontal directional drilling rigs, mobile generators) across all city agencies.
+* **Inter-Agency Requisitions:** Departments can borrow idle equipment from other agencies with automated inventory decrementing and incrementing upon return.
+* **Approval State Machine:** Full request lifecycle (`pending` $\rightarrow$ `approved` $\rightarrow$ `in-use` $\rightarrow$ `returned` / `rejected`).
+
+### 5. Project Milestones & Task Progress Tracking
+* **Milestones Engine:** Break large multi-month infrastructure projects into sequential milestones with dedicated target completion dates and deliverable tracking.
+* **Task Assignment:** Assign specific site engineering tasks to field officers with progress percentages, checklists, and real-time status updates.
+
+### 6. Machine Learning Delay & Risk Prediction
+* **Predictive Risk Modeling:** Evaluates project parameters including planned duration, budget size, assigned contractor tier, monsoon weather risk coefficients, and department historical efficiency to forecast project completion delays.
+* **Early Warning Flags:** High-risk projects are highlighted on the commissioner's dashboard to ensure timely supervisory intervention.
+
+### 7. Multi-Tier Role-Based Access Control (RBAC)
+* **City Administrator (`city_admin`):** Full municipal jurisdiction, permit issuance, conflict resolution override, user account management, and system audit log inspection.
+* **Department Head (`department_head`):** Project proposal, budget/date modification, resource request approvals, and inter-department coordination.
+* **Field Officer (`officer`):** On-site progress updates, milestone tracking, and equipment borrowing requests.
+
+### 8. Real-Time Collision Alerts & Immutable Audit Trail
+* **Automated Collision Warnings:** Instant in-app alerts dispatched whenever a proposed project clashes with an existing schedule.
+* **Immutable Audit Trail:** Chronological, tamper-evident log capturing every project creation, parameter modification, conflict resolution, and equipment transfer with UTC timestamps and user identifiers.
+
+---
+
+## 📢 Core Platform 2: CitySyncPublic — Citizen Grievance Portal
+
+**CitySyncPublic** is the official citizen-facing portal (`http://127.0.0.1:5174`) designed to make urban governance transparent, responsive, and accountable.
+
+### 1. Geo-Tagged Photo Reporting & Pin-Drop Map Picker
+* **Photo Evidence Upload:** Citizens upload up to 3 high-resolution photos per report (JPG, PNG, WebP up to 5MB) processed via Multer with automated static URL delivery.
+* **Interactive Pin-Drop Map Picker:** Integrated **Leaflet/OpenStreetMap** component (`LocationPickerMap.jsx`) allows residents to drag a marker or click directly on a road to pin exact latitude/longitude coordinates, supplemented by an HTML5 browser auto-geolocation button.
+* **Smart Department Routing:** Automatically maps complaint categories directly to responsible authorities:
+  * Potholes / Broken Roads $\rightarrow$ **Public Works Department (PWD)**
+  * Water Pipeline Ruptures / Sewage Overflow $\rightarrow$ **Water Supply & Sewerage Board (WSSB)**
+  * Non-Functional Streetlights $\rightarrow$ **Electricity DISCOM**
+  * Garbage Dumps $\rightarrow$ **Solid Waste Management (SWM)**
+  * Malfunctioning Traffic Signals $\rightarrow$ **Traffic Police Division**
+
+### 2. Public Civic Transparency Map (`/map`)
+* **Live GIS City Map:** Full-screen interactive map displaying all geo-tagged complaints across city zones.
+* **Custom Pin Clustering:** Color-coded status pins (🔴 Red: *Submitted*, 🟠 Amber: *Under Repair*, 🟢 Emerald: *Resolved*).
+* **Multi-Filter System:** Filter map pins by issue category, resolution status, or text search query with clickable popups linking directly to live ticket trackers.
+
+### 3. "Before & After" Resolution Verification
+* **Side-by-Side Photo Inspection:** When municipal engineers mark a ticket as resolved, they must upload an on-site completion photo.
+* **Citizen Verification:** On `TrackStatusPage.jsx`, residents see their original complaint photo side-by-side with the official resolution evidence photo.
+
+### 4. Satisfaction Ratings (1-5 Stars) & Re-Open Workflow
+* **Quality Audit Ratings:** Citizens submit a 1 to 5-star rating with satisfaction remarks on resolved complaints.
+* **"Still Broken? Request Re-Open":** If repair work was substandard (e.g., loose gravel filling instead of asphalt), the citizen can re-open the complaint with a detailed reason, shifting status to `reopened` and auto-escalating priority to **CRITICAL**.
+
+### 5. "I Am Also Facing This" Community Upvoting (+1)
+* **Combatting Ticket Duplication:** Instead of filing 50 duplicate tickets for the same crater on a main road, residents click **"+1 Facing This"** on any public ticket card, detail view, or map pin.
+* **Automatic Priority Escalation:** Accumulating community upvotes automatically escalates issue priority from Medium to High ($\ge 4$ upvotes) and Critical ($\ge 10$ upvotes).
+
+### 6. Dynamic SLA Clocks & Overdue Breach Indicators
+* **Severity-Based Deadlines:** Every complaint automatically receives a statutory Service Level Agreement (SLA) countdown upon creation:
+  * Water Leaks / Sewage / Traffic Lights $\rightarrow$ **24-Hour SLA Target**
+  * Potholes / Streetlights $\rightarrow$ **48-Hour SLA Target**
+  * Broken Roads / Major Resurfacing $\rightarrow$ **72-Hour SLA Target**
+* **Live Countdown Badges:** Displays real-time hours remaining or prominent `SLA Overdue` breach badges on tracker pages.
+
+### 7. In-Portal Notification Center & Profile Management
+* **Notification Bell:** Live unread badge counter in the citizen navigation bar with a dropdown stream of real-time repair alerts and a "Mark all as read" button.
+* **Profile Management (`/profile`):** Citizens manage their verified contact information (full name, phone, address) and update account passwords.
+
+### 8. Self-Service Password Recovery with 6-Digit OTP
+* **Zero-Lockout Recovery:** Added a self-service password reset modal on `CitizenLoginPage.jsx` powered by a 6-digit OTP code valid for 15 minutes, allowing citizens to regain account access securely.
+
+---
+
+## 🌐 Bilingual Support & Institutional Zero-Blue Design
+
+CitySync implements a complete institutional identity tailored for Indian municipal governance:
+
+* **Instant English & हिन्दी Toggle:** Single-click language switcher (`LanguageToggle.jsx`) available across both portals. All navigation items, forms, table headers, error alerts, and statuses are translated via comprehensive i18n dictionaries.
+* **Zero-Blue Palette:** To convey administrative authority and distinguish CitySync from generic SaaS themes, the interface employs a warm, zero-blue palette:
+  * **Primary Accents:** Deep Forest Emerald (`#047857`, `#059669`) and Warm Amber Gold (`#d97706`, `#b45309`).
+  * **Surfaces:** Warm Parchment Ivory (`#fdfbf7`, `#f4efe6`) in light mode, and Rich Obsidian Zinc (`#121316`, `#18191d`) in dark mode.
+  * **Status Colors:** Muted Coral Crimson for Critical, Warm Amber for In-Progress, and Crisp Mint for Resolved.
 
 ---
 
@@ -229,105 +317,182 @@ flowchart TB
 
 | Layer | Technology | Version | Purpose |
 |---|---|---|---|
-| **Frontend Framework** | React.js | `^18.3.1` | Component-driven declarative user interface |
-| **Build Tool & Dev Server** | Vite | `^6.0.1` | Ultra-fast HMR and optimized production bundling |
-| **Routing** | React Router DOM | `^6.28.0` | Client-side routing, protected navigation flows |
-| **Styling & Design** | Vanilla CSS (CSS3) | — | Custom, high-performance responsive styling |
-| **Mapping & GIS** | Leaflet.js / OpenStreetMap | — | Interactive spatial map layer and project plotting |
-| **Backend Runtime** | Node.js | `>= 18.0.0` | Scalable asynchronous JavaScript server environment |
-| **Web Framework** | Express.js | `^5.3.0` | Robust RESTful routing and middleware pipeline |
-| **Database** | MongoDB Atlas / Mongoose | `^9.11.2` | Document database with native geospatial query support |
-| **Authentication** | JSON Web Tokens (`jsonwebtoken`) | `^9.0.3` | Stateless token authorization across all API routes |
-| **Password Encryption**| `bcryptjs` | `^3.0.3` | Salted hashing for secure credential persistence |
-| **Environment Config** | `dotenv` | `^18.0.8` | Secure zero-exposure environment variable management |
-| **CORS Middleware** | `cors` | `^2.8.6` | Cross-origin resource sharing between client & server |
-| **ML Engine (Planned)**| Python 3 / Scikit-Learn | `3.10+` | Project delay prediction and risk classification |
+| **Frontend Framework (Both Portals)** | React.js | `^18.3.1` | Component-driven declarative UI |
+| **Build Tool & Dev Server** | Vite | `^6.0.1` | High-speed HMR & optimized production bundling |
+| **CSS Framework** | Tailwind CSS & `@tailwindcss/vite` | `^4.3.3` | Utility-first styling with modern Vite integration |
+| **Client-Side Routing** | React Router DOM | `^6.28.0` | Protected routes, layout nesting, query param handling |
+| **Interactive Mapping** | Leaflet & React-Leaflet | `^1.9.4` / `^4.2.1` | GIS maps, pin-drop coordinates, custom marker pins |
+| **Tile Provider** | OpenStreetMap (OSM) | Free / Open | Free raster tile server (`{s}.tile.openstreetmap.org`) |
+| **Icons** | Lucide React | `^1.61.0` | Comprehensive civic icon library |
+| **Backend Runtime (Both Portals)** | Node.js | `>= 18.0.0` | Non-blocking event-driven JavaScript runtime |
+| **Web Server Framework** | Express.js | `^5.3.0` | Modern RESTful routing and middleware engine |
+| **Object Data Modeling (ODM)** | Mongoose | `^9.11.2` | MongoDB schema modeling, validation, and indexing |
+| **Database** | MongoDB Atlas / Local | `6.0+` | Scalable NoSQL document store with GeoJSON support |
+| **File Upload Engine** | Multer | `^1.4.5-lts.1` | Multipart form-data handling for photo evidence |
+| **Authentication & Security** | JSON Web Tokens (`jsonwebtoken`) | `^9.0.3` | Stateless Bearer token authentication |
+| **Password Hashing** | `bcryptjs` | `^3.0.3` | Salted SHA-512 credential encryption |
+| **CORS Middleware** | `cors` | `^2.8.6` | Secure cross-origin resource sharing |
+| **Environment Configuration** | `dotenv` | `^18.0.8` | Zero-exposure environment variable management |
 
 ---
 
-## 📂 Repository File Structure
+## 📂 Repository Directory Structure
 
 ```text
 CitySync/
-├── backend/
+├── backend/                                   # Portal 1: Municipal Staff & Admin Backend (Port 5000)
 │   ├── src/
 │   │   ├── config/
-│   │   │   └── db.js                 # MongoDB connection & lifecycle handling
+│   │   │   └── db.js                         # MongoDB connection & lifecycle management
 │   │   ├── controllers/
-│   │   │   ├── authController.js         # User registration, login & token issuance
-│   │   │   ├── departmentController.js   # Department directory & management
-│   │   │   ├── userController.js         # User administration & role assignment
-│   │   │   ├── projectController.js      # Project CRUD, filtering & timeline schedules
-│   │   │   ├── conflictController.js     # Conflict listing, inspection & resolution
-│   │   │   ├── resourceController.js     # Equipment inventory management
-│   │   │   ├── requestController.js      # Resource borrowing & requisition lifecycle
-│   │   │   ├── notificationController.js # Multi-department alert dispatching
-│   │   │   └── auditController.js        # Comprehensive action audit log retrieval
+│   │   │   ├── authController.js             # Staff registration, login & JWT issuance
+│   │   │   ├── departmentController.js       # Municipal agency registry & directory
+│   │   │   ├── userController.js             # Staff user administration & department assignment
+│   │   │   ├── projectController.js          # Project CRUD, spatial querying & scheduling
+│   │   │   ├── conflictController.js         # Spatial & temporal conflict inspection & resolution
+│   │   │   ├── milestoneController.js        # Project milestone progress tracking
+│   │   │   ├── taskController.js             # Site engineering task assignments
+│   │   │   ├── resourceController.js         # Shared heavy machinery inventory management
+│   │   │   ├── requestController.js          # Inter-agency machinery requisition lifecycle
+│   │   │   ├── notificationController.js     # Collision warnings & administrative alerts
+│   │   │   └── auditController.js            # Immutable audit trail retrieval
 │   │   ├── middleware/
-│   │   │   ├── authMiddleware.js         # JWT verification & request user injection
-│   │   │   └── roleMiddleware.js         # RBAC route protection based on user role
+│   │   │   ├── authMiddleware.js             # Staff JWT token verification
+│   │   │   └── roleMiddleware.js             # Role-based access enforcement (RBAC)
 │   │   ├── models/
-│   │   │   ├── User.js                   # User credentials, roles & department refs
-│   │   │   ├── Department.js             # Municipal agency registry & contact points
-│   │   │   ├── Project.js                # Project specs, coordinates, budget & status
-│   │   │   ├── Conflict.js               # Flagged spatial/temporal collisions
-│   │   │   ├── Resource.js               # Heavy machinery & shared equipment pool
-│   │   │   ├── ResourceRequest.js        # Requisition records & approval states
-│   │   │   ├── Notification.js           # Real-time alert messages
-│   │   │   └── AuditLog.js               # Immutable record of system modifications
+│   │   │   ├── User.js                       # Staff credentials, roles & department references
+│   │   │   ├── Department.js                 # City agencies, contact emails & ward locations
+│   │   │   ├── Project.js                    # Infrastructure specs, GPS coordinates, budget, status
+│   │   │   ├── Conflict.js                   # Spatial & temporal collision records & severity
+│   │   │   ├── Milestone.js                  # Project phases & deliverable targets
+│   │   │   ├── Task.js                       # Field officer engineering tasks & checklists
+│   │   │   ├── Resource.js                   # Heavy machinery specifications & quantities
+│   │   │   ├── ResourceRequest.js            # Equipment borrowing requests & approval states
+│   │   │   ├── Notification.js               # Staff alerts & collision notifications
+│   │   │   └── AuditLog.js                   # Immutable record of all system modifications
 │   │   ├── routes/
-│   │   │   ├── authRoutes.js             # /api/auth endpoints
-│   │   │   ├── departmentRoutes.js       # /api/departments endpoints
-│   │   │   ├── userRoutes.js             # /api/users endpoints
-│   │   │   ├── projectRoutes.js          # /api/projects endpoints
-│   │   │   ├── conflictRoutes.js         # /api/conflicts endpoints
-│   │   │   ├── resourceRoutes.js         # /api/resources endpoints
-│   │   │   ├── requestRoutes.js          # /api/requests endpoints
-│   │   │   ├── notificationRoutes.js     # /api/notifications endpoints
-│   │   │   └── auditRoutes.js            # /api/audit endpoints
+│   │   │   ├── authRoutes.js                 # /api/auth endpoints
+│   │   │   ├── departmentRoutes.js           # /api/departments endpoints
+│   │   │   ├── userRoutes.js                 # /api/users endpoints
+│   │   │   ├── projectRoutes.js              # /api/projects endpoints
+│   │   │   ├── conflictRoutes.js             # /api/conflicts endpoints
+│   │   │   ├── milestoneRoutes.js            # /api/milestones endpoints
+│   │   │   ├── taskRoutes.js                 # /api/tasks endpoints
+│   │   │   ├── resourceRoutes.js             # /api/resources endpoints
+│   │   │   ├── requestRoutes.js              # /api/requests endpoints
+│   │   │   ├── notificationRoutes.js         # /api/notifications endpoints
+│   │   │   └── auditRoutes.js                # /api/audit endpoints
 │   │   ├── utils/
-│   │   │   ├── conflictDetector.js       # Haversine distance & temporal overlap engine
-│   │   │   └── notifyAudit.js            # Cross-cutting notification & audit helper
-│   │   └── app.js                        # Express server assembly & route registration
-│   ├── seed.js                           # Automated test data seeder with sample conflicts
-│   ├── server.js                         # Application entry point & port listener
-│   ├── package.json                      # Backend dependencies & runtime scripts
-│   └── README.md                         # Backend module documentation
+│   │   │   ├── conflictDetector.js           # Haversine distance & temporal collision engine
+│   │   │   └── notifyAudit.js                # Cross-cutting audit logger and alert helper
+│   │   └── app.js                            # Express server assembly & middleware pipeline
+│   ├── seed.js                               # Automated seeder for departments, projects & conflicts
+│   ├── server.js                             # Backend entrypoint (Port 5000)
+│   └── package.json                          # Dependencies & scripts
 │
-├── frontend/
+├── frontend/                                  # Portal 1: Municipal Staff & Admin Frontend (Port 5173)
 │   ├── src/
-│   │   ├── api/                          # Axios/Fetch API client abstractions
-│   │   ├── components/                   # Reusable UI elements (Navbar, Cards, Modals)
-│   │   ├── context/                      # React context for Auth & Global state
-│   │   ├── pages/                        # Screen views (Dashboard, Projects, Map, Gantt)
-│   │   │   ├── auth/                     # Login & Register views
-│   │   │   ├── dashboard/                # Central executive overview
-│   │   │   ├── departments/              # Department directory
-│   │   │   ├── resources/                # Equipment inventory & requisition forms
-│   │   │   ├── notifications/            # Alert inbox
-│   │   │   └── audit/                    # Immutable audit trail
-│   │   ├── styles/                       # Modular CSS stylesheets
-│   │   ├── App.jsx                       # Root React router and view structure
-│   │   └── main.jsx                      # DOM mount entry point
-│   ├── index.html                        # HTML5 shell
-│   ├── vite.config.js                    # Vite configuration with /api backend proxy
-│   └── package.json                      # Frontend dependencies & build scripts
+│   │   ├── api/                              # Client abstraction for staff backend APIs
+│   │   ├── components/
+│   │   │   ├── common/                       # ThemeToggle, LanguageToggle, Modals, StatusPills
+│   │   │   ├── layout/                       # DashboardLayout, Sidebar, TopBar, HeaderStrip
+│   │   │   └── milestones/                   # MilestonesModal, MilestoneTasks components
+│   │   ├── context/                          # AuthContext, ThemeContext, LanguageContext, ToastContext
+│   │   ├── i18n/
+│   │   │   └── translations.js               # Full English & Hindi dictionary for staff portal
+│   │   ├── pages/
+│   │   │   ├── auth/                         # LoginPage, RegisterPage
+│   │   │   ├── dashboard/                    # DashboardPage with analytics & project metrics
+│   │   │   ├── projects/                     # ProjectsPage with filters, creation modal & Gantt
+│   │   │   ├── conflicts/                    # ConflictsPage with collision resolution workflows
+│   │   │   ├── map/                          # MapPage with Leaflet GIS project visualizer
+│   │   │   ├── resources/                    # ResourcesPage for machinery inventory & borrowing
+│   │   │   ├── requests/                     # RequestsPage for approving equipment loans
+│   │   │   ├── departments/                  # DepartmentsPage (City Admin directory)
+│   │   │   ├── users/                        # UsersPage (City Admin user management)
+│   │   │   ├── notifications/                # NotificationsPage (Alert inbox)
+│   │   │   ├── audit/                        # AuditPage (Immutable system audit trail)
+│   │   │   └── LandingPage.jsx               # Official portal landing page with citizen portal CTA
+│   │   ├── styles/                           # index.css with institutional styling variables
+│   │   ├── App.jsx                           # Route configuration & protected route wrappers
+│   │   └── main.jsx                          # React DOM mount point
+│   ├── index.html                            # HTML5 shell
+│   ├── vite.config.js                        # Vite config with /api proxy to Port 5000
+│   └── package.json                          # Dependencies & scripts
 │
-├── Interdepartmental_Cooperation_Platform.pptx    # Capstone presentation deck
-├── Interdepartmental_Cooperation_Platform_Report.pdf # Capstone academic report
-├── roadmap.md                            # Detailed developer implementation roadmap
-└── README.md                             # Master project documentation
+├── CitySyncPublic/                            # Portal 2: Dedicated Citizen Grievance Redressal Portal
+│   ├── backend/                              # Citizen Backend Service (Port 5001)
+│   │   ├── src/
+│   │   │   ├── config/
+│   │   │   │   └── db.js                     # MongoDB connection
+│   │   │   ├── controllers/
+│   │   │   │   ├── citizenAuthController.js  # Registration, login, profile, OTP password reset
+│   │   │   │   └── grievanceController.js    # Submissions, map, SLA, ratings, upvotes, reopen
+│   │   │   ├── middleware/
+│   │   │   │   ├── citizenAuthMiddleware.js  # Citizen JWT validation
+│   │   │   │   └── uploadMiddleware.js       # Multer photo upload config (3 files, 5MB limit)
+│   │   │   ├── models/
+│   │   │   │   ├── CitizenUser.js            # Citizen profiles & OTP reset tokens
+│   │   │   │   ├── Grievance.js              # Complaints, geo-coordinates, SLA, ratings, photos
+│   │   │   │   └── CitizenNotification.js    # Citizen in-portal status alerts
+│   │   │   ├── routes/
+│   │   │   │   ├── citizenAuthRoutes.js      # /api/citizen/auth endpoints
+│   │   │   │   └── grievanceRoutes.js        # /api/citizen/grievances endpoints
+│   │   │   └── app.js                        # Express server assembly & CORS config
+│   │   ├── uploads/                          # Static directory for uploaded grievance photos
+│   │   ├── seed.js                           # Seeder for demo citizen accounts & sample complaints
+│   │   ├── server.js                         # Backend entrypoint (Port 5001)
+│   │   └── package.json                      # Dependencies & scripts
+│   │
+│   └── frontend/                             # Citizen Frontend SPA (Port 5174)
+│       ├── src/
+│       │   ├── api/
+│       │   │   └── client.js                 # Unified fetch API client with token management
+│       │   ├── components/
+│       │   │   ├── common/
+│       │   │   │   ├── LocationPickerMap.jsx # Interactive Leaflet pin-drop GPS picker
+│       │   │   │   └── ThemeToggle.jsx       # Light/Dark mode switcher
+│       │   │   └── layout/
+│       │   │       ├── CitizenNavbar.jsx     # Nav with notification bell & mobile drawer
+│       │   │       └── GovernmentHeaderStrip # Official Government header with EN/HI toggle
+│       │   ├── context/
+│       │   │   ├── CitizenAuthContext.jsx    # Citizen auth state & session storage
+│       │   │   ├── LanguageContext.jsx       # Bilingual English/Hindi state provider
+│       │   │   ├── ThemeContext.jsx          # Institutional theme provider
+│       │   │   └── ToastContext.jsx          # Alert banner notifications
+│       │   ├── i18n/
+│       │   │   └── translations.js           # Bilingual translations for all citizen flows
+│       │   ├── pages/
+│       │   │   ├── LandingPage.jsx           # Public hero, quick track bar, live GIS banner
+│       │   │   ├── FileComplaintPage.jsx     # Multi-step complaint submission with photo upload
+│       │   │   ├── TrackStatusPage.jsx       # Before/after verification, SLA clock, 5-star ratings
+│       │   │   ├── MyComplaintsPage.jsx      # Citizen's personal history dashboard
+│       │   │   ├── CivicMapPage.jsx          # Interactive full-screen GIS transparency map
+│       │   │   ├── CitizenProfilePage.jsx    # Profile & security password settings
+│       │   │   └── CitizenAuthPages.jsx      # Citizen login, registration & OTP password reset
+│       │   ├── styles/
+│       │   │   └── index.css                 # Tailwind CSS v4 styles & custom color vars
+│       │   ├── App.jsx                       # Citizen portal router
+│       │   └── main.jsx                      # React entrypoint
+│       ├── index.html                        # HTML5 shell
+│       ├── vite.config.js                    # Vite config with /api & /uploads proxy to Port 5001
+│       └── package.json                      # Dependencies & scripts
+│
+├── Dummy_data.md                              # Quick reference for test credentials
+├── roadmap.md                                 # Developer architecture & feature roadmap
+├── Interdepartmental_Cooperation_Platform.pptx# Academic presentation slide deck
+├── Interdepartmental_Cooperation_Platform_Report.pdf # Comprehensive capstone report
+└── README.md                                  # Master project documentation (You are here)
 ```
 
 ---
 
-## 🛠️ Installation & Setup Guide
+## 🛠️ Quickstart & Installation Guide
 
-### System Prerequisites
-Ensure the following tools are installed on your workstation:
-* **Node.js:** v18.0.0 or higher ([Download](https://nodejs.org/))
-* **Git:** Latest version ([Download](https://git-scm.com/))
-* **MongoDB:** A running local MongoDB instance or a free [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) cluster URL
+### Prerequisites
+* **Node.js:** v18.0.0 or higher ([Download Node.js](https://nodejs.org/))
+* **Git:** Latest version ([Download Git](https://git-scm.com/))
+* **MongoDB:** A running local MongoDB service (`mongodb://127.0.0.1:27017`) or a free [MongoDB Atlas Cluster](https://www.mongodb.com/cloud/atlas).
 
 ---
 
@@ -339,245 +504,290 @@ cd CitySync
 
 ---
 
-### Step 2: Configure and Seed the Backend
+### Step 2: Run Portal 1 — Municipal Staff Platform
 
-1. Navigate to the `backend/` directory:
+#### 2A. Start the Municipal Staff Backend (Port 5000)
+1. Open Terminal 1 and navigate to `backend/`:
    ```bash
    cd backend
    npm install
    ```
-
-2. Create a `.env` configuration file inside `backend/`:
+2. Create `.env` in `backend/`:
    ```env
    PORT=5000
-   MONGO_URI=mongodb://localhost:27017/Citysync
-   JWT_SECRET=your_super_secret_jwt_key_citysync_2026
+   MONGO_URI=mongodb://127.0.0.1:27017/citysync
+   JWT_SECRET=citysync_super_secret_jwt_key_2026
    JWT_EXPIRES_IN=1d
+   ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
    ```
-   *(If using MongoDB Atlas, replace `MONGO_URI` with your Atlas connection string).*
-
-3. **Seed Database with Realistic Municipal Data:**
-   Run the automated database seeder to populate sample departments, pre-configured roles, equipment, and a live spatial conflict:
+3. Seed municipal departments, users, projects, and live conflicts:
    ```bash
    node seed.js
    ```
-   *Output confirmation:*
-   ```text
-   🌱 CitySync Database Seeded Successfully!
-   Detected and logged 1 conflict(s) between seed projects.
-   ```
-
-4. **Launch the Backend API Server:**
+4. Start the server:
    ```bash
    npm run dev
    ```
-   The backend will start on **`http://localhost:5000`**. You can verify server status at `http://localhost:5000/api/health`.
+   *Staff Backend is live at `http://127.0.0.1:5000` (Healthcheck: `http://127.0.0.1:5000/api/health`).*
 
----
-
-### Step 3: Run the Frontend Client
-
-1. Open a new terminal window and navigate to `frontend/`:
+#### 2B. Start the Municipal Staff Frontend (Port 5173)
+1. Open Terminal 2 and navigate to `frontend/`:
    ```bash
    cd frontend
    npm install
    ```
-
-2. **Launch the Vite Development Server:**
+2. Start the Vite development server:
    ```bash
    npm run dev
    ```
-   The client application will start on **`http://localhost:5173`** (or `http://127.0.0.1:5173`).  
-   *(Vite automatically proxies all `/api/*` network requests to `http://localhost:5000` via [vite.config.js](file:///e:/Capstone/CitySync/frontend/vite.config.js)).*
+   *Staff Portal is accessible at **`http://localhost:5173`**.*
 
 ---
 
-## 👥 Pre-Seeded Demo Accounts
+### Step 3: Run Portal 2 — CitySyncPublic Citizen Portal
 
-The database seeder provisions four ready-to-test accounts representing each administrative tier:
+#### 3A. Start the Citizen Backend (Port 5001)
+1. Open Terminal 3 and navigate to `CitySyncPublic/backend`:
+   ```bash
+   cd CitySyncPublic/backend
+   npm install
+   ```
+2. Create `.env` in `CitySyncPublic/backend`:
+   ```env
+   PORT=5001
+   MONGO_URI=mongodb://127.0.0.1:27017/citysync
+   JWT_SECRET=citysync_public_citizen_jwt_secret_key_2026
+   JWT_EXPIRES_IN=7d
+   ALLOWED_ORIGINS=http://localhost:5174,http://127.0.0.1:5174
+   ```
+3. Seed citizen accounts and sample municipal complaints:
+   ```bash
+   node seed.js
+   ```
+4. Start the server:
+   ```bash
+   npm run dev
+   ```
+   *Citizen Backend is live at `http://127.0.0.1:5001` (Healthcheck: `http://127.0.0.1:5001/api/health`).*
 
-| Role | Email | Password | Department | Recommended Test Scenarios |
-|---|---|---|---|---|
-| **City Administrator** | `admin@citysync.gov` | `Admin@1234` | All Municipalities | Review citywide dashboard, approve/override flagged conflicts, inspect immutable audit logs |
-| **PWD Department Head** | `pwd_head@citysync.gov` | `Head@1234` | Public Works Dept | Create roadwork projects, check conflict detection engine, request machinery from other agencies |
-| **Water Board Head** | `water_head@citysync.gov`| `Head@1234` | Water Supply & Sewerage | Approve inter-agency equipment borrowing, review overlapping corridor warnings |
-| **Field Officer** | `officer@citysync.gov` | `Officer@1234`| Public Works Dept | Submit ground milestone updates, report project completion status |
-
----
-
-## 🔗 REST API Reference
-
-All protected routes require a Bearer token in the request header:  
-`Authorization: Bearer <your_jwt_token>`
-
-### 1. Authentication & Users
-| Method | Endpoint | Auth | Allowed Roles | Description |
-|---|---|---|---|---|
-| `POST` | `/api/auth/register` | Public | Anyone | Register a new city officer or department head |
-| `POST` | `/api/auth/login` | Public | Anyone | Authenticate with email/password; returns JWT |
-| `GET` | `/api/auth/me` | Bearer | All Authenticated | Get current authenticated user profile |
-| `GET` | `/api/users` | Bearer | `city_admin` | View all registered accounts across agencies |
-| `PUT` | `/api/users/:id/department` | Bearer | `city_admin` | Assign a user to a specific municipal department |
-
-### 2. Departments
-| Method | Endpoint | Auth | Allowed Roles | Description |
-|---|---|---|---|---|
-| `GET` | `/api/departments` | Bearer | All Authenticated | List all registered city departments and contact details |
-| `POST` | `/api/departments` | Bearer | `city_admin` | Register a new municipal agency into the system |
-| `GET` | `/api/departments/:id` | Bearer | All Authenticated | Fetch department details by ID |
-
-### 3. Project Management & Scheduling (Core Engine)
-| Method | Endpoint | Auth | Allowed Roles | Description |
-|---|---|---|---|---|
-| `GET` | `/api/projects` | Bearer | All Authenticated | List projects with filtering (`status`, `department`, `zone`, `category`) |
-| `GET` | `/api/projects/:id` | Bearer | All Authenticated | Fetch full project dossier and geospatial coordinates |
-| `POST` | `/api/projects` | Bearer | `city_admin`, `department_head`, `officer` | Register new project & **automatically trigger conflict detection** |
-| `PUT` | `/api/projects/:id` | Bearer | `city_admin`, `department_head` | Update project parameters, budget, dates or status |
-| `DELETE`| `/api/projects/:id` | Bearer | `city_admin`, `department_head` | Soft delete / remove project from active registry |
-| `GET` | `/api/projects/schedule/timeline` | Bearer | All Authenticated | Get grouped project schedule data formatted for Gantt view |
-| `GET` | `/api/projects/schedule/calendar` | Bearer | All Authenticated | Get monthly calendar view of active municipal excavations |
-
-### 4. Conflict Detection & Resolution
-| Method | Endpoint | Auth | Allowed Roles | Description |
-|---|---|---|---|---|
-| `GET` | `/api/conflicts` | Bearer | All Authenticated | List all detected spatial & temporal project collisions |
-| `GET` | `/api/conflicts/:id` | Bearer | All Authenticated | View details of a specific conflict, distance & affected parties |
-| `PUT` | `/api/conflicts/:id/resolve` | Bearer | `city_admin`, `department_head` | Record joint coordination notes and mark conflict resolved |
-
-### 5. Shared Equipment & Requisitions
-| Method | Endpoint | Auth | Allowed Roles | Description |
-|---|---|---|---|---|
-| `GET` | `/api/resources` | Bearer | All Authenticated | Browse available machinery pool with real-time stock |
-| `POST` | `/api/resources` | Bearer | `city_admin`, `department_head` | Register new equipment into the shared departmental inventory |
-| `POST` | `/api/requests` | Bearer | All Authenticated | Submit equipment borrowing requisition to another agency |
-| `GET` | `/api/requests` | Bearer | All Authenticated | View sent and received resource borrowing requests |
-| `PUT` | `/api/requests/:id/approve` | Bearer | `department_head` (Owner) | Approve resource requisition and reserve machinery |
-| `PUT` | `/api/requests/:id/return` | Bearer | All Authenticated | Record equipment return and restore inventory count |
-
-### 6. Notifications & Audit Logs
-| Method | Endpoint | Auth | Allowed Roles | Description |
-|---|---|---|---|---|
-| `GET` | `/api/notifications` | Bearer | All Authenticated | Fetch personalized unread alerts and conflict warnings |
-| `PUT` | `/api/notifications/:id/read`| Bearer | All Authenticated | Mark a notification as read |
-| `GET` | `/api/audit` | Bearer | `city_admin` | Inspect immutable audit log history across all departments |
-| `GET` | `/api/health` | Public | Anyone | Backend healthcheck and uptime ping |
+#### 3B. Start the Citizen Frontend (Port 5174)
+1. Open Terminal 4 and navigate to `CitySyncPublic/frontend`:
+   ```bash
+   cd CitySyncPublic/frontend
+   npm install
+   ```
+2. Start the Vite development server:
+   ```bash
+   npm run dev
+   ```
+   *Citizen Grievance Portal is accessible at **`http://localhost:5174`**.*
 
 ---
 
-## 🔐 Role-Based Permissions Matrix
+## 👥 Pre-Seeded Demo Accounts & Credentials
 
-| Platform Action | City Administrator (`city_admin`) | Department Head (`department_head`) | Field Officer (`officer`) |
-|---|:---:|:---:|:---:|
-| **View City GIS Map & Projects** | ✅ Full Access | ✅ Full Access | ✅ Full Access |
-| **Create New Project** | ✅ Yes | ✅ Yes (Own Dept) | ✅ Yes (Assigned Zone) |
-| **Modify Project Budget / Dates** | ✅ Yes | ✅ Yes (Own Dept) | ❌ Read Only |
-| **Delete Project** | ✅ Yes | ✅ Yes (Own Dept) | ❌ Read Only |
-| **Inspect Detected Conflicts** | ✅ Full Access | ✅ Involved Depts | ✅ View Only |
-| **Resolve & Override Conflicts** | ✅ Authoritative | ✅ Bilateral Agreement | ❌ Read Only |
-| **Add Equipment to Inventory** | ✅ Yes | ✅ Yes (Own Dept) | ❌ Read Only |
-| **Borrow Shared Machinery** | ✅ Yes | ✅ Yes | ✅ Submit Requisition |
-| **Approve Machinery Loan** | ✅ Yes | ✅ Yes (Owner Dept) | ❌ No |
-| **Access System Audit Logs** | ✅ Full Audit Trail | ❌ No | ❌ No |
-| **Manage Departments & Users** | ✅ Full Management | ❌ No | ❌ No |
+### 1. Municipal Staff & Administrator Portal (`http://localhost:5173/login`)
+
+| Role | Name | Email | Password | Department | Recommended Test Workflows |
+|---|---|---|---|---|---|
+| **City Administrator** | Admin CitySync | `admin@citysync.gov` | `Admin@1234` | All Municipalities | Inspect citywide dashboard, review & resolve spatial conflicts, manage staff users & departments, view audit logs |
+| **PWD Department Head** | Rajesh Kumar | `pwd_head@citysync.gov` | `Head@1234` | Public Works Dept (PWD) | Propose road construction projects, trigger conflict engine, request heavy machinery loans |
+| **Water Board Head** | Sunita Verma | `water_head@citysync.gov`| `Head@1234` | Water Supply & Sewerage (WSSB) | Approve inter-agency equipment borrowing, review overlapping trenching warnings |
+| **Field Officer** | Hiralal Mahato | `officer@citysync.gov` | `Officer@1234`| Public Works Dept (PWD) | Update on-site task milestones, report ground completion |
+
+### 2. Citizen Grievance Portal (`http://localhost:5174/login`)
+
+| Account Type | Name | Email | Password | Role | Features to Test |
+|---|---|---|---|---|---|
+| **Registered Citizen** | Aakash Sharma | `citizen@citysync.gov` | `Citizen@1234` | Verified Resident | Submit photo grievances with map pin-drop, view tracking timeline, upvote issues, rate repairs |
+| **Registered Citizen** | Pooja Mehta | `pooja@citysync.gov` | `Citizen@1234` | Verified Resident | Track Water Board tickets, re-open complaints with reasons, manage profile |
+
+### 3. Sample Live Tracking Tickets (`http://localhost:5174/track`)
+* `GRV-2026-1011` — *Deep crater-sized pothole near Sector 14 Metro Station* (Status: `in_progress`, Assigned: PWD)
+* `GRV-2026-1012` — *Main drinking water pipeline leak flooding Sector 9 Market* (Status: `assigned_to_dept`, Assigned: WSSB)
+* `GRV-2026-1013` — *Non-functional streetlights along Outer Ring Road flyover* (Status: `resolved` $\rightarrow$ Test Before/After & 5-Star Rating)
+
+---
+
+## 🔗 Complete REST API Reference
+
+All protected endpoints require the Bearer token in the request header:  
+`Authorization: Bearer <jwt_token>`
+
+### Inter-Departmental Platform APIs (Port 5000)
+
+#### 1. Authentication & Users (`/api/auth`, `/api/users`)
+* `POST /api/auth/register` — Register a new staff user or department officer
+* `POST /api/auth/login` — Authenticate staff credentials; returns JWT
+* `GET /api/auth/me` — Retrieve current authenticated staff profile
+* `GET /api/users` — *(City Admin)* List all registered municipal officers
+* `PUT /api/users/:id/department` — *(City Admin)* Assign user to a specific department
+
+#### 2. Department Management (`/api/departments`)
+* `GET /api/departments` — List all registered city departments, contact emails, and ward locations
+* `POST /api/departments` — *(City Admin)* Register a new municipal agency into CitySync
+* `GET /api/departments/:id` — Fetch specific department details
+
+#### 3. Project Registry & Scheduling Engine (`/api/projects`)
+* `GET /api/projects` — List projects with multi-filters (`status`, `department`, `zone`, `category`, `search`)
+* `GET /api/projects/:id` — Fetch project dossier with GPS coordinates and contractor specs
+* `POST /api/projects` — Create project proposal & **automatically trigger conflict detection**
+* `PUT /api/projects/:id` — Update project budget, dates, coordinates, or status
+* `DELETE /api/projects/:id` — Remove project from active registry
+* `GET /api/projects/schedule/timeline` — Grouped project schedule formatted for Gantt timeline
+* `GET /api/projects/schedule/calendar` — Monthly calendar view of active municipal excavations
+
+#### 4. Spatial & Temporal Conflict Resolution (`/api/conflicts`)
+* `GET /api/conflicts` — List all detected spatial/temporal project collisions
+* `GET /api/conflicts/:id` — Inspect conflict details, distance ($d$ in meters), and affected parties
+* `PUT /api/conflicts/:id/resolve` — Record joint coordination notes and mark conflict resolved
+
+#### 5. Milestones & Task Management (`/api/milestones`, `/api/tasks`)
+* `GET /api/milestones/project/:projectId` — Fetch sequential milestones for a project
+* `POST /api/milestones` — Create a new project milestone
+* `PUT /api/milestones/:id` — Update milestone progress percentage and completion status
+* `GET /api/tasks/project/:projectId` — Fetch field engineering tasks
+* `POST /api/tasks` — Assign a task to an on-site field officer
+* `PUT /api/tasks/:id/status` — Update task status (`pending`, `in_progress`, `completed`)
+
+#### 6. Shared Equipment & Requisitions (`/api/resources`, `/api/requests`)
+* `GET /api/resources` — Browse shared machinery inventory with real-time stock
+* `POST /api/resources` — Register new machinery into shared inventory
+* `POST /api/requests` — Submit equipment borrowing requisition to another agency
+* `GET /api/requests` — View sent and received resource requests
+* `PUT /api/requests/:id/approve` — *(Owner Dept Head)* Approve machinery loan and decrement stock
+* `PUT /api/requests/:id/return` — Record machinery return and increment stock count
+
+#### 7. Notifications & Audit Logs (`/api/notifications`, `/api/audit`)
+* `GET /api/notifications` — Fetch personalized collision alerts and notifications
+* `PUT /api/notifications/:id/read` — Mark notification as read
+* `GET /api/audit` — *(City Admin)* Inspect immutable system audit log
+* `GET /api/health` — Service healthcheck ping
+
+---
+
+### CitySyncPublic Citizen APIs (Port 5001)
+
+#### 1. Citizen Authentication & Profile (`/api/citizen/auth`)
+* `POST /api/citizen/auth/register` — Create citizen account with name, email, password, phone, and address
+* `POST /api/citizen/auth/login` — Citizen login; returns 7-day citizen JWT
+* `GET /api/citizen/auth/me` — Retrieve verified citizen profile
+* `PUT /api/citizen/auth/profile` — Update contact information (phone, address, full name)
+* `POST /api/citizen/auth/change-password` — Change password with current password verification
+* `POST /api/citizen/auth/forgot-password` — Generate 6-digit OTP code (valid for 15 minutes)
+* `POST /api/citizen/auth/reset-password` — Reset password using verified OTP code
+
+#### 2. Grievances, Map, Ratings & Upvotes (`/api/citizen/grievances`)
+* `GET /api/citizen/grievances/stats` — Public live counters (Total Reported, Active Repairs, Resolved)
+* `GET /api/citizen/grievances/map` — Full GIS map data with `{ lat, lng }`, status pins, and categories
+* `POST /api/citizen/grievances/submit` — *(Citizen JWT)* Multipart form upload with up to 3 photos, GPS coordinates, category, and automatic SLA calculation
+* `GET /api/citizen/grievances/track/:ticketId` — Public tracking endpoint returning status steps, SLA clock, before/after evidence photos, and remarks
+* `GET /api/citizen/grievances/my-complaints` — *(Citizen JWT)* Citizen's personal complaint history
+* `POST /api/citizen/grievances/:ticketId/upvote` — Community "+1 Facing This" upvote (escalates priority to High at 4, Critical at 10)
+* `POST /api/citizen/grievances/:ticketId/rate` — *(Citizen JWT)* Submit 1 to 5-star rating & feedback for resolved complaints
+* `POST /api/citizen/grievances/:ticketId/reopen` — *(Citizen JWT)* Reopen an unsatisfactorily resolved complaint with reason; shifts status to `reopened` and escalates priority to Critical
+* `GET /api/citizen/grievances/notifications` — *(Citizen JWT)* Stream of personal in-portal alerts
+* `PATCH /api/citizen/grievances/notifications/:id/read` — Mark a single citizen notification as read
+* `POST /api/citizen/grievances/notifications/read-all` — Mark all citizen notifications as read
+
+---
+
+## 🔐 Role & Permissions Matrix
+
+| Platform Capability | City Admin (`city_admin`) | Dept Head (`department_head`) | Field Officer (`officer`) | Citizen (`citizen`) |
+|---|:---:|:---:|:---:|:---:|
+| **View City GIS Coordination Map** | ✅ Full Access | ✅ Full Access | ✅ Full Access | ❌ Staff Only |
+| **View Public Civic Redressal Map** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Full Access |
+| **Propose Civil Infrastructure Project** | ✅ Yes | ✅ Yes (Own Dept) | ❌ Read Only | ❌ No |
+| **Inspect Spatial & Temporal Conflicts** | ✅ Full Access | ✅ Involved Depts | ✅ View Only | ❌ No |
+| **Resolve / Override Flagged Conflicts** | ✅ Authoritative | ✅ Bilateral Agreement | ❌ Read Only | ❌ No |
+| **Borrow Heavy Machinery Across Agencies** | ✅ Yes | ✅ Yes | ✅ Requisition | ❌ No |
+| **Approve Machinery Loans** | ✅ Yes | ✅ Yes (Owner Dept) | ❌ No | ❌ No |
+| **Inspect System Audit Logs** | ✅ Full Audit Trail | ❌ No | ❌ No | ❌ No |
+| **Manage Department Directory & Staff** | ✅ Full Management | ❌ No | ❌ No | ❌ No |
+| **Submit Citizen Grievance with Photos** | ❌ Portal 1 | ❌ Portal 1 | ❌ Portal 1 | ✅ Full Access |
+| **Track Complaint Resolution via Ticket ID** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Full Access |
+| **Community Upvote ("+1 Facing This")** | ❌ No | ❌ No | ❌ No | ✅ Full Access |
+| **Rate Resolution & Re-Open Complaints** | ❌ No | ❌ No | ❌ No | ✅ Full Access |
 
 ---
 
 ## 🛡️ The 5-Part "Dig-Later" Policy Framework
 
-To ensure that digital coordination is backed by rigorous civic enforcement, CitySync operationalizes the **5-Part Policy Framework**:
+To ensure that software coordination translates into ground enforcement, CitySync implements the **5-Part Policy Framework**:
 
 ```
-[1. Declare Future Needs] ──> [2. Build Shared Ducts] ──> [3. No-Dig Moratorium] ──> [4. Trenchless Tech] ──> [5. Penalty Fund]
+[1. Declare 3-Yr Capital Plans] ──> [2. Build Common Ducts] ──> [3. No-Dig Moratorium] ──> [4. Mandatory Trenchless] ──> [5. Escrow Penalty Fund]
 ```
 
-1. **Declare Future Needs:** All utility agencies must submit their 3-to-5-year underground infrastructure capital plans onto CitySync prior to any road construction. Silence is legally recorded as "No Objection".
-2. **Build Shared Common Ducts:** Standardized multi-utility conduits and access chambers are laid during initial road surfacing, allowing future fiber cables or pipes to be pulled through without cutting surface asphalt.
-3. **No-Dig Moratorium:** Newly completed roads automatically receive a 2-to-3 year protected moratorium. Non-emergency open-trench cuts are rejected programmatically.
-4. **Mandatory Trenchless Technology:** When unforeseen subsurface work is unavoidable, agencies are required to use **Horizontal Directional Drilling (HDD)** or micro-trenching instead of destructive open-trench excavation.
-5. **Restoration Surcharge & Penalty Fund:** Unauthorized or uncoordinated road cuts incur punitive financial levies deposited into a dedicated municipal escrow fund for immediate surface restoration.
+1. **Mandatory Declaration of Future Needs:** All utility providers must register their 3-to-5-year capital pipeline expansions on CitySync prior to any road surfacing. Unregistered claims forfeit excavation permits for 36 months.
+2. **Standardized Multi-Utility Conduits:** When an arterial road is excavated, standardized common utility ducts and access manholes are co-installed. Future fiber cables or water lines can be pulled through without cutting surface asphalt.
+3. **No-Dig Moratorium Enforcement:** Freshly paved roads automatically enter a 2-to-3 year protected moratorium. CitySync programmatically blocks non-emergency excavation permit applications during this freeze.
+4. **Mandatory Trenchless Technology:** When unforeseen subsurface repairs are necessary, contractors are required to use **Horizontal Directional Drilling (HDD)** or micro-trenching instead of open-trench digging.
+5. **Restoration Surcharge & Escrow Penalty Fund:** Unauthorized or uncoordinated road cuts incur punitive financial penalties deposited into an escrow account dedicated to immediate high-grade surface restoration.
 
 ---
 
-## 🏛️ Institutional Governance Model
+## 🏛️ Statutory Governance & Institutional Model
 
-Software works only when accompanied by statutory authority. CitySync is architected to operate under an empowered **City Infrastructure Coordination Cell (ICC)** chaired by the Municipal Commissioner:
+Technology alone cannot solve inter-agency conflict without statutory backing. CitySync operates under an empowered **City Infrastructure Coordination Cell (ICC)** chaired by the Municipal Commissioner:
 
 ```mermaid
 flowchart TD
-    MC["Municipal Commissioner / State Urban Dept"] --> ICC["City Infrastructure Coordination Cell (ICC)"]
-    ICC --> Permits["Permit Approval & Sequencing Authority"]
-    ICC --> Fund["Road Restoration & Penalty Fund"]
-    ICC --> Escalations["Inter-Agency Dispute Resolution"]
+    MC["Municipal Commissioner / State Urban Development Dept"] --> ICC["City Infrastructure Coordination Cell (ICC)"]
+    ICC --> Permits["Permit Approval & Mandatory Sequencing"]
+    ICC --> Fund["Escrow Restoration & Penalty Fund"]
+    ICC --> Escalations["Bilateral Conflict Resolution & Arbitration"]
     
-    ICC -.-> Dept1["Municipal Corporation (Roads/Waste)"]
-    ICC -.-> Dept2["Water Supply & Sewerage Board"]
-    ICC -.-> Dept3["Electricity DISCOM"]
+    ICC -.-> Dept1["Municipal Corporation (Roads / Drainage)"]
+    ICC -.-> Dept2["Water Supply & Sewerage Board (WSSB)"]
+    ICC -.-> Dept3["Electricity DISCOMs"]
     ICC -.-> Dept4["Public Works Department (PWD)"]
-    ICC -.-> Dept5["Metro / Transport Authority"]
-    ICC -.-> Dept6["Telecom & City Gas Utility"]
+    ICC -.-> Dept5["Metro Rail / Transport Corporations"]
+    ICC -.-> Dept6["City Gas & Telecom Concessionaires"]
 ```
 
 ---
 
-## 👥 Module Distribution & Team Contributions
+## 👥 Capstone Team Roles & Module Distribution
 
-| Member | Focus Area | Technology | Key Deliverables & Responsibilities |
+| Member | Focus Module | Primary Technologies | Key Deliverables & Responsibilities |
 |---|---|---|---|
-| **Member 1** | **Frontend & Dashboard** | React.js, CSS3, Charts | Built main dashboard UI, status cards, interactive analytics, timeline view, project tables, and API integration. |
-| **Member 2** | **Authentication & Department Management** | Node.js, Express, MongoDB, JWT | Implemented user registration/login, Bcrypt hashing, JWT auth middleware, role-based access control, and department directory. |
-| **Member 3** | **Project Management & Scheduling** | Node.js, Express, Mongoose, Haversine | **Core coordination engine:** Built project CRUD, double-layer conflict detection (spatial via Haversine + temporal overlap), unified timeline schedule, and resolution workflow. |
-| **Member 4** | **Machine Learning** | Python, Scikit-learn, REST API | Developed ML delay prediction model and project risk classification pipeline to estimate project overrun probabilities. |
-| **Member 5** | **Resource Sharing & Notifications** | Node.js, Express, MongoDB | Built shared equipment inventory, inter-agency requisition/approval workflows, real-time alert dispatching, and audit logging. |
-| **Member 6** | **Database, GIS & System Integration** | MongoDB Atlas, Leaflet.js, OSM, Postman | Designed database schema and geospatial indexes, integrated Leaflet interactive map, seed datasets, and coordinated end-to-end testing. |
+| **Member 1** | **Frontend & Dashboard UI** | React.js, Tailwind CSS v4, Lucide | Built main executive dashboard, project cards, metric visualizations, interactive timeline visualizer, and responsive UI layouts. |
+| **Member 2** | **Authentication & Department Management** | Node.js, Express 5, MongoDB, JWT | Built staff registration/login, Bcrypt hashing, JWT auth middleware, role-based access control, and department management directory. |
+| **Member 3** | **Project Management & Conflict Engine** | Node.js, Express, Mongoose, Haversine | **Core coordination engine:** Built project CRUD, double-layer conflict detection (spatial Haversine + temporal window overlap), unified timeline schedule, and resolution workflow. |
+| **Member 4** | **Machine Learning & Predictive Risk** | Python 3, Scikit-learn, REST | Developed predictive delay modeling, evaluating project duration, budget, contractor tier, and monsoon weather risk factors. |
+| **Member 5** | **Resource Sharing & Notifications** | Node.js, Express, MongoDB | Developed shared heavy equipment inventory, inter-agency borrowing lifecycle, real-time alert dispatching, and immutable audit logging. |
+| **Member 6** | **Database, GIS Integration & CitySyncPublic** | MongoDB Atlas, Leaflet.js, OpenStreetMap, Multer | Designed unified database schemas and geospatial indexing, integrated Leaflet GIS maps across both portals, built CitySyncPublic citizen redressal platform (SLA clocks, ratings, upvoting, OTP reset, and bilingual i18n). |
 
 ---
 
-## 🌿 Git Collaboration Rules
+## 🌿 Git Collaboration & Branching Strategy
 
-To ensure a smooth, conflict-free multi-developer workflow on GitHub, follow this branch-based protocol:
+To maintain codebase stability across multiple team members, follow this branch-based protocol:
 
 ### Golden Rules:
-1. **Never commit or push directly to `main`:** The `main` branch is the protected production branch.
-2. **Always develop on designated feature branches:**  
-   * Format: `feature/<member-number>-<feature-name>` (e.g., `feature/member-3-conflict-engine`).
-3. **Pull latest changes before starting a session:**
+1. **Never commit or push directly to `main`:** The `main` branch is protected and reserved for production-verified releases.
+2. **Develop on designated feature branches:**  
+   * Format: `feature/<member-number>-<feature-name>` (e.g., `feature/member-3-conflict-engine`, `feature/member-6-citizen-portal`).
+3. **Keep branches synchronized with `main`:**
    ```bash
    git checkout main
    git pull origin main
    git checkout feature/your-branch
    git merge main
    ```
-4. **Use Conventional Commit Messages:**
-   * `feat: implement haversine conflict detection algorithm`
-   * `fix: correct date overlap evaluation in project schedule`
-   * `docs: update API documentation and setup instructions`
-5. **Open Pull Requests (PR):** Push your branch to GitHub and create a PR targeting `main`. Await code review and validation before merging.
-
----
-
-## 🗺️ Roadmap & Future Horizons
-
-- [x] **Phase 1: Core MERN Architecture & Infrastructure (Current)**
-  - [x] Multi-tier JWT Authentication & Role-Based Authorization
-  - [x] Project Registry with Geotagged Coordinates
-  - [x] Automated Spatial (Haversine) & Temporal Conflict Detection Engine
-  - [x] Master City Gantt Timeline & Phasing Visualizer
-  - [x] Shared Machinery Inventory & Requisition Workflow
-  - [x] Real-time Alerts & Immutable Action Audit Trail
-- [ ] **Phase 2: Advanced GIS & Predictive Analytics**
-  - [ ] Polygons and multi-point road corridor routing on Leaflet map
-  - [ ] Production integration of Python ML Delay Prediction microservice
-  - [ ] Automated SMS / WhatsApp webhook alerts for field engineers
-- [ ] **Phase 3: Public Transparency & Smart City IoT**
-  - [ ] Public Citizen Portal: View upcoming roadworks, detour maps, and report unauthorized digging
-  - [ ] IoT Ground Vibration & Acoustic Sensor ingestion to detect illegal unauthorized drilling in real time
-  - [ ] Drone photogrammetry integration for post-resurfacing pavement quality verification
+4. **Conventional Commits:**
+   * `feat: implement haversine spatial conflict detection`
+   * `fix: correct SLA countdown display for resolved tickets`
+   * `docs: update master README with dual-portal architecture`
+5. **Pull Requests (PR):** Push your branch to GitHub and open a Pull Request targeting `main`. Await code review and automated build validation before merging.
 
 ---
 
 ## 📄 License & Academic Attribution
 
-Developed as a Capstone Project for **Urban Governance & Smart Infrastructure Systems**.  
-Built with pride to modernize Indian municipal operations and eliminate wasteful urban excavation.
+Developed as a Major Capstone Project for **Urban Governance & Smart Infrastructure Systems**.  
+Built with pride to modernize Indian municipal operations, enhance civic transparency, and permanently eradicate wasteful urban excavation.
 
 **CitySync** — *One Platform. One City. No More Digging in the Dark.*
