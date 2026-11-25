@@ -582,6 +582,7 @@ cd CitySync
    ```
    *Citizen Grievance Portal is accessible at **`http://localhost:5174`**.*
 
+
 ---
 
 ## 👥 Pre-Seeded Demo Accounts & Credentials
@@ -758,7 +759,7 @@ flowchart TD
 | **Member 3** | **Project Management & Conflict Engine** | Node.js, Express, Mongoose, Haversine | **Core coordination engine:** Built project CRUD, double-layer conflict detection (spatial Haversine + temporal window overlap), unified timeline schedule, and resolution workflow. |
 | **Member 4** | **Machine Learning & Predictive Risk** | Python 3, Scikit-learn, REST | Developed predictive delay modeling, evaluating project duration, budget, contractor tier, and monsoon weather risk factors. |
 | **Member 5** | **Resource Sharing & Notifications** | Node.js, Express, MongoDB | Developed shared heavy equipment inventory, inter-agency borrowing lifecycle, real-time alert dispatching, and immutable audit logging. |
-| **Member 6** | **Database, GIS Integration & CitySyncPublic** | MongoDB Atlas, Leaflet.js, OpenStreetMap, Multer | Designed unified database schemas and geospatial indexing, integrated Leaflet GIS maps across both portals, built CitySyncPublic citizen redressal platform (SLA clocks, ratings, upvoting, OTP reset, and bilingual i18n). |
+| **Member 6** | **Database, GIS Integration & CitySyncPublic** | MongoDB Atlas, Leaflet.js, OpenStreetMap, Multer, Supertest | Designed unified database schemas and geospatial indexing, integrated Leaflet GIS maps across both portals, built CitySyncPublic citizen redressal platform (SLA clocks, ratings, upvoting, OTP reset, and bilingual i18n), and implemented automated backend API integration tests using Node.js Test Runner and Supertest. |
 
 ---
 
